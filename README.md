@@ -13,7 +13,7 @@ State management with Redux is killer.  But it requires switch statements and wo
 ## _note:_ anything marked _| no docs |_ means I haven't documented it yet.
 
 ## Contents
-1. [Demo](#demo)
+1. [Demos](#demos)
 2. [Installation](#installation)
 3. [Instantiation](#instantiation)
 4. [Options](#options)
@@ -24,8 +24,9 @@ State management with Redux is killer.  But it requires switch statements and wo
 9. [Custom Events](#custom-events) _| no docs |_
 10. [Updates to Come](#updates-to-come)
 
-## Demo
-[This is a simple demo.](//jsfiddle.net/TomSaporito/s3oykwoe/embedded/result/)  The module can be observed in the console
+## Demos
+[Demo showing State object changing.](//jsfiddle.net/TomSaporito/s3oykwoe/embedded/result/)  The module can be observed in the console
+_|new demos forth-coming with React, Vanilla JS, jQuery|_
 
 ## Installation
 * `npm install substate --save`
