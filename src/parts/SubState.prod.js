@@ -126,15 +126,13 @@ export default class SubState extends PubSub {
 
         this.emit((action.type || 'CHUNK_UPDATED'), newChunk);//emit with latest data
 
-//        this.saveOnChange ? this.saveState() : '';
+        this.saveOnChange ? this.saveState() : '';
     }
 
     updateState(action) {
 
 
         var newState = Object.assign({}, this.getCurrentState());//clone state
-//        console.log('newstate ', newState);
-//        console.log('in newState: ', action);
 
         //
         //update temp new state
