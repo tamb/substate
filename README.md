@@ -20,7 +20,7 @@ State management with Redux is killer.  But it requires switch statements and wo
 5. [Initialization](#initialization)
 6. [State Methods](#state-methods)
 7. [Event Methods](#event-methods)
-8. [State Events](#state-events)  _| no docs |_
+8. [State Events](#state-events)  
 9. [Custom Events](#custom-events) _| no docs |_
 10. [Updates to Come](#updates-to-come)
 
@@ -86,10 +86,11 @@ to initialize the class call
 
 
 ## State Events
-| Method        | Desc                                                  | Returns             |
+| Event        | Desc                                                   | Returns             |
 | ------------- |-------------------------------------------------------| -------------------:|
-|           |                                |   |
-
+| 'UPDATE_STATE'|   updates the entire state with the object passed in  | updated state       |
+|'UPDATE_CHUNK' |   updates part of a state, this does not iterate over the entire state object| the data passed in|
+|'CHANGE_STATE' |  fires changeState method above requires same `@param`s|emits 'STATE_CHANGED'|
 
 ## Custom Events  
 | Method        | Desc                                                  | Returns             |
