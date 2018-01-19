@@ -12,6 +12,15 @@ State management with Redux is killer.  But it requires switch statements and wo
 
 ## _note:_ anything marked _| no docs |_ means I haven't documented it yet.
 
+## Contents
+1. [Demo](#demo)
+2. [Installation](#installation)
+3. [Instantiation](#instantiation)
+4. [Options](#options)
+5. [Initialization](#initialization)
+6. [State Methods](#state-methods)
+7. [Event Methods](#event-methods)
+
 ## Demo
 [This is a simple demo.](//jsfiddle.net/TomSaporito/s3oykwoe/embedded/result/)  The module can be observed in the console
 
