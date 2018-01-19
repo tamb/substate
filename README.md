@@ -52,10 +52,10 @@ to initialize the class call
 
 | Method           | Desc                                                                      | Returns              |
 | ---------------- |:-------------------------------------------------------------------------:| --------------------:|
-| getState         | get a state `@param*` - index of state needed                               | state                |
+| getState         | get a state `@param*` - index of state needed                             | state                |
 | getcurrentState  | get the current state                                                     | current state object |
-| getProp          | get a prop from current state `@param*` - string path to prop               | property you request |
-| changeState      | change the version of the state `@param*` -                                 | null                 |
+| getProp          | get a prop from current state `@param*` - string path to prop             | property you request |
+| changeState      | change the version of the state `@param*` - `{requestedState: index of state, action: (optional name of event to emit)}`| emits `action` parameter event or 'STATE_CHANGED' event with the new current state    |
 | saveState        | save stateStorage array to localStorage                                   | null                 |
 | state            | object containing the initial state                                       | null                 |
 |                  |                                                                           |                      |
