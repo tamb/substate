@@ -1,6 +1,6 @@
 {
   "name": "substate",
-  "version": "2.0.7",
+  "version": "2.0.8",
   "description": "manage your nested state",
   "main": "index.js",
   "scripts": {
