@@ -28,7 +28,8 @@ State management with Redux is killer.  But it requires switch statements and wo
 [This is a simple demo.](//jsfiddle.net/TomSaporito/s3oykwoe/embedded/result/)  The module can be observed in the console
 
 ## Installation
-`npm install substate --save`
+* `npm install substate --save`
+* copy and paste from `index.js` into a `<script>` or external js file
 
 ## Instantiation 
 SubState is a class so you call it like so
