@@ -1,5 +1,5 @@
 {
-  "name": "nestate",
+  "name": "substate",
   "version": "1.0.0",
   "description": "manage your nested state",
   "main": "index.js",
@@ -7,18 +7,15 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "Tamb (Tom Saporito)",
   "license": "MIT",
   "devDependencies": {
     "babel-core": "^6.24.1",
     "babel-loader": "^7.0.0",
     "babel-preset-es2015": "^6.24.1",
-    "babel-preset-react": "^6.24.1",
     "webpack": "^3.10.0"
   },
   "dependencies": {
-    "object-bystring": "^2.1.1",
-    "react": "^15.6.1",
-    "react-dom": "^15.6.1"
+    "object-bystring": "^2.1.1"
   }
 }
