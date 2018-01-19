@@ -15,5 +15,20 @@ SubState is a class so you call it like so
 `import SubState from 'substate';`
 
 Then you instantiate it as such
+
 `var s = new SubState();`
+
+## Options
+Substate accepts an options object as an optional parameter.
+These are the possible options
+
+| Option        | Desc                                                  | Default             |
+| ------------- |:-----------------------------------------------------:| -------------------:|
+| name          | name of the instance                                  | 'SubStateInstance'  |
+| currentState  | index of state to start on                            |   0                 |
+| stateStorage  | array of all the state                                |    []               |
+| saveOnChange  | save state to localStorage on change                  | null                |
+| pullFromLocal | pull currentState from localStorage on initialization | null                |
+| state         | object containing the initial state                   | null                |
+|               |                                                       |                     |
 
