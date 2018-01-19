@@ -32,7 +32,7 @@ Substate accepts an options object as an optional parameter.
 These are the possible options
 
 | Option        | Desc                                                  | Default             |
-| ------------- |:-----------------------------------------------------:| -------------------:|
+| ------------- |-------------------------------------------------------| -------------------:|
 | name          | name of the instance                                  | 'SubStateInstance'  |
 | currentState  | index of state to start on                            |   0                 |
 | stateStorage  | array of all the states                               |    [ ]              |
@@ -51,7 +51,7 @@ to initialize the class call
 * `@param*`   required param for method
 
 | Method           | Desc                                                                      | Returns              |
-| ---------------- |:-------------------------------------------------------------------------:| --------------------:|
+| ---------------- |---------------------------------------------------------------------------| --------------------:|
 | getState         | get a state `@param*` - index of state needed                             | state                |
 | getcurrentState  | get the current state                                                     | current state object |
 | getProp          | get a prop from current state `@param*` - string path to prop             | property you request |
@@ -64,16 +64,17 @@ to initialize the class call
 * `@param` optional parameter
 * `@param*` required parameter
 * `@param[num]` order of parameter
-| Method        | Desc                                                                                                                  |
-| ------------- |:---------------------------------------------------------------------------------------------------------------------:|
-| on            | `@param1*` STRING of event name to listen to. `@param2*` FUNC handler to execute when this event you listen to happens|
-| off           | `@param1*` STRING of event name to remove handler from.` @param2*` FUNC to remove from the execution queue            | 
-| emit          | `@param1*` STRING event name  `@param2` data to pass into your handler event from 'on' method                         | 
+
+| Method        | Desc                                                                                                                  
+| ------------- |---------------------------------------------------------------------------------------------------------------------
+| on            | `@param1*` STRING of event name to listen to. `@param2*` FUNC handler to execute when this event you listen to happens
+| off           | `@param1*` STRING of event name to remove handler from.` @param2*` FUNC to remove from the execution queue             
+| emit          | `@param1*` STRING event name  `@param2` data to pass into your handler event from 'on' method                          
 
 
 ## Events  _| no docs |_
 | Method        | Desc                                                  | Returns             |
-| ------------- |:-----------------------------------------------------:| -------------------:|
+| ------------- |-------------------------------------------------------| -------------------:|
 | name          | name of the instance                                  | 'SubStateInstance'  |
 | currentState  | index of state to start on                            |   0                 |
 | stateStorage  | array of all the state                                |    [ ]              |
@@ -84,7 +85,7 @@ to initialize the class call
 
 ## Custom Events  _| no docs |_
 | Method        | Desc                                                  | Returns             |
-| ------------- |:-----------------------------------------------------:| -------------------:|
+| ------------- |-------------------------------------------------------| -------------------:|
 | name          | name of the instance                                  | 'SubStateInstance'  |
 | currentState  | index of state to start on                            |   0                 |
 | stateStorage  | array of all the state                                |    [ ]              |
