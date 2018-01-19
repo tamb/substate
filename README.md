@@ -1,6 +1,6 @@
 # SubState
 
-## _note:_ anything marked | no docs | means I haven't documented it yet.
+## _note:_ anything marked _| no docs |_ means I haven't documented it yet.
 
 ## Purpose
 To manage state with a simple PubSub pattern, it returns the whole state or just a chunk of state.  Message filtering can be applied _without_ a `switch` statement
@@ -50,7 +50,7 @@ to initialize the class call
 | state         | object containing the initial state                   | null                |
 |               |                                                       |                     |
 
-## Event Methods
+## Event Methods _| no docs |_
 | Method        | Desc                                                  | Returns             |
 | ------------- |:-----------------------------------------------------:| -------------------:|
 | name          | name of the instance                                  | 'SubStateInstance'  |
@@ -61,7 +61,7 @@ to initialize the class call
 | state         | object containing the initial state                   | null                |
 |               |                                                       |                     |
 
-## Events
+## Events  _| no docs |_
 | Method        | Desc                                                  | Returns             |
 | ------------- |:-----------------------------------------------------:| -------------------:|
 | name          | name of the instance                                  | 'SubStateInstance'  |
@@ -72,7 +72,7 @@ to initialize the class call
 | state         | object containing the initial state                   | null                |
 |               |                                                       |                     |
 
-## Custom Events
+## Custom Events  _| no docs |_
 | Method        | Desc                                                  | Returns             |
 | ------------- |:-----------------------------------------------------:| -------------------:|
 | name          | name of the instance                                  | 'SubStateInstance'  |
