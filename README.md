@@ -1,9 +1,14 @@
 # SubState
 
-## _note:_ anything marked _| no docs |_ means I haven't documented it yet.
+## The Problem
+State management with Redux is killer.  But it requires switch statements and works poorly with deeply nested states.
 
 ## Purpose
-To manage state with a simple PubSub pattern, it returns the whole state or just a chunk of state.  Message filtering can be applied _without_ a `switch` statement
+* To manage state with a simple PubSub pattern
+* For State to return the whole state or just a chunk of state (just what you need).  
+* Message filtering can be applied _without_ a `switch` statement (you create your own event types
+
+## _note:_ anything marked _| no docs |_ means I haven't documented it yet.
 
 ## Demo
 [This is a simple demo.](//jsfiddle.net/TomSaporito/s3oykwoe/embedded/result/)  The module can be observed in the console
