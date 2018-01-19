@@ -9,6 +9,8 @@ export default class SubState extends PubSub {
     constructor(obj, inst) {
         super();
 
+        var obj = obj || {}
+
         this.name = obj.name || "SubStateInstance";
 
 
@@ -49,6 +51,7 @@ export default class SubState extends PubSub {
 
 
     getProp(prop) {
+        //TODO does not work need to rewrite since object.bystring is rewritten
         return Object.byString(this.getCurrentState(), prop);
     }
 
