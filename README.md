@@ -26,7 +26,7 @@ State management with Redux is killer.  But it requires switch statements and wo
 
 ## Demos
 * [Demo showing State object changing.](//jsfiddle.net/TomSaporito/s3oykwoe/embedded/result/)  The module can be observed in the console
-* _|new demos forth-coming with React, Vanilla JS, jQuery|_
+* _new demos forth-coming with React, Vanilla JS, jQuery_
 
 ## Installation
 * `npm install substate --save`
