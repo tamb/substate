@@ -47,15 +47,18 @@ to initialize the class call
 `instance.init()`
 
 ## State Methods
-| Method        | Desc                                                  | Returns             |
-| ------------- |:-----------------------------------------------------:| -------------------:|
-| name          | name of the instance                                  | 'SubStateInstance'  |
-| currentState  | index of state to start on                            |   0                 |
-| stateStorage  | array of all the state                                |    [ ]              |
-| saveOnChange  | save state to localStorage on change                  | null                |
-| pullFromLocal | pull currentState from localStorage on initialization | null                |
-| state         | object containing the initial state                   | null                |
-|               |                                                       |                     |
+* `@param`    param the method can accept
+* `@param*`   required param for method
+
+| Method           | Desc                                                                      | Returns              |
+| ---------------- |:-------------------------------------------------------------------------:| --------------------:|
+| getState         | get a state `@param*` - index of state needed                               | state                |
+| getcurrentState  | get the current state                                                     | current state object |
+| getProp          | get a prop from current state `@param*` - string path to prop               | property you request |
+| changeState      | change the version of the state `@param*` -                                 | null                 |
+| saveState        | save stateStorage array to localStorage                                   | null                 |
+| state            | object containing the initial state                                       | null                 |
+|                  |                                                                           |                      |
 
 ## Event Methods _| no docs |_
 | Method        | Desc                                                  | Returns             |
