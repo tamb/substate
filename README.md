@@ -6,7 +6,8 @@ State management with Redux is killer.  But it requires switch statements and wo
 ## Purpose
 * To manage state with a simple PubSub pattern
 * For State to return the whole state or just a chunk of state (just what you need).  
-* Message filtering can be applied _without_ a `switch` statement (you create your own event types
+* Message filtering can be applied _without_ a `switch` statement (you create your own event types)
+* To allow for manipulation of deeply nested state properties through use of strings
 
 ## _note:_ anything marked _| no docs |_ means I haven't documented it yet.
 
