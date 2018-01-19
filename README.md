@@ -39,7 +39,7 @@ These are the possible options
 | saveOnChange  | save state to localStorage on change                  | null                |
 | pullFromLocal | pull currentState from localStorage on initialization | null                |
 | state         | object containing the initial state                   | null                |
-|               |                                                       |                     |
+                                                                                     
 
 ## Initialization
 to initialize the class call
