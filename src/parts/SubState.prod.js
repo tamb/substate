@@ -15,8 +15,8 @@ export default class SubState extends PubSub {
 
         this.currentState = obj.currentState || 0;
         this.stateStorage = obj.stateStorage || [];
-        this.saveOnChange = obj.saveOnChange;
-        this.pullFromLocal = obj.pullFromLocal;
+        this.saveOnChange = obj.saveOnChange || null;
+        this.pullFromLocal = obj.pullFromLocal || null;
 
         obj.state ? this.stateStorage.push(obj.state) : null;
     }
