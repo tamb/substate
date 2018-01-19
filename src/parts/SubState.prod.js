@@ -65,13 +65,15 @@ export default class SubState extends PubSub {
         };
 
         window.localStorage.setItem(this.name, JSON.stringify(obj));
+        this.emit('STATE_SAVED');
     }
 
     removeSavedState() {
         window.localStorage.removeItem(this.name);
+        this.emit('STATE_REMOVED_SAVED_STATE');
     }
 
-    clearState() {
+    resetState() {
         this.currentState = 0;
         this.stateStorage = [this.stateStorage[0]];
         this.emit('STATE_RESET');
