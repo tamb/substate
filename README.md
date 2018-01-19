@@ -9,7 +9,7 @@ To manage state with a simple PubSub pattern, it returns the whole state or just
 ## Installation
 `npm install substate --save`
 
-## Instantiation
+## Instantiation 
 SubState is a class so you call it like so
 
 `import SubState from 'substate';`
