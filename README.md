@@ -59,8 +59,8 @@ to initialize the class call
 `instance.init()`
 
 ## State Methods
-* `@param`    param the method can accept
-* `@param*`   required param for method
+* `@param`    optional method parameter
+* `@param*`   required method parameter
 
 | Method           | Desc                                                                      | Returns              |
 | ---------------- |---------------------------------------------------------------------------| --------------------:|
@@ -73,9 +73,9 @@ to initialize the class call
 | resetState       | resets the `stateStorage` array to an empty array                         |emits 'STATE_RESET'   |
 
 ## Event Methods
-* `@param` optional parameter
-* `@param*` required parameter
-* `@param[num]` order of parameter
+* `@param` optional method parameter
+* `@param*` required method parameter
+* `@param[num]` order of method parameter
 
 | Method        | Desc                                                                                                                  
 | ------------- |---------------------------------------------------------------------------------------------------------------------
