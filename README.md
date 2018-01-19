@@ -20,6 +20,9 @@ State management with Redux is killer.  But it requires switch statements and wo
 5. [Initialization](#initialization)
 6. [State Methods](#state-methods)
 7. [Event Methods](#event-methods)
+8. [State Events](#state-events)  _| no docs |_
+9. [Custom Events](#custom-events) _| no docs |_
+10. [Updates to Come](#updates-to-come)
 
 ## Demo
 [This is a simple demo.](//jsfiddle.net/TomSaporito/s3oykwoe/embedded/result/)  The module can be observed in the console
@@ -81,27 +84,17 @@ to initialize the class call
 | emit          | `@param1*` STRING event name  `@param2` data to pass into your handler event from 'on' method                          
 
 
-## Events  _| no docs |_
+## State Events
 | Method        | Desc                                                  | Returns             |
 | ------------- |-------------------------------------------------------| -------------------:|
-| name          | name of the instance                                  | 'SubStateInstance'  |
-| currentState  | index of state to start on                            |   0                 |
-| stateStorage  | array of all the state                                |    [ ]              |
-| saveOnChange  | save state to localStorage on change                  | null                |
-| pullFromLocal | pull currentState from localStorage on initialization | null                |
-| state         | object containing the initial state                   | null                |
-|               |                                                       |                     |
+|           |                                |   |
 
-## Custom Events  _| no docs |_
+
+## Custom Events  
 | Method        | Desc                                                  | Returns             |
 | ------------- |-------------------------------------------------------| -------------------:|
-| name          | name of the instance                                  | 'SubStateInstance'  |
-| currentState  | index of state to start on                            |   0                 |
-| stateStorage  | array of all the state                                |    [ ]              |
-| saveOnChange  | save state to localStorage on change                  | null                |
-| pullFromLocal | pull currentState from localStorage on initialization | null                |
-| state         | object containing the initial state                   | null                |
-|               |                                                       |                     |
+|          |                                   |   |
+
 
 ## Updates to come
 1. Updated documentation on events
