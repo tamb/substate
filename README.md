@@ -32,3 +32,18 @@ These are the possible options
 | state         | object containing the initial state                   | null                |
 |               |                                                       |                     |
 
+## Initialization
+to initialize the class call
+
+`instance.init()`
+
+## Methods
+| Method        | Desc                                                  | Returns             |
+| ------------- |:-----------------------------------------------------:| -------------------:|
+| name          | name of the instance                                  | 'SubStateInstance'  |
+| currentState  | index of state to start on                            |   0                 |
+| stateStorage  | array of all the state                                |    [ ]              |
+| saveOnChange  | save state to localStorage on change                  | null                |
+| pullFromLocal | pull currentState from localStorage on initialization | null                |
+| state         | object containing the initial state                   | null                |
+|               |                                                       |                     |
