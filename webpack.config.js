@@ -59,7 +59,7 @@ module.exports = {
     },
 
     output: {
-        path: path.join(__dirname, '/libDist'),
+        path: path.join(__dirname, '/dist'),
         filename: 'index.js',
         library: 'SubState',
         libraryExport: "default"
