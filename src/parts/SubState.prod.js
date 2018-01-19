@@ -55,7 +55,7 @@ export default class SubState extends PubSub {
 
     changeState(action) {
         this.currentState = action.requestedState;
-        this.emit((action.type || 'UPDATED_STATE'), this.getCurrentState());
+        this.emit((action.type || 'STATE_CHANGED'), this.getCurrentState());
     }
 
     saveState() {
@@ -122,7 +122,7 @@ export default class SubState extends PubSub {
 
 
 
-        this.emit((action.type || 'UPDATED_CHUNK'), newChunk);//emit with latest data
+        this.emit((action.type || 'CHUNK_UPDATED'), newChunk);//emit with latest data
 
 //        this.saveOnChange ? this.saveState() : '';
     }
@@ -176,7 +176,7 @@ export default class SubState extends PubSub {
         this.stateStorage.push(newState);//push cloned state to stateStorage
         ++this.currentState;//update
 
-        this.emit((action.type || 'UPDATED_STATE'), this.getCurrentState());//emit with latest data
+        this.emit((action.type || 'STATE_UPDATED'), this.getCurrentState());//emit with latest data
 
         this.saveOnChange ? this.saveState() : '';
 
