@@ -1,5 +1,7 @@
 # SubState
 
+## _note:_ anything marked | no docs | means I haven't documented it yet.
+
 ## Purpose
 To manage state with a simple PubSub pattern, it returns the whole state or just a chunk of state.  Message filtering can be applied _without_ a `switch` statement
 
@@ -37,7 +39,7 @@ to initialize the class call
 
 `instance.init()`
 
-## Methods
+## State Methods
 | Method        | Desc                                                  | Returns             |
 | ------------- |:-----------------------------------------------------:| -------------------:|
 | name          | name of the instance                                  | 'SubStateInstance'  |
@@ -47,3 +49,38 @@ to initialize the class call
 | pullFromLocal | pull currentState from localStorage on initialization | null                |
 | state         | object containing the initial state                   | null                |
 |               |                                                       |                     |
+
+## Event Methods
+| Method        | Desc                                                  | Returns             |
+| ------------- |:-----------------------------------------------------:| -------------------:|
+| name          | name of the instance                                  | 'SubStateInstance'  |
+| currentState  | index of state to start on                            |   0                 |
+| stateStorage  | array of all the state                                |    [ ]              |
+| saveOnChange  | save state to localStorage on change                  | null                |
+| pullFromLocal | pull currentState from localStorage on initialization | null                |
+| state         | object containing the initial state                   | null                |
+|               |                                                       |                     |
+
+## Events
+| Method        | Desc                                                  | Returns             |
+| ------------- |:-----------------------------------------------------:| -------------------:|
+| name          | name of the instance                                  | 'SubStateInstance'  |
+| currentState  | index of state to start on                            |   0                 |
+| stateStorage  | array of all the state                                |    [ ]              |
+| saveOnChange  | save state to localStorage on change                  | null                |
+| pullFromLocal | pull currentState from localStorage on initialization | null                |
+| state         | object containing the initial state                   | null                |
+|               |                                                       |                     |
+
+## Custom Events
+| Method        | Desc                                                  | Returns             |
+| ------------- |:-----------------------------------------------------:| -------------------:|
+| name          | name of the instance                                  | 'SubStateInstance'  |
+| currentState  | index of state to start on                            |   0                 |
+| stateStorage  | array of all the state                                |    [ ]              |
+| saveOnChange  | save state to localStorage on change                  | null                |
+| pullFromLocal | pull currentState from localStorage on initialization | null                |
+| state         | object containing the initial state                   | null                |
+|               |                                                       |                     |
+
+## updates to come
