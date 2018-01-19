@@ -97,5 +97,4 @@ to initialize the class call
 ## Updates to come
 1. Updated documentation on events
 2. Additional documentation on the "| no docs |" sections
-3. Changed Event Names to a standardized format
-4. documentation on special array methods for state
+3. documentation on special array methods for state
