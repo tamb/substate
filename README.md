@@ -56,9 +56,9 @@ to initialize the class call
 | getcurrentState  | get the current state                                                     | current state object |
 | getProp          | get a prop from current state `@param*` - string path to prop             | property you request |
 | changeState      | change the version of the state `@param*` - `{requestedState: index of state, action: (optional name of event to emit)}`| emits `action` parameter event or 'STATE_CHANGED' event with the new current state    |
-| saveState        | save stateStorage array to localStorage                                   | null                 |
-| state            | object containing the initial state                                       | null                 |
-|                  |                                                                           |                      |
+| saveState        | save stateStorage array to localStorage.  Will use instance param of name | emits 'STATE_SAVED'  |
+| removeSavedState | removed state from LocalStorage                                           |emits 'STATE_REMOVED_SAVED_STATE'|
+| resetState       | resets the `stateStorage` array to an empty array                         |emits 'STATE_RESET'   |
 
 ## Event Methods _| no docs |_
 | Method        | Desc                                                  | Returns             |
