@@ -32,7 +32,7 @@ Substate accepts an options object as an optional parameter.
 These are the possible options
 
 | Option        | Desc                                                  | Default             |
-| ------------- |:-----------------------------------------------------:| -------------------:|
+| ------------- |-------------------------------------------------------| -------------------:|
 | name          | name of the instance                                  | 'SubStateInstance'  |
 | currentState  | index of state to start on                            |   0                 |
 | stateStorage  | array of all the states                               |    [ ]              |
@@ -51,7 +51,7 @@ to initialize the class call
 * `@param*`   required param for method
 
 | Method           | Desc                                                                      | Returns              |
-| ---------------- |:-------------------------------------------------------------------------:| --------------------:|
+| ---------------- |---------------------------------------------------------------------------| --------------------:|
 | getState         | get a state `@param*` - index of state needed                             | state                |
 | getcurrentState  | get the current state                                                     | current state object |
 | getProp          | get a prop from current state `@param*` - string path to prop             | property you request |
@@ -60,20 +60,21 @@ to initialize the class call
 | removeSavedState | removed state from LocalStorage                                           |emits 'STATE_REMOVED_SAVED_STATE'|
 | resetState       | resets the `stateStorage` array to an empty array                         |emits 'STATE_RESET'   |
 
-## Event Methods _| no docs |_
-| Method        | Desc                                                  | Returns             |
-| ------------- |:-----------------------------------------------------:| -------------------:|
-| name          | name of the instance                                  | 'SubStateInstance'  |
-| currentState  | index of state to start on                            |   0                 |
-| stateStorage  | array of all the state                                |    [ ]              |
-| saveOnChange  | save state to localStorage on change                  | null                |
-| pullFromLocal | pull currentState from localStorage on initialization | null                |
-| state         | object containing the initial state                   | null                |
-|               |                                                       |                     |
+## Event Methods
+* `@param` optional parameter
+* `@param*` required parameter
+* `@param[num]` order of parameter
+
+| Method        | Desc                                                                                                                  
+| ------------- |---------------------------------------------------------------------------------------------------------------------
+| on            | `@param1*` STRING of event name to listen to. `@param2*` FUNC handler to execute when this event you listen to happens
+| off           | `@param1*` STRING of event name to remove handler from.` @param2*` FUNC to remove from the execution queue             
+| emit          | `@param1*` STRING event name  `@param2` data to pass into your handler event from 'on' method                          
+
 
 ## Events  _| no docs |_
 | Method        | Desc                                                  | Returns             |
-| ------------- |:-----------------------------------------------------:| -------------------:|
+| ------------- |-------------------------------------------------------| -------------------:|
 | name          | name of the instance                                  | 'SubStateInstance'  |
 | currentState  | index of state to start on                            |   0                 |
 | stateStorage  | array of all the state                                |    [ ]              |
@@ -84,7 +85,7 @@ to initialize the class call
 
 ## Custom Events  _| no docs |_
 | Method        | Desc                                                  | Returns             |
-| ------------- |:-----------------------------------------------------:| -------------------:|
+| ------------- |-------------------------------------------------------| -------------------:|
 | name          | name of the instance                                  | 'SubStateInstance'  |
 | currentState  | index of state to start on                            |   0                 |
 | stateStorage  | array of all the state                                |    [ ]              |
@@ -96,5 +97,4 @@ to initialize the class call
 ## Updates to come
 1. Updated documentation on events
 2. Additional documentation on the "| no docs |" sections
-3. Changed Event Names to a standardized format
-4. documentation on special array methods for state
+3. documentation on special array methods for state
