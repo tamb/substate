@@ -101,3 +101,4 @@ to initialize the class call
 1. Updated documentation on events
 2. Additional documentation on the "| no docs |" sections
 3. documentation on special array methods for state
+4. change 'action' nomenclature to 'event'
