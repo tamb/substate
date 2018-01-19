@@ -60,16 +60,16 @@ to initialize the class call
 | removeSavedState | removed state from LocalStorage                                           |emits 'STATE_REMOVED_SAVED_STATE'|
 | resetState       | resets the `stateStorage` array to an empty array                         |emits 'STATE_RESET'   |
 
-## Event Methods _| no docs |_
-| Method        | Desc                                                  | Returns             |
-| ------------- |:-----------------------------------------------------:| -------------------:|
-| name          | name of the instance                                  | 'SubStateInstance'  |
-| currentState  | index of state to start on                            |   0                 |
-| stateStorage  | array of all the state                                |    [ ]              |
-| saveOnChange  | save state to localStorage on change                  | null                |
-| pullFromLocal | pull currentState from localStorage on initialization | null                |
-| state         | object containing the initial state                   | null                |
-|               |                                                       |                     |
+## Event Methods
+* `@param` optional parameter
+* `@param*` required parameter
+* `@param[num]` order of parameter
+| Method        | Desc                                                                                                                  |
+| ------------- |:---------------------------------------------------------------------------------------------------------------------:|
+| on            | `@param1*` STRING of event name to listen to. `@param2*` FUNC handler to execute when this event you listen to happens|
+| off           | `@param1*` STRING of event name to remove handler from.` @param2*` FUNC to remove from the execution queue            | 
+| emit          | `@param1*` STRING event name  `@param2` data to pass into your handler event from 'on' method                         | 
+
 
 ## Events  _| no docs |_
 | Method        | Desc                                                  | Returns             |
