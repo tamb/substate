@@ -62,7 +62,7 @@ module.exports = {
         path: path.join(__dirname, '/'),
         filename: 'index.js',
         library: 'SubState',
-        libraryExport: "default"
+        libraryTarget: "umd"
     },
 
     resolve: {
