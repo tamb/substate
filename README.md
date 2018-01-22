@@ -104,3 +104,4 @@ to initialize the class call
 2. Example Code for all Events and Custom Events
 3. documentation on special array methods for state
 4. change 'action' nomenclature to 'event'
+5. Add in comments and console.logs and remove them with UglifyJS
