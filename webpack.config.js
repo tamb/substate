@@ -33,12 +33,27 @@ module.exports = {
     },
 
 
-    plugins: [
-        new webpack.optimize.UglifyJsPlugin({ //plugin that minifies js
-            compress: { warnings: false }, //compression settings
-            sourceMap: true //generate a source map for each minified file
-        })
-    ],
+    plugins: pluginForEnvironment(false),
 
 
 };
+
+
+function pluginForEnvironment(bool){
+
+    return(
+        [
+                new webpack.optimize.UglifyJsPlugin({ //plugin that minifies js
+                    // Eliminate comments
+                    comments: false,
+                    compress: {
+                        warnings: false, //remove warnings
+                        drop_console: bool //remove console.logs
+                    },
+                    sourceMap: true //generate a source map for each minified file
+                })
+            ]
+
+    )
+
+}

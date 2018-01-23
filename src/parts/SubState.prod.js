@@ -25,6 +25,8 @@ export default class SubState extends PubSub {
 
 
     init() {
+
+        console.warn('making new thing')
         this.on('UPDATE_STATE', this.updateState.bind(this));
         this.on('CHANGE_STATE', this.changeState.bind(this));
         this.on('UPDATE_CHUNK', this.updateChunk.bind(this));
