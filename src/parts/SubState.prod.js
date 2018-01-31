@@ -8,6 +8,21 @@ import bystring from 'object-bystring';
 export default class SubState extends PubSub {
     constructor(obj, inst) {
         super();
+        console.warn(`
+
+        "Yoooo. You are using a Development version of SubState (npm substate, etc.).
+        Please run UglifyJS/similar for production mode (to remove comments, and console.logs
+        You can run UglifyJS/similar with options similar to
+        ~~~~~new webpack.optimize.UglifyJsPlugin({ //plugin that minifies js
+                comments: true,// Eliminate comments
+                compress: {
+                    warnings: false, //remove warnings
+                    drop_console: true //remove console.logs
+                },
+                sourceMap: !bool //generate a source map for each minified file
+             })~~~~~"
+    /( '0')/
+        `);
 
         var obj = obj || {}
 
