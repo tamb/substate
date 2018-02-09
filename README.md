@@ -98,10 +98,10 @@ _note: the object of data that is passed, cannot have a key called 'type'_
 
 | Method        | Event                   |  Custom Event                                     |Next                 |
 | -------- |----------------------------------------------------------------------------------| -------------------:|
-|  emit    | 'UPDATE_CHUNK','UPDATE_STATE'| `@param2` is an object `{type: 'MY_CUSTOM_EVENT'}`| Will update/change state.  The `type` property will then be emitted so you can listen to it like `SubStateInstance.on('MY_CUSTOM_EVENT', func)`
+|  emit    | 'UPDATE_CHUNK','UPDATE_STATE'| `@param2` is an object `{type: 'MY_CUSTOM_EVENT'}`| Will update/change state.  The `type` property will then be emitted so you can listen to it like `SubStateInstance.on('MY_CUSTOM_EVENT', func)`|
 
 ### To clear this ^ up :
-Basically to utilitze a custom Event, you still need to use `UPDATE_STATE`/`UPDATE_CHUNK` but the data object needs a `type` with an event name you want the State to emit _when updated_
+Basically to utilitze a custom event, you still need to use `UPDATE_STATE`/`UPDATE_CHUNK` but the data object needs a `type` with an event name you want the State to emit _when updated_
 
 ## Updates to come
 1. Documentation on Custom Events
