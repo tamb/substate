@@ -69,7 +69,7 @@ export default class SubState extends PubSub {
 
     getProp(prop) {
         //TODO does not work need to rewrite since object.bystring is rewritten
-        return Object.byString(this.getCurrentState(), prop);
+        return this.getCurrentState().byString( prop);
     }
 
 
