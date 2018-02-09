@@ -21,7 +21,7 @@ State management with Redux is killer.  But it requires switch statements and wo
 6. [State Methods](#state-methods)
 7. [Event Methods](#event-methods)
 8. [State Events](#state-events)  
-9. [Custom Events](#custom-events) _| no docs |_
+9. [Custom Events](#custom-events)
 10. [Updates to Come](#updates-to-come)
 
 ## Demos
@@ -98,7 +98,7 @@ _note: the object of data that is passed, cannot have a key called 'type'_
 
 | Method   | Event                         |  Custom Event                                     | Next                |
 | -------- |-------------------------------| --------------------------------------------------|--------------------:|
-|  emit    | 'UPDATE_CHUNK' _or_ 'UPDATE_STATE' | `@param2` is an object `{type: 'MY_CUSTOM_EVENT'}`| Will update/change state. The `type` property will then be emitted so you can listen to it like `SubStateInstance.on('MY_CUSTOM_EVENT', func)`|
+|  emit    | 'UPDATE_CHUNK' _or_ 'UPDATE_STATE' | `@param2` is an object:   `{type: 'MY_CUSTOM_EVENT'}` | Will update/change state. The `type` property will then be emitted so you can listen to it like `SubStateInstance.on('MY_CUSTOM_EVENT', func)`|
 
 ### To clear this ^ up :
 Basically to utilitze a custom event, you still need to use `UPDATE_STATE`/`UPDATE_CHUNK` but the data object needs a `type` with an event name you want the State to emit _when updated_
