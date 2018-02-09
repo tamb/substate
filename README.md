@@ -83,7 +83,7 @@ to initialize the class call
 | ------------- |---------------------------------------------------------------------------------------------------------------------
 | on            | `@param1*` STRING of event name to listen to. `@param2*` FUNC handler to execute when this event you listen to happens
 | off           | `@param1*` STRING of event name to remove handler from.` @param2*` FUNC to remove from the execution queue             
-| emit          | `@param1*` STRING event name  `@param2` data to pass into your handler event from 'on' method                          
+| emit          | `@param1*` STRING event name  `@param2` object of data to pass into your handler event from 'on' method                          
 
 
 ## State Events
@@ -94,10 +94,14 @@ to initialize the class call
 |'CHANGE_STATE' |  fires changeState method above requires same `@param`s|emits 'STATE_CHANGED'|
 
 ## Custom Events  
-| Method        | Desc                                                  | Returns             |
-| ------------- |-------------------------------------------------------| -------------------:|
-|          |                                   |   |
+_note: the object of data that is passed, cannot have a key called 'type'_
 
+| Method        | Event                   |  Custom Event                                     |Next                 |
+| -------- |----------------------------------------------------------------------------------| -------------------:|
+|  emit    | 'UPDATE_CHUNK','UPDATE_STATE'| `@param2` is an object `{type: 'MY_CUSTOM_EVENT'}`| Will update/change state.  The `type` property will then be emitted so you can listen to it like `SubStateInstance.on('MY_CUSTOM_EVENT', func)`
+
+### To clear this ^ up :
+Basically to utilitze a custom Event, you still need to use `UPDATE_STATE`/`UPDATE_CHUNK` but the data object needs a `type` with an event name you want the State to emit _when updated_
 
 ## Updates to come
 1. Documentation on Custom Events
