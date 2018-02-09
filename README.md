@@ -104,7 +104,7 @@ _note: the object of data that is passed, cannot have a key called 'type'_
 Basically to utilitze a custom event, you still need to use `UPDATE_STATE`/`UPDATE_CHUNK` but the data object needs a `type` with an event name you want the State to emit _when updated_
 
 ## Updates to come
-1. Documentation on Custom Events
+1. ~~Documentation on Custom Events~~
 2. Example Code for all Events and Custom Events
 3. documentation on special array methods for state
 4. change 'action' nomenclature to 'event'
