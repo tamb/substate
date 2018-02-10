@@ -1,3 +1,5 @@
+This is an example
+
 import SubState from 'substate';
 
 const options = {
