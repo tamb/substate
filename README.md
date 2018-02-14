@@ -109,3 +109,4 @@ Basically to utilitze a custom event, you still need to use `UPDATE_STATE`/`UPDA
 3. documentation on special array methods for state
 4. change 'action' nomenclature to 'event'
 5. Add in comments and console.logs and remove them with UglifyJS
+6. Have only production version with dev version not published to npm
