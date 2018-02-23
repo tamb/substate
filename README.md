@@ -1,7 +1,7 @@
 # SubState
 
 ## The Problem
-State management with Redux is killer.  But it requires switch statements and works poorly with deeply nested states.
+State management with Redux is really nice.  But it requires switch statements and works poorly with deeply nested states.  I also find the terminology very confusing.
 
 ## Purpose
 * To manage state with a simple PubSub pattern
