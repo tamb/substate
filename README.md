@@ -26,6 +26,7 @@ State management with Redux is really nice.  But it requires switch statements a
 
 ## Demos
 * [Demo showing State object changing.](//jsfiddle.net/TomSaporito/s3oykwoe/embedded/result/)  The module can be observed in the console
+* [Demo with React and VanillaJS](https://run.plnkr.co/preview/cje1pegdz0007nneloxtig63p/)
 * _new demos forth-coming with React, Vanilla JS, jQuery_
 
 ## Installation
