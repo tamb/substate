@@ -1,7 +1,43 @@
  var webpack = require('webpack');
  var path = require('path');
 
-module.exports = {
+module.exports = [{
+    context: __dirname + '/', // `__dirname` is root of project and `src` is source
+
+    entry: {
+        substate: './src/parts/SubState.prod.js'
+    },
+
+    output: {
+      path: path.join(__dirname),
+      filename: 'index.dev.js',
+      library: ["SubState"],
+      libraryTarget: "umd",
+      libraryExport: "default"
+    },
+
+    resolve: {
+        extensions: ['.js']
+    },
+
+    // maybe for later if writing in ES6>
+    module: {
+        rules: [{
+            test: /\.js?$/, // Check for all js files
+            exclude: /node_modules/,
+            use: [{
+                loader: 'babel-loader',
+                options: { presets: ['es2015'] }
+            }]
+        }]
+    },
+
+
+    plugins: pluginForEnvironment(false),
+
+
+},
+{
     context: __dirname + '/', // `__dirname` is root of project and `src` is source
 
     entry: {
@@ -33,10 +69,10 @@ module.exports = {
     },
 
 
-    plugins: pluginForEnvironment(false),
+    plugins: pluginForEnvironment(true),
 
 
-};
+}];
 
 
 function pluginForEnvironment(bool){

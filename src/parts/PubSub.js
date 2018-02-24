@@ -33,35 +33,35 @@ export default class PubSub{
         }
     }
 
-    react(eventName, data, fn){
-      this.events[eventName] = this.events[eventName] || [];  
-      this.events[eventName].push(fn);
+    // react(eventName, data, fn){
+    //   this.events[eventName] = this.events[eventName] || [];  
+    //   this.events[eventName].push(fn);
 
-      if (this.events[eventName]) {
-        this.events[eventName].forEach(function(fn) {
-          fn(data);
-        });
-      }
+    //   if (this.events[eventName]) {
+    //     this.events[eventName].forEach(function(fn) {
+    //       fn(data);
+    //     });
+    //   }
 
-    }
+    // }
 
-    once(eventName, data, fn){
+    // once(eventName, data, fn){
 
-      this.events[eventName] = this.events[eventName] || [];
-      this.events[eventName].push(fn);
+    //   this.events[eventName] = this.events[eventName] || [];
+    //   this.events[eventName].push(fn);
       
-      if (this.events[eventName]) {
+    //   if (this.events[eventName]) {
 
-        var array = this.events[eventName].sort().filter(function(item, pos, ary) {
-          return !pos || item != ary[pos - 1];
-        });
+    //     var array = this.events[eventName].sort().filter(function(item, pos, ary) {
+    //       return !pos || item != ary[pos - 1];
+    //     });
 
-        array.forEach(function(fn) {
-          fn(data);
-        });
+    //     array.forEach(function(fn) {
+    //       fn(data);
+    //     });
 
-      }
+    //   }
     
-    }
+    // }
 
 };
