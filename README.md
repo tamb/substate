@@ -28,6 +28,8 @@ State management with Redux is really nice.  But it requires switch statements a
 * [Demo showing State object changing.](//jsfiddle.net/TomSaporito/s3oykwoe/embedded/result/)  The module can be observed in the console
 * [Demo with React and VanillaJS](https://next.plnkr.co/plunks/nR9n5efElxC4avt2)
 * _new demos forth-coming with React, Vanilla JS, jQuery_
+![](Substate.png)
+
 
 ## Installation
 * `npm install substate --save`
