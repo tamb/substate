@@ -85,6 +85,12 @@ export default class SubState extends PubSub {
         this.emit('STATE_RESET');
     }
 
+    // Updates the state history array and sets the currentState pointer properly
+    pushState(newState) {
+      this.stateStorage = this.stateStorage.concat(newState);
+      this.currentState = this.stateStorage.length;
+    }
+
     updateChunk(action) {//DOESNT WORK
         const newChunk = {};
         const newState = Object.assign({}, this.getCurrentState());//clone state
@@ -104,13 +110,9 @@ export default class SubState extends PubSub {
             }
         }
 
-        //push new state to array
-        this.stateStorage.push(newState);//push cloned state to stateStorage
+        //pushes new state
+        this.pushState(newState);
 
-        //update currentState index to last state
-        this.currentState = this.stateStorage.length;
-
-        // //
         // //retrieve only chunk
         //**NOTE: State: 01-AB** this is the legit way to do it.  See note 01-AA
         // for (var key in action) {
@@ -134,7 +136,6 @@ export default class SubState extends PubSub {
                 // switch (key){
                 //     case '$REMOVE':
                 //         action[key].forEach(function(cv, ci){
-
                 //             var st = cv.split('.');//resplit string
                 //             var nk = st.pop();//remove and store end (we assume you made en the index)
                 //             var arr = Object.byString(st.join('.'), newState);//find the array
@@ -156,9 +157,8 @@ export default class SubState extends PubSub {
             }
         }
 
-        //update currentState index to last state
-        this.stateStorage.push(newState);//push cloned state to stateStorage
-        this.currentState = this.stateStorage.length;
+        //pushes new state
+        this.pushState(newState);
 
         this.emit((action.type || 'STATE_UPDATED'), this.getCurrentState());//emit with latest data
 
