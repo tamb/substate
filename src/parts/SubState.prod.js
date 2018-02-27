@@ -88,7 +88,7 @@ export default class SubState extends PubSub {
     // Updates the state history array and sets the currentState pointer properly
     pushState(newState) {
       this.stateStorage = this.stateStorage.concat(newState);
-      this.currentState = this.stateStorage.length;
+      this.currentState = (this.stateStorage.length -1);
     }
 
     updateChunk(action) {//DOESNT WORK
@@ -133,27 +133,7 @@ export default class SubState extends PubSub {
         //update temp new state
         for (let key in action) {
             if (action.hasOwnProperty(key)) {
-                // switch (key){
-                //     case '$REMOVE':
-                //         action[key].forEach(function(cv, ci){
-                //             var st = cv.split('.');//resplit string
-                //             var nk = st.pop();//remove and store end (we assume you made en the index)
-                //             var arr = Object.byString(st.join('.'), newState);//find the array
-                //             arr = arr.splice(nk, 1);//remove from array
-                //         });
-                //     break;
-                //     case '$ADD':
-                //         for(var k in action[key]){//loop through object
-                //             if(action[key].hasOwnProperty(k)){
-                //                 var arr = Object.byString(k.toString(), newState);//find array to push to
-                //                 arr.push(action[key][k]);//push value to it.
-                //             }
-                //         }
-                //     break;
-
-                // default:
                     newState.byString(key, action[key]);//update cloned state
-                // }
             }
         }
 
