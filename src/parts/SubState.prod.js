@@ -85,7 +85,7 @@ export default class SubState extends PubSub {
         this.emit('STATE_RESET');
     }
 
-    updateChunk(action){//DOESNT WORK
+    updateChunk(action) {//DOESNT WORK
         const newChunk = {};
         const newState = Object.assign({}, this.getCurrentState());//clone state
 
@@ -104,14 +104,11 @@ export default class SubState extends PubSub {
             }
         }
 
-        //update currentState index to last state
-        if (this.currentState != this.stateStorage.length - 1) {
-            this.currentState = this.stateStorage.length - 1;
-        }
-        ++this.currentState;//update
-
         //push new state to array
         this.stateStorage.push(newState);//push cloned state to stateStorage
+
+        //update currentState index to last state
+        this.currentState = this.stateStorage.length;
 
         // //
         // //retrieve only chunk
