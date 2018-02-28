@@ -1,12 +1,8 @@
-/**
- * Created by root on 6/27/17.
- */
-import PubSub from './PubSub.js';
 import bystring from 'object-bystring';
-
+import PubSub from './PubSub.js';
 
 export default class SubState extends PubSub {
-    constructor(obj, inst) {
+    constructor(objParam, inst) {
         super();
         console.warn(`
 
@@ -24,34 +20,28 @@ export default class SubState extends PubSub {
     /( '0')/
         `);
 
-        var obj = obj || {}
+        const obj = objParam || {}
 
         this.name = obj.name || "SubStateInstance";
-
-
 
         this.currentState = obj.currentState || 0;
         this.stateStorage = obj.stateStorage || [];
         this.saveOnChange = obj.saveOnChange || null;
         this.pullFromLocal = obj.pullFromLocal || null;
 
-        obj.state ? this.stateStorage.push(obj.state) : null;
+        if (obj.state) this.stateStorage.push(obj.state);
     }
 
-
     init() {
-
-        console.warn('making new thing')
         this.on('UPDATE_STATE', this.updateState.bind(this));
         this.on('CHANGE_STATE', this.changeState.bind(this));
         this.on('UPDATE_CHUNK', this.updateChunk.bind(this));
 
         if (this.pullFromLocal) {
             if (window.localStorage[this.name]) {
-                var state = JSON.parse(window.localStorage.getItem(this.name));
+                const state = JSON.parse(window.localStorage.getItem(this.name));
                 this.currentState = state.currentState;
                 this.stateStorage = state.stateStorage;
-
             }
         }
     }
@@ -60,18 +50,14 @@ export default class SubState extends PubSub {
         return this.stateStorage[index];
     }
 
-
-    getCurrentState(){
+    getCurrentState() {
         return this.getState(this.currentState);
     }
 
-
-
     getProp(prop) {
         //TODO does not work need to rewrite since object.bystring is rewritten
-        return this.getCurrentState().byString( prop);
+        return this.getCurrentState().byString(prop);
     }
-
 
     changeState(action) {
         this.currentState = action.requestedState;
@@ -79,7 +65,7 @@ export default class SubState extends PubSub {
     }
 
     saveState() {
-        var obj = {
+        const obj = {
             currentState: this.currentState,
             stateStorage: this.stateStorage,
         };
@@ -99,19 +85,22 @@ export default class SubState extends PubSub {
         this.emit('STATE_RESET');
     }
 
+    // Updates the state history array and sets the currentState pointer properly
+    pushState(newState) {
+      this.stateStorage = this.stateStorage.concat(newState);
+      this.currentState = (this.stateStorage.length -1);
+    }
 
-    updateChunk(action){//DOESNT WORK
-        var newChunk = {};
-        var newState = Object.assign({}, this.getCurrentState());//clone state
+    updateChunk(action) {//DOESNT WORK
+        const newChunk = {};
+        const newState = Object.assign({}, this.getCurrentState());//clone state
 
-        //
         //update temp new state
-        for (var key in action) {
-            if(action.hasOwnProperty(key)){
-//                console.log('key value: ',action[key]);
+        for (let key in action) {
+            if (action.hasOwnProperty(key)) {
                 newState.byString(key, action[key]);//update cloned state
-                newChunk[key]= action[key];//create chunk
-//                console.log(newChunk)
+                newChunk[key] = action[key];//create chunk
+
                 //**NOTE: 01-AA** this is a performance cheat.  I'm not retrieving current state.
                 //...I'm building the chunk from the passed in action this avoids another
                 //...loop to build the chunk from the current state
@@ -121,18 +110,9 @@ export default class SubState extends PubSub {
             }
         }
 
-        //
-        //update currentState index to last state
-        if (this.currentState != this.stateStorage.length - 1) {
-            this.currentState = this.stateStorage.length - 1;
-        }
-        ++this.currentState;//update
+        //pushes new state
+        this.pushState(newState);
 
-        //
-        //push new state to array
-        this.stateStorage.push(newState);//push cloned state to stateStorage
-
-        // //
         // //retrieve only chunk
         //**NOTE: State: 01-AB** this is the legit way to do it.  See note 01-AA
         // for (var key in action) {
@@ -142,63 +122,26 @@ export default class SubState extends PubSub {
         //     }
         // }
 
-
-
         this.emit((action.type || 'CHUNK_UPDATED'), newChunk);//emit with latest data
 
-        this.saveOnChange ? this.saveState() : '';
+        if (this.saveOnChange) this.saveState();
     }
 
     updateState(action) {
+        const newState = Object.assign({}, this.getCurrentState());//clone state
 
-        var newState = Object.assign({}, this.getCurrentState());//clone state
-
-        //
         //update temp new state
-        for (var key in action) {
-            if(action.hasOwnProperty(key)){
-
-
-
-                // switch (key){
-                //     case '$REMOVE':
-                //         action[key].forEach(function(cv, ci){
-
-                //             var st = cv.split('.');//resplit string
-                //             var nk = st.pop();//remove and store end (we assume you made en the index)
-                //             var arr = Object.byString(st.join('.'), newState);//find the array
-                //             arr = arr.splice(nk, 1);//remove from array
-                //         });
-                //     break;
-                //     case '$ADD':
-                //         for(var k in action[key]){//loop through object
-                //             if(action[key].hasOwnProperty(k)){
-                //                 var arr = Object.byString(k.toString(), newState);//find array to push to
-                //                 arr.push(action[key][k]);//push value to it.
-                //             }
-                //         }
-                //     break;
-
-                // default:
+        for (let key in action) {
+            if (action.hasOwnProperty(key)) {
                     newState.byString(key, action[key]);//update cloned state
-                // }
             }
         }
 
-
-
-        //
-        //update currentState index to last state
-        if (this.currentState != this.stateStorage.length - 1) {
-            this.currentState = this.stateStorage.length - 1;
-        }
-        this.stateStorage.push(newState);//push cloned state to stateStorage
-        ++this.currentState;//update
+        //pushes new state
+        this.pushState(newState);
 
         this.emit((action.type || 'STATE_UPDATED'), this.getCurrentState());//emit with latest data
 
-        this.saveOnChange ? this.saveState() : '';
-
-
+        if (this.saveOnChange) this.saveState();
     }
 }

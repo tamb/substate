@@ -1,10 +1,11 @@
 {
   "name": "substate",
-  "version": "2.2.3",
+  "version": "2.3.6",
   "description": "manage your nested state",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
   },
   "repository": {
     "type": "git",
