@@ -5,6 +5,7 @@ export default class PubSub{
     constructor(name){
         this.events = {};
         this.name = name || 'PubSub';
+
     }
 
     on(eventName, fn){
@@ -32,6 +33,8 @@ export default class PubSub{
             });
         }
     }
+
+    
 
     // react(eventName, data, fn){
     //   this.events[eventName] = this.events[eventName] || [];  
