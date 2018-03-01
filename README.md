@@ -64,9 +64,7 @@ These are the possible options
                                                                                      
 
 ## Initialization
-to initialize the class call
-
-`instance.init()`
+When you initialize the class it wires up the three events in [State Events](#state-events)
 
 ## State Methods
 * `@param`    optional method parameter
