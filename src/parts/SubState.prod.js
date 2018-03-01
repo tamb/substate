@@ -23,6 +23,7 @@ export default class SubState extends PubSub {
         const obj = objParam || {}
 
         this.name = obj.name || "SubStateInstance";
+        this.loaded = false;
 
         this.currentState = obj.currentState || 0;
         this.stateStorage = obj.stateStorage || [];
@@ -30,9 +31,11 @@ export default class SubState extends PubSub {
         this.pullFromLocal = obj.pullFromLocal || null;
 
         if (obj.state) this.stateStorage.push(obj.state);
+        this.init();
     }
 
     init() {
+      if (!this.loaded){
         this.on('UPDATE_STATE', this.updateState.bind(this));
         this.on('CHANGE_STATE', this.changeState.bind(this));
         this.on('UPDATE_CHUNK', this.updateChunk.bind(this));
@@ -44,6 +47,8 @@ export default class SubState extends PubSub {
                 this.stateStorage = state.stateStorage;
             }
         }
+        this.loaded = true;
+      }
     }
 
     getState(index) {
