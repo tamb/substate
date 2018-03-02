@@ -114,6 +114,8 @@ export default class SubState extends PubSub {
                 //...'UPDATE_STATE' or 'UPDATE_CHUNK'
             }
         }
+        
+        if(!action.$type) newState.$type = 'UPDATE_CHUNK';
 
         //pushes new state
         this.$pushState(newState);
@@ -141,6 +143,8 @@ export default class SubState extends PubSub {
                     newState.byString(key, action[key]);//update cloned state
             }
         }
+
+        if(!action.$type) newState.$type = 'UPDATE_STATE'; 
 
         //pushes new state
         this.$pushState(newState);
