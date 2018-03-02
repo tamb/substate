@@ -25,7 +25,7 @@ State management with Redux is really nice.  It's also nice with Vuex.  And a lo
 10. [Updates to Come](#updates-to-come)
 
 ## Demos
-* * [Download and run this:](https://github.com/TomSaporito/substate-demo)
+* [Download and run this:](https://github.com/TomSaporito/substate-demo)
 `npm install`
 `webpack`
 open `index.html`
