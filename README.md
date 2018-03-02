@@ -1,14 +1,14 @@
 # SubState
 
 ## The Problem
-State management with Redux is really nice.  But it requires switch statements and works poorly with deeply nested states.  I also find the terminology very confusing.
+State management with Redux is really nice.  It's also nice with Vuex.  And a lot of people don't like Pub/Sub because they lose track of events.  Well it's hybrid time!
 
 ## Purpose
 * To manage state with a simple PubSub pattern
 * For State to return the whole state or just a chunk of state (just what you need).  
-* Message filtering can be applied _without_ a `switch` statement (you create your own event types)
-* To allow for manipulation of deeply nested state properties through use of strings
-* Maintain a small size.  Currently it's 6kb minified, <2kb gzipped!
+* Message filtering can be applied _without_ a `switch` statement (you create your own event `$type`)
+* To allow for manipulation of deeply nested state properties through use of strings `{'my[index]deeply.nests.state': 'new value'}` (we're sending this to SubState to _not mutate_ the state, but make a new copy (Flux-y)!
+* Maintain a small size.  Currently it's <6kb minified, <2kb gzipped!
 
 ## _note:_ anything marked _| no docs |_ means I haven't documented it yet.
 
@@ -104,7 +104,7 @@ _note: the object of data that is passed, cannot have a key called 'type'_
 
 | Method   | Event                         |  Custom Event                                     | Next                |
 | -------- |-------------------------------| --------------------------------------------------|--------------------:|
-|  emit    | 'UPDATE_CHUNK' _or_ 'UPDATE_STATE' | `@param2` is an object:   `{type: 'MY_CUSTOM_EVENT'}` | Will update/change state. The `type` property will then be emitted so you can listen to it like `SubStateInstance.on('MY_CUSTOM_EVENT', func)`|
+|  emit    | 'UPDATE_CHUNK' _or_ 'UPDATE_STATE' | `@param2` is an object:   `{$type: 'MY_CUSTOM_EVENT'}` | Will update/change state. The `type` property will then be emitted so you can listen to it like `SubStateInstance.on('MY_CUSTOM_EVENT', func)`|
 
 ### To clear this ^ up :
 Basically to utilitze a custom event, you still need to use `UPDATE_STATE`/`UPDATE_CHUNK` but the data object needs a `type` with an event name you want the State to emit _when updated_
