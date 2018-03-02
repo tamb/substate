@@ -25,12 +25,13 @@ State management with Redux is really nice.  It's also nice with Vuex.  And a lo
 10. [Updates to Come](#updates-to-come)
 
 ## Demos
-* [Demo showing State object changing.](//jsfiddle.net/TomSaporito/s3oykwoe/embedded/result/)  The module can be observed in the console
-* [Demo with React and VanillaJS](https://next.plnkr.co/plunks/nR9n5efElxC4avt2)
-* [Download and run this:](https://github.com/TomSaporito/substate-demo)
+* * [Download and run this:](https://github.com/TomSaporito/substate-demo)
 `npm install`
 `webpack`
 open `index.html`
+* [Demo showing State object changing.](//jsfiddle.net/TomSaporito/s3oykwoe/embedded/result/)  The module can be observed in the console
+* [Demo with React and VanillaJS](https://next.plnkr.co/plunks/nR9n5efElxC4avt2)
+
 * _new demos forth-coming with React, Vanilla JS, jQuery_
 ![](Substate.png)
  _a "Subscriber" can be your React Component/Anything that will ingest a state object and rerender HTML_
