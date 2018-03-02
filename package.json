@@ -1,7 +1,7 @@
 {
   "name": "substate",
-  "version": "2.4.1",
-  "description": "manage your nested state",
+  "version": "3.0.0",
+  "description": "Hybrid Flux and Pub/Sub state management",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
