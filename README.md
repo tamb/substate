@@ -34,7 +34,6 @@ open `index.html`
 
 * _new demos forth-coming with React, Vanilla JS, jQuery_
 ![](Substate.png?raw=true)
- _a "Subscriber" can be your React Component/Anything that will ingest a state object and rerender HTML_
 
 
 ## Installation
