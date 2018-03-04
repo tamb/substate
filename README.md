@@ -1,7 +1,7 @@
 # SubState
 
 ## The Problem
-State management with Redux is really nice.  It's also nice with Vuex.  And a lot of people don't like Pub/Sub because they lose track of events.  Well it's hybrid time!
+State management with Redux is really nice.  It's also nice with Vuex.  But it's lacking in filtering.  When using a Pub/Sub you can filter by "topic" or by "content" but you can easily lose track of events ebing fired.  Well it's hybrid time!
 
 ## Purpose
 * To manage state with a simple PubSub pattern
