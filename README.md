@@ -32,7 +32,7 @@ State management with Redux is really nice.  It's also nice with Vuex.  And a lo
 `webpack`
 open `index.html`
 * _new demos forth-coming with React, Vanilla JS, jQuery_
-![](Substate.png)
+![](SubState.png)
  _a "Subscriber" can be your React Component/Anything that will ingest a state object and rerender HTML_
 
 
