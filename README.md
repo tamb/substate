@@ -34,7 +34,7 @@ State management with Redux is really nice.  It's also nice with Vuex.  But it's
 
 ### The Steps
 1. Components will register a method to rerender themselves using your instance (see [instantiation](#instantiation))  using `myInstance.$on('STATE_UPDATED', rerender)`
-2. Components take UI event ("click", "focus", etc) and pass it off to a handler/"reducer"
+2. Components take UI event ("click", "focus", etc) and pass it off to a Handler/Reducer
 3. The Handler/Reducer figures out what would change in the state (it does not update the state directly).  It also figures out if/what `$type` should be sent to the Pub/Sub module
 4. The Handler/Reducer will then `$emit` `UPDATE_STATE`/`UPDATE_CHUNK` to the Pub/Sub module
 5. The Pub/Sub module will create a _new_ state and will `$emit` `STATE_UPDATED`/`CHUNK_UPDATED` or the specified `$type` to the Components.
