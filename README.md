@@ -5,6 +5,7 @@ State management with Redux is really nice.  It's also nice with Vuex.  But it's
 
 ## Purpose
 * To manage state with a simple PubSub pattern
+* To use the simplicity of Flux
 * For State to return the whole state or just a chunk of state (just what you need).  
 * Message filtering can be applied _without_ a `switch` statement (you create your own event `$type`)
 * To allow for manipulation of deeply nested state properties through use of strings `{'my[index]deeply.nests.state': 'new value'}` (we're sending this to SubState to _not mutate_ the state, but make a new copy (Flux-y)!
