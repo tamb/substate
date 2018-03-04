@@ -17,12 +17,11 @@ State management with Redux is really nice.  It's also nice with Vuex.  And a lo
 2. [Installation](#installation)
 3. [Instantiation](#instantiation)
 4. [Options](#options)
-5. [Initialization](#initialization)
-6. [State Methods](#state-methods)
-7. [Event Methods](#event-methods)
-8. [State Events](#state-events)  
-9. [Custom Events](#custom-events)
-10. [Updates to Come](#updates-to-come)
+5. [State Methods](#state-methods)
+6. [Event Methods](#event-methods)
+7. [State Events](#state-events)  
+8. [Custom Events](#custom-events)
+9. [Updates to Come](#updates-to-come)
 
 ## Demos
 * [Download and run this:](https://github.com/TomSaporito/substate-demo)
@@ -62,9 +61,6 @@ These are the possible options
 | pullFromLocal | pull currentState from localStorage on initialization | null                |
 | state         | object containing the initial state                   | null                |
                                                                                      
-
-## Initialization
-When you initialize the class it wires up the three events in [State Events](#state-events)
 
 ## State Methods
 * `@param`    optional method parameter
