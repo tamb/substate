@@ -13,15 +13,34 @@ State management with Redux is really nice.  It's also nice with Vuex.  And a lo
 ## _note:_ anything marked _| no docs |_ means I haven't documented it yet.
 
 ## Contents
-1. [Demos](#demos)
-2. [Installation](#installation)
-3. [Instantiation](#instantiation)
-4. [Options](#options)
-5. [State Methods](#state-methods)
-6. [Event Methods](#event-methods)
-7. [State Events](#state-events)  
-8. [Custom Events](#custom-events)
-9. [Updates to Come](#updates-to-come)
+1. [How it Works](#how-it-works)
+    * [Diagram](#diagram)
+    * [The Steps](#the-steps)
+    
+2. [Demos](#demos)
+3. [Installation](#installation)
+4. [Instantiation](#instantiation)
+5. [Options](#options)
+6. [State Methods](#state-methods)
+7. [Event Methods](#event-methods)
+8. [State Events](#state-events)  
+9. [Custom Events](#custom-events)
+10. [Updates to Come](#updates-to-come)
+
+## How it Works
+### Diagram
+![](Substate.png?raw=true)
+
+### The Steps
+1. Components will register a method to rerender themselves using your instance (see [instantiation](#instantiation))  using `myInstance.$on('STATE_UPDATED', rerender)`
+2. Components take UI event ("click", "focus", etc) and pass it off to a handler/"reducer"
+3. The Handler/Reducer figures out what would change in the state (it does not update the state directly).  It also figures out if/what `$type` should be sent to the Pub/Sub module
+4. The Handler/Reducer will then `$emit` `UPDATE_STATE`/`UPDATE_CHUNK` to the Pub/Sub module
+5. The Pub/Sub module will create a _new_ state and will `$emit` `STATE_UPDATED`/`CHUNK_UPDATED` or the specified `$type` to the Components.
+
+
+ 
+
 
 ## Demos
 * [Download and run this:](https://github.com/TomSaporito/substate-demo)
@@ -32,7 +51,7 @@ open `index.html`
 * [Demo with React and VanillaJS](https://next.plnkr.co/plunks/nR9n5efElxC4avt2)
 
 * _new demos forth-coming with React, Vanilla JS, jQuery_
-![](Substate.png?raw=true)
+
 
 
 ## Installation
@@ -46,7 +65,7 @@ SubState is a class so you call it like so
 
 Then you instantiate it as such
 
-`var s = new SubState();`
+`var myInstance = new SubState();`
 
 ## Options
 Substate accepts an options object as an optional parameter.
