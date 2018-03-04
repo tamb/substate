@@ -25,12 +25,13 @@ State management with Redux is really nice.  It's also nice with Vuex.  And a lo
 10. [Updates to Come](#updates-to-come)
 
 ## Demos
-* [Demo showing State object changing.](//jsfiddle.net/TomSaporito/s3oykwoe/embedded/result/)  The module can be observed in the console
-* [Demo with React and VanillaJS](https://next.plnkr.co/plunks/nR9n5efElxC4avt2)
 * [Download and run this:](https://github.com/TomSaporito/substate-demo)
 `npm install`
 `webpack`
 open `index.html`
+* [Demo showing State object changing.](//jsfiddle.net/TomSaporito/s3oykwoe/embedded/result/)  The module can be observed in the console
+* [Demo with React and VanillaJS](https://next.plnkr.co/plunks/nR9n5efElxC4avt2)
+
 * _new demos forth-coming with React, Vanilla JS, jQuery_
 ![](SubState.png)
  _a "Subscriber" can be your React Component/Anything that will ingest a state object and rerender HTML_
@@ -110,9 +111,4 @@ _note: the object of data that is passed, cannot have a key called '$type'_
 Basically to utilitze a custom event, you still need to use `UPDATE_STATE`/`UPDATE_CHUNK` but the data object needs a `$type` with an event name you want the State to emit _when updated_
 
 ## Updates to come
-1. ~~Documentation on Custom Events~~
-2. Example Code for all Events and Custom Events
-3. documentation on special array methods for state
-4. change 'action' nomenclature to 'event'
-5. Add in comments and console.logs and remove them with UglifyJS
-6. Have only production version with dev version not published to npm
+Nothin' here, buddy.
