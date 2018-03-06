@@ -1,6 +1,6 @@
 {
   "name": "substate",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "description": "Hybrid Flux and Pub/Sub state management",
   "main": "index.js",
   "scripts": {
@@ -21,7 +21,9 @@
     "webpack": "^3.10.0"
   },
   "dependencies": {
-    "object-bystring": "^2.1.2"
+    "object-assign": "4.1.1",
+    "object-bystring": "^2.1.2",
+    "save": "2.3.2"
   },
   "files": [
     "LICENSE",
