@@ -1,10 +1,11 @@
 # SubState
 
 ## The Problem
-State management with Redux is really nice.  It's also nice with Vuex.  And a lot of people don't like Pub/Sub because they lose track of events.  Well it's hybrid time!
+State management with Redux is really nice.  It's also nice with Vuex.  But it's lacking in filtering.  When using a Pub/Sub you can filter by "topic" or by "content" but you can easily lose track of events being fired.  Well it's hybrid time!
 
 ## Purpose
 * To manage state with a simple PubSub pattern
+* To use the simplicity of Flux
 * For State to return the whole state or just a chunk of state (just what you need).  
 * Message filtering can be applied _without_ a `switch` statement (you create your own event `$type`)
 * To allow for manipulation of deeply nested state properties through use of strings `{'my[index]deeply.nests.state': 'new value'}` (we're sending this to SubState to _not mutate_ the state, but make a new copy (Flux-y)!
@@ -13,27 +14,47 @@ State management with Redux is really nice.  It's also nice with Vuex.  And a lo
 ## _note:_ anything marked _| no docs |_ means I haven't documented it yet.
 
 ## Contents
-1. [Demos](#demos)
-2. [Installation](#installation)
-3. [Instantiation](#instantiation)
-4. [Options](#options)
-5. [Initialization](#initialization)
+1. [How it Works](#how-it-works)
+    * [Diagram](#diagram)
+    * [The Steps](#the-steps)
+    
+2. [Demos](#demos)
+3. [Installation](#installation)
+4. [Instantiation](#instantiation)
+5. [Options](#options)
 6. [State Methods](#state-methods)
 7. [Event Methods](#event-methods)
 8. [State Events](#state-events)  
 9. [Custom Events](#custom-events)
 10. [Updates to Come](#updates-to-come)
 
+## How it Works
+### Diagram
+![](Substate.png?raw=true)
+
+### The Steps
+1. (if using modules) `import { myInstance } from 'myFile'`
+2. Components will register one or more methods to rerender themselves using your instance (see [instantiation](#instantiation))  using `myInstance.$on('STATE_UPDATED', rerender)` per method
+3. Components take UI event ("click", "focus", etc) and pass it off to a Handler/Reducer
+4. The Handler/Reducer figures out what should change in the state (it does not update the state directly).  It also figures out if/what `$type` should be sent to the Pub/Sub module
+5. The Handler/Reducer will then `$emit` `UPDATE_STATE` or `UPDATE_CHUNK` to the Pub/Sub module
+6. The Pub/Sub module will create a _new_ state and will `$emit` `STATE_UPDATED` or `CHUNK_UPDATED` or the specified `$type` to the Components.
+7. The Components will digest the new State using the method(s) registered in step 2
+
+
+ 
+
+
 ## Demos
-* [Demo showing State object changing.](//jsfiddle.net/TomSaporito/s3oykwoe/embedded/result/)  The module can be observed in the console
-* [Demo with React and VanillaJS](https://next.plnkr.co/plunks/nR9n5efElxC4avt2)
 * [Download and run this:](https://github.com/TomSaporito/substate-demo)
 `npm install`
 `webpack`
 open `index.html`
+* [Demo showing State object changing.](//jsfiddle.net/TomSaporito/s3oykwoe/embedded/result/)  The module can be observed in the console
+* [Demo with React and VanillaJS](https://next.plnkr.co/plunks/nR9n5efElxC4avt2)
+
 * _new demos forth-coming with React, Vanilla JS, jQuery_
-![](Substate.png)
- _a "Subscriber" can be your React Component/Anything that will ingest a state object and rerender HTML_
+
 
 
 ## Installation
@@ -43,11 +64,13 @@ open `index.html`
 ## Instantiation 
 SubState is a class so you call it like so
 
+_myFile.js_
+
 `import SubState from 'substate';`
 
 Then you instantiate it as such
 
-`var s = new SubState();`
+`export let myInstance = new SubState({options});`
 
 ## Options
 Substate accepts an options object as an optional parameter.
@@ -62,9 +85,6 @@ These are the possible options
 | pullFromLocal | pull currentState from localStorage on initialization | null                |
 | state         | object containing the initial state                   | null                |
                                                                                      
-
-## Initialization
-When you initialize the class it wires up the three events in [State Events](#state-events)
 
 ## State Methods
 * `@param`    optional method parameter
@@ -110,9 +130,4 @@ _note: the object of data that is passed, cannot have a key called '$type'_
 Basically to utilitze a custom event, you still need to use `UPDATE_STATE`/`UPDATE_CHUNK` but the data object needs a `$type` with an event name you want the State to emit _when updated_
 
 ## Updates to come
-1. ~~Documentation on Custom Events~~
-2. Example Code for all Events and Custom Events
-3. documentation on special array methods for state
-4. change 'action' nomenclature to 'event'
-5. Add in comments and console.logs and remove them with UglifyJS
-6. Have only production version with dev version not published to npm
+Nothin' here, buddy.
