@@ -1,6 +1,6 @@
 {
   "name": "substate",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "Hybrid Flux and Pub/Sub state management",
   "main": "index.js",
   "scripts": {
