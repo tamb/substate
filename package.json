@@ -21,7 +21,6 @@
     "webpack": "^3.10.0"
   },
   "dependencies": {
-    "object-assign": "4.1.1",
     "object-bystring": "^2.1.2",
     "save": "2.3.2"
   },
