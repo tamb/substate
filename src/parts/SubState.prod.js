@@ -120,6 +120,7 @@ export default class SubState extends PubSub {
     $pushState(newState) {
       this.$stateStorage = this.$stateStorage.concat(newState);
       this.$currentState = (this.$stateStorage.length -1);
+      console.log('State Pushed, is now this ', this.$getCurrentState());
     }
 
     $updateChunk(action) {//DOESNT WORK
@@ -161,23 +162,26 @@ export default class SubState extends PubSub {
     }
 
     $updateState(action) {
-        const newState = Object.assign({}, this.$getCurrentState());//clone state
+        console.log('closning state');
+        var newState = Object.assign({}, this.$getCurrentState());//clone state
 
         //update temp new state
         for (let key in action) {
+            console.log('replacing key ', key);
             if (action.hasOwnProperty(key)) newState.byString(key, action[key]);
              //update cloned state
         }
 
-        console.log('new State: ', newState);
+        console.log('New State: ', newState);
 
         if(!action.$type) newState.$type = 'UPDATE_STATE'; 
 
         //pushes new state
         this.$pushState(newState);
 
+        console.log('about to emit ', newState.$type);
         this.$emit((action.$type || 'STATE_UPDATED'), this.$getCurrentState());//emit with latest data
-        console.log('Current State: ', this.$getCurrentState());
+        
 
         if (this.$saveOnChange) this.$saveState();
     }
