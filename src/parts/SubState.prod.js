@@ -167,12 +167,15 @@ export default class SubState extends PubSub {
              //update cloned state
         }
 
+        console.log('new State: ', newState);
+
         if(!action.$type) newState.$type = 'UPDATE_STATE'; 
 
         //pushes new state
         this.$pushState(newState);
 
         this.$emit((action.$type || 'STATE_UPDATED'), this.$getCurrentState());//emit with latest data
+        console.log('Current State: ', this.$getCurrentState());
 
         if (this.$saveOnChange) this.$saveState();
     }
