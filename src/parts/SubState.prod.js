@@ -80,7 +80,8 @@ export default class SubState extends PubSub {
         return this.$stateStorage[index];
     }
 
-    $getCurrentState() {
+    $getCurrentState(s) {
+        console.log('getting current state from this>> ', this, s);
         return this.$getState(this.$currentState);
     }
 
