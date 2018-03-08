@@ -56,6 +56,7 @@ export default class SubState extends PubSub {
 
         if ($obj.state) this.$stateStorage.push($obj.state);
         this.$init();
+        this.$getCurrentState = this.$getCurrentState.bind(this);
     }
 
     $init() {
