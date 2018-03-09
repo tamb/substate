@@ -26,8 +26,10 @@ export default class PubSub{
     }
 
     $emit(eventName, data) {
+        console.log('in $emit: ', data);
         if (this.$events[eventName]) {
-            this.$events[eventName].forEach(function(fn) {
+            this.$events[eventName].forEach(function(fn, i) {
+                console.log(i, eventName, data);
                 fn(data);
             });
         }

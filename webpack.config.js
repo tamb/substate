@@ -33,7 +33,7 @@ module.exports = [{
     },
 
 
-    plugins: pluginForEnvironment(false),
+    // plugins: pluginForEnvironment(false),
 
 
 },

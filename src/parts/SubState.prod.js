@@ -29,22 +29,11 @@ export default class SubState extends PubSub {
     constructor(objParam, inst) {
         super();
         console.warn(`
-
         "Yoooo. You are using a Development version of SubState (npm substate, etc.).
-        Please run UglifyJS/similar for production mode (to remove comments, and console.logs
-        You can run UglifyJS/similar with options similar to
-        ~~~~~new webpack.optimize.UglifyJsPlugin({ //plugin that minifies js
-                comments: true,// Eliminate comments
-                compress: {
-                    warnings: false, //remove warnings
-                    drop_console: true //remove console.logs
-                },
-                sourceMap: !bool //generate a source map for each minified file
-             })~~~~~"
     /( '0')/
         `);
 
-        const $obj = objParam || {}
+        const $obj = objParam || {};
 
         this.$name = $obj.name || "SubStateInstance";
         this.$loaded = false;
@@ -56,7 +45,7 @@ export default class SubState extends PubSub {
 
         if ($obj.state) this.$stateStorage.push($obj.state);
         this.$init();
-        this.$getCurrentState = this.$getCurrentState.bind(this);
+   
     }
 
     $init() {
@@ -81,7 +70,6 @@ export default class SubState extends PubSub {
     }
 
     $getCurrentState(s) {
-        console.log('getting current state from this>> ', this, s);
         return this.$getState(this.$currentState);
     }
 
@@ -102,7 +90,7 @@ export default class SubState extends PubSub {
         };
 
         window.localStorage.setItem(this.$name, JSON.stringify(obj));
-        this.$emit('STATE_SAVED');
+        this.$emit('STATE_SAVED', this.$getCurrentState());
     }
 
     $removeSavedState() {
@@ -118,12 +106,13 @@ export default class SubState extends PubSub {
 
     // Updates the state history array and sets the currentState pointer properly
     $pushState(newState) {
-      this.$stateStorage = this.$stateStorage.concat(newState);
+      this.$stateStorage.push(newState);
       this.$currentState = (this.$stateStorage.length -1);
-      console.log('State Pushed, is now this ', this.$getCurrentState());
+      console.log('State Pushed');
     }
 
     $updateChunk(action) {//DOESNT WORK
+       
         const newChunk = {};
         const newState = Object.assign({}, this.$getCurrentState());//clone state
 
@@ -162,7 +151,6 @@ export default class SubState extends PubSub {
     }
 
     $updateState(action) {
-        console.log('closning state');
         var newState = Object.assign({}, this.$getCurrentState());//clone state
 
         //update temp new state
@@ -178,8 +166,7 @@ export default class SubState extends PubSub {
 
         //pushes new state
         this.$pushState(newState);
-
-        console.log('about to emit ', newState.$type);
+        
         this.$emit((action.$type || 'STATE_UPDATED'), this.$getCurrentState());//emit with latest data
         
 

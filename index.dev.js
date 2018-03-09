@@ -1,1 +1,403 @@
-!function(t,e){"object"==typeof exports&&"object"==typeof module?module.exports=e():"function"==typeof define&&define.amd?define([],e):"object"==typeof exports?exports.SubState=e():t.SubState=e()}("undefined"!=typeof self?self:this,function(){return function(t){function e(r){if(n[r])return n[r].exports;var o=n[r]={i:r,l:!1,exports:{}};return t[r].call(o.exports,o,o.exports,e),o.l=!0,o.exports}var n={};return e.m=t,e.c=n,e.d=function(t,n,r){e.o(t,n)||Object.defineProperty(t,n,{configurable:!1,enumerable:!0,get:r})},e.n=function(t){var n=t&&t.__esModule?function(){return t.default}:function(){return t};return e.d(n,"a",n),n},e.o=function(t,e){return Object.prototype.hasOwnProperty.call(t,e)},e.p="",e(e.s=0)}([function(t,e,n){"use strict";function r(t){return t&&t.__esModule?t:{default:t}}function o(t,e){if(!(t instanceof e))throw new TypeError("Cannot call a class as a function")}function a(t,e){if(!t)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return!e||"object"!=typeof e&&"function"!=typeof e?t:e}function i(t,e){if("function"!=typeof e&&null!==e)throw new TypeError("Super expression must either be null or a function, not "+typeof e);t.prototype=Object.create(e&&e.prototype,{constructor:{value:t,enumerable:!1,writable:!0,configurable:!0}}),e&&(Object.setPrototypeOf?Object.setPrototypeOf(t,e):t.__proto__=e)}Object.defineProperty(e,"__esModule",{value:!0});var s=function(){function t(t,e){for(var n=0;n<e.length;n++){var r=e[n];r.enumerable=r.enumerable||!1,r.configurable=!0,"value"in r&&(r.writable=!0),Object.defineProperty(t,r.key,r)}}return function(e,n,r){return n&&t(e.prototype,n),r&&t(e,r),e}}(),u=n(1),c=(r(u),n(2)),l=r(c);"function"!=typeof Object.assign&&(Object.assign=function(t,e){if(null==t)throw new TypeError("Cannot convert undefined or null to object");for(var n=Object(t),r=1;r<arguments.length;r++){var o=arguments[r];if(null!=o)for(var a in o)Object.prototype.hasOwnProperty.call(o,a)&&(n[a]=o[a])}return n});var f=function(t){function e(t,n){o(this,e);var r=a(this,(e.__proto__||Object.getPrototypeOf(e)).call(this));console.warn("\n\n        \"Yoooo. You are using a Development version of SubState (npm substate, etc.).\n        Please run UglifyJS/similar for production mode (to remove comments, and console.logs\n        You can run UglifyJS/similar with options similar to\n        ~~~~~new webpack.optimize.UglifyJsPlugin({ //plugin that minifies js\n                comments: true,// Eliminate comments\n                compress: {\n                    warnings: false, //remove warnings\n                    drop_console: true //remove console.logs\n                },\n                sourceMap: !bool //generate a source map for each minified file\n             })~~~~~\"\n    /( '0')/\n        ");var i=t||{};return r.$name=i.name||"SubStateInstance",r.$loaded=!1,r.$currentState=i.currentState||0,r.$stateStorage=i.stateStorage||[],r.$saveOnChange=i.saveOnChange||null,r.$pullFromLocal=i.pullFromLocal||null,i.state&&r.$stateStorage.push(i.state),r.$init(),r.$getCurrentState=r.$getCurrentState.bind(r),r}return i(e,t),s(e,[{key:"$init",value:function(){if(!this.$loaded){if(this.$on("UPDATE_STATE",this.$updateState.bind(this)),this.$on("CHANGE_STATE",this.$changeState.bind(this)),this.$on("UPDATE_CHUNK",this.$updateChunk.bind(this)),this.pullFromLocal&&window.localStorage[this.name]){var t=JSON.parse(window.localStorage.getItem(this.name));this.$currentState=t.currentState,this.$stateStorage=t.stateStorage}this.$loaded=!0}}},{key:"$getState",value:function(t){return this.$stateStorage[t]}},{key:"$getCurrentState",value:function(t){return console.log("getting current state from this>> ",this,t),this.$getState(this.$currentState)}},{key:"$getProp",value:function(t){return this.$getCurrentState().byString(t)}},{key:"$changeState",value:function(t){this.$currentState=t.requestedState,this.$emit(t.$type||"STATE_CHANGED",this.$getCurrentState())}},{key:"$saveState",value:function(){var t={currentState:this.$currentState,stateStorage:this.$stateStorage};window.localStorage.setItem(this.$name,JSON.stringify(t)),this.$emit("STATE_SAVED")}},{key:"$removeSavedState",value:function(){window.localStorage.removeItem(this.name),this.$emit("STATE_REMOVED_SAVED_STATE")}},{key:"$resetState",value:function(){this.$currentState=0,this.$stateStorage=[this.$stateStorage[0]],this.$emit("STATE_RESET")}},{key:"$pushState",value:function(t){this.$stateStorage=this.$stateStorage.concat(t),this.$currentState=this.$stateStorage.length-1,console.log("State Pushed, is now this ",this.$getCurrentState())}},{key:"$updateChunk",value:function(t){var e={},n=Object.assign({},this.$getCurrentState());for(var r in t)t.hasOwnProperty(r)&&(n.byString(r,t[r]),e[r]=t[r]);t.$type||(n.$type="UPDATE_CHUNK"),this.$pushState(n),this.$emit(t.$type||"CHUNK_UPDATED",e),this.$saveOnChange&&this.$saveState()}},{key:"$updateState",value:function(t){console.log("closning state");var e=Object.assign({},this.$getCurrentState());for(var n in t)console.log("replacing key ",n),t.hasOwnProperty(n)&&e.byString(n,t[n]);console.log("New State: ",e),t.$type||(e.$type="UPDATE_STATE"),this.$pushState(e),console.log("about to emit ",e.$type),this.$emit(t.$type||"STATE_UPDATED",this.$getCurrentState()),this.$saveOnChange&&this.$saveState()}}]),e}(l.default);e.default=f},function(t,e,n){!function(e,n){t.exports=n()}(0,function(){return function(t){function e(r){if(n[r])return n[r].exports;var o=n[r]={i:r,l:!1,exports:{}};return t[r].call(o.exports,o,o.exports,e),o.l=!0,o.exports}var n={};return e.m=t,e.c=n,e.d=function(t,n,r){e.o(t,n)||Object.defineProperty(t,n,{configurable:!1,enumerable:!0,get:r})},e.n=function(t){var n=t&&t.__esModule?function(){return t.default}:function(){return t};return e.d(n,"a",n),n},e.o=function(t,e){return Object.prototype.hasOwnProperty.call(t,e)},e.p="",e(e.s=0)}([function(t,e){Object.prototype.byString||Object.defineProperty(Object.prototype,"byString",{enumerable:!1,configurable:!1,writable:!1,value:function(t,e,n){var r=n||this;t=t.toString().replace(/\[(\w+)\]/g,".$1"),t=t.toString().replace(/^\./,"");for(var o=t.split("."),a=0;a<o.length;++a){var i=o[a];i in r?r.hasOwnProperty(i)&&(void 0!==e&&a===o.length-1&&(r[i]=e),r=r[i]):r[i]=e}return r}})}])})},function(t,e,n){"use strict";function r(t,e){if(!(t instanceof e))throw new TypeError("Cannot call a class as a function")}Object.defineProperty(e,"__esModule",{value:!0});var o=function(){function t(t,e){for(var n=0;n<e.length;n++){var r=e[n];r.enumerable=r.enumerable||!1,r.configurable=!0,"value"in r&&(r.writable=!0),Object.defineProperty(t,r.key,r)}}return function(e,n,r){return n&&t(e.prototype,n),r&&t(e,r),e}}(),a=function(){function t(){r(this,t),this.$events={}}return o(t,[{key:"$on",value:function(t,e){this.$events[t]=this.$events[t]||[],this.$events[t].push(e)}},{key:"$off",value:function(t,e){if(this.$events[t])for(var n=0;n<this.$events[t].length;n++)if(this.$events[t][n]===e){this.$events[t].splice(n,1);break}}},{key:"$emit",value:function(t,e){this.$events[t]&&this.$events[t].forEach(function(t){t(e)})}}]),t}();e.default=a}]).default});
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else if(typeof exports === 'object')
+		exports["SubState"] = factory();
+	else
+		root["SubState"] = factory();
+})(typeof self !== 'undefined' ? self : this, function() {
+return /******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, {
+/******/ 				configurable: false,
+/******/ 				enumerable: true,
+/******/ 				get: getter
+/******/ 			});
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _objectBystring = __webpack_require__(1);
+
+var _objectBystring2 = _interopRequireDefault(_objectBystring);
+
+var _PubSub2 = __webpack_require__(2);
+
+var _PubSub3 = _interopRequireDefault(_PubSub2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+if (typeof Object.assign != 'function') {
+    Object.assign = function (target, varArgs) {
+        // .length of function is 2
+        'use strict';
+
+        if (target == null) throw new TypeError('Cannot convert undefined or null to object');
+        var to = Object(target);
+
+        for (var index = 1; index < arguments.length; index++) {
+            var nextSource = arguments[index];
+
+            if (nextSource != null) {
+                // Skip over if undefined or null
+                for (var nextKey in nextSource) {
+                    // Avoid bugs when hasOwnProperty is shadowed
+                    if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) to[nextKey] = nextSource[nextKey];
+                }
+            }
+        }
+        return to;
+    };
+}
+
+var SubState = function (_PubSub) {
+    _inherits(SubState, _PubSub);
+
+    function SubState(objParam, inst) {
+        _classCallCheck(this, SubState);
+
+        var _this = _possibleConstructorReturn(this, (SubState.__proto__ || Object.getPrototypeOf(SubState)).call(this));
+
+        console.warn('\n        "Yoooo. You are using a Development version of SubState (npm substate, etc.).\n    /( \'0\')/\n        ');
+
+        var $obj = objParam || {};
+
+        _this.$name = $obj.name || "SubStateInstance";
+        _this.$loaded = false;
+
+        _this.$currentState = $obj.currentState || 0;
+        _this.$stateStorage = $obj.stateStorage || [];
+        _this.$saveOnChange = $obj.saveOnChange || null;
+        _this.$pullFromLocal = $obj.pullFromLocal || null;
+
+        if ($obj.state) _this.$stateStorage.push($obj.state);
+        _this.$init();
+
+        return _this;
+    }
+
+    _createClass(SubState, [{
+        key: '$init',
+        value: function $init() {
+            if (!this.$loaded) {
+                this.$on('UPDATE_STATE', this.$updateState.bind(this));
+                this.$on('CHANGE_STATE', this.$changeState.bind(this));
+                this.$on('UPDATE_CHUNK', this.$updateChunk.bind(this));
+
+                if (this.pullFromLocal) {
+                    if (window.localStorage[this.name]) {
+                        var state = JSON.parse(window.localStorage.getItem(this.name));
+                        this.$currentState = state.currentState;
+                        this.$stateStorage = state.stateStorage;
+                    }
+                }
+                this.$loaded = true;
+            }
+        }
+    }, {
+        key: '$getState',
+        value: function $getState(index) {
+            return this.$stateStorage[index];
+        }
+    }, {
+        key: '$getCurrentState',
+        value: function $getCurrentState(s) {
+            return this.$getState(this.$currentState);
+        }
+    }, {
+        key: '$getProp',
+        value: function $getProp(prop) {
+            //TODO does not work need to rewrite since object.bystring is rewritten
+            return this.$getCurrentState().byString(prop);
+        }
+    }, {
+        key: '$changeState',
+        value: function $changeState(action) {
+            this.$currentState = action.requestedState;
+            this.$emit(action.$type || 'STATE_CHANGED', this.$getCurrentState());
+        }
+    }, {
+        key: '$saveState',
+        value: function $saveState() {
+            var obj = {
+                currentState: this.$currentState,
+                stateStorage: this.$stateStorage
+            };
+
+            window.localStorage.setItem(this.$name, JSON.stringify(obj));
+            this.$emit('STATE_SAVED', this.$getCurrentState());
+        }
+    }, {
+        key: '$removeSavedState',
+        value: function $removeSavedState() {
+            window.localStorage.removeItem(this.name);
+            this.$emit('STATE_REMOVED_SAVED_STATE');
+        }
+    }, {
+        key: '$resetState',
+        value: function $resetState() {
+            this.$currentState = 0;
+            this.$stateStorage = [this.$stateStorage[0]];
+            this.$emit('STATE_RESET');
+        }
+
+        // Updates the state history array and sets the currentState pointer properly
+
+    }, {
+        key: '$pushState',
+        value: function $pushState(newState) {
+            this.$stateStorage.push(newState);
+            this.$currentState = this.$stateStorage.length - 1;
+            console.log('State Pushed');
+        }
+    }, {
+        key: '$updateChunk',
+        value: function $updateChunk(action) {
+            //DOESNT WORK
+
+            var newChunk = {};
+            var newState = Object.assign({}, this.$getCurrentState()); //clone state
+
+            //update temp new state
+            for (var key in action) {
+                if (action.hasOwnProperty(key)) {
+                    newState.byString(key, action[key]); //update cloned state
+                    newChunk[key] = action[key]; //create chunk
+
+                    //**NOTE: 01-AA** this is a performance cheat.  I'm not retrieving current state.
+                    //...I'm building the chunk from the passed in action this avoids another
+                    //...loop to build the chunk from the current state
+                    //...this assumption is that the state update will be successful and that
+                    //...there is no altered data from here until the next call of
+                    //...'UPDATE_STATE' or 'UPDATE_CHUNK'
+                }
+            }
+
+            if (!action.$type) newState.$type = 'UPDATE_CHUNK';
+
+            //pushes new state
+            this.$pushState(newState);
+
+            // //retrieve only chunk
+            //**NOTE: State: 01-AB** this is the legit way to do it.  See note 01-AA
+            // for (var key in action) {
+            //     if(action.hasOwnProperty(key)){
+            //         console.log('key value: ',action[key]);
+            //         newChunk[this.getProp(key)] = action[key];//create chunk
+            //     }
+            // }
+
+            this.$emit(action.$type || 'CHUNK_UPDATED', newChunk); //emit with latest data
+
+            if (this.$saveOnChange) this.$saveState();
+        }
+    }, {
+        key: '$updateState',
+        value: function $updateState(action) {
+            var newState = Object.assign({}, this.$getCurrentState()); //clone state
+
+            //update temp new state
+            for (var key in action) {
+                console.log('replacing key ', key);
+                if (action.hasOwnProperty(key)) newState.byString(key, action[key]);
+                //update cloned state
+            }
+
+            console.log('New State: ', newState);
+
+            if (!action.$type) newState.$type = 'UPDATE_STATE';
+
+            //pushes new state
+            this.$pushState(newState);
+
+            this.$emit(action.$type || 'STATE_UPDATED', this.$getCurrentState()); //emit with latest data
+
+
+            if (this.$saveOnChange) this.$saveState();
+        }
+    }]);
+
+    return SubState;
+}(_PubSub3.default);
+
+exports.default = SubState;
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+!function(e,t){ true?module.exports=t():"function"==typeof define&&define.amd?define("object-bystring",[],t):"object"==typeof exports?exports["object-bystring"]=t():e["object-bystring"]=t()}(this,function(){return function(e){function t(n){if(r[n])return r[n].exports;var o=r[n]={i:n,l:!1,exports:{}};return e[n].call(o.exports,o,o.exports,t),o.l=!0,o.exports}var r={};return t.m=e,t.c=r,t.d=function(e,r,n){t.o(e,r)||Object.defineProperty(e,r,{configurable:!1,enumerable:!0,get:n})},t.n=function(e){var r=e&&e.__esModule?function(){return e.default}:function(){return e};return t.d(r,"a",r),r},t.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},t.p="",t(t.s=0)}([function(e,t){Object.prototype.byString||Object.defineProperty(Object.prototype,"byString",{enumerable:!1,configurable:!1,writable:!1,value:function(e,t,r){var n=r||this;e=e.toString().replace(/\[(\w+)\]/g,".$1"),e=e.toString().replace(/^\./,"");for(var o=e.split("."),i=0;i<o.length;++i){var c=o[i];c in n?n.hasOwnProperty(c)&&(void 0!==t&&i===o.length-1&&(n[c]=t),n=n[c]):n[c]=t}return n}})}])});
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/**
+ * Created by root on 6/27/17.
+ */
+var PubSub = function () {
+    function PubSub() {
+        _classCallCheck(this, PubSub);
+
+        this.$events = {};
+    }
+
+    _createClass(PubSub, [{
+        key: '$on',
+        value: function $on(eventName, fn) {
+
+            this.$events[eventName] = this.$events[eventName] || [];
+            this.$events[eventName].push(fn);
+        }
+    }, {
+        key: '$off',
+        value: function $off(eventName, fn) {
+            if (this.$events[eventName]) {
+                for (var i = 0; i < this.$events[eventName].length; i++) {
+                    if (this.$events[eventName][i] === fn) {
+                        this.$events[eventName].splice(i, 1);
+                        break;
+                    }
+                }
+            }
+        }
+    }, {
+        key: '$emit',
+        value: function $emit(eventName, data) {
+            console.log('in $emit: ', data);
+            if (this.$events[eventName]) {
+                this.$events[eventName].forEach(function (fn, i) {
+                    console.log(i, eventName, data);
+                    fn(data);
+                });
+            }
+        }
+
+        // react(eventName, data, fn){
+        //   this.events[eventName] = this.events[eventName] || [];  
+        //   this.events[eventName].push(fn);
+
+        //   if (this.events[eventName]) {
+        //     this.events[eventName].forEach(function(fn) {
+        //       fn(data);
+        //     });
+        //   }
+
+        // }
+
+        // once(eventName, data, fn){
+
+        //   this.events[eventName] = this.events[eventName] || [];
+        //   this.events[eventName].push(fn);
+
+        //   if (this.events[eventName]) {
+
+        //     var array = this.events[eventName].sort().filter(function(item, pos, ary) {
+        //       return !pos || item != ary[pos - 1];
+        //     });
+
+        //     array.forEach(function(fn) {
+        //       fn(data);
+        //     });
+
+        //   }
+
+        // }
+
+    }]);
+
+    return PubSub;
+}();
+
+exports.default = PubSub;
+;
+
+/***/ })
+/******/ ])["default"];
+});
