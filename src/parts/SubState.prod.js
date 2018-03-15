@@ -151,7 +151,7 @@ export default class SubState extends PubSub {
     }
 
     $updateState(action) {
-        var newState = Object.assign({}, this.$getCurrentState());//clone state
+        const newState = Object.assign({}, this.$getCurrentState());//clone state
 
         //update temp new state
         for (let key in action) {
