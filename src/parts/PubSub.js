@@ -3,69 +3,36 @@
  */
 export default class PubSub{
     constructor(){
-        this.$events = {};
+        this.events = {};
 
     }
 
-    $on(eventName, fn){
+    on(eventName, fn){
 
-        this.$events[eventName] = this.$events[eventName] || [];
-        this.$events[eventName].push(fn);
+        this.events[eventName] = this.events[eventName] || [];
+        this.events[eventName].push(fn);
 
     }
 
-    $off(eventName, fn) {
-        if (this.$events[eventName]) {
-            for (var i = 0; i < this.$events[eventName].length; i++) {
-                if (this.$events[eventName][i] === fn) {
-                    this.$events[eventName].splice(i, 1);
+    off(eventName, fn) {
+        if (this.events[eventName]) {
+            for (var i = 0; i < this.events[eventName].length; i++) {
+                if (this.events[eventName][i] === fn) {
+                    this.events[eventName].splice(i, 1);
                     break;
                 }
             }
         }
     }
 
-    $emit(eventName, data) {
-        console.log('in $emit: ', data);
-        if (this.$events[eventName]) {
-            this.$events[eventName].forEach(function(fn, i) {
+    emit(eventName, data) {
+        console.log('in emit: ', data);
+        if (this.events[eventName]) {
+            this.events[eventName].forEach(function(fn, i) {
                 console.log(i, eventName, data);
                 fn(data);
             });
         }
     }
-
-    
-
-    // react(eventName, data, fn){
-    //   this.events[eventName] = this.events[eventName] || [];  
-    //   this.events[eventName].push(fn);
-
-    //   if (this.events[eventName]) {
-    //     this.events[eventName].forEach(function(fn) {
-    //       fn(data);
-    //     });
-    //   }
-
-    // }
-
-    // once(eventName, data, fn){
-
-    //   this.events[eventName] = this.events[eventName] || [];
-    //   this.events[eventName].push(fn);
-      
-    //   if (this.events[eventName]) {
-
-    //     var array = this.events[eventName].sort().filter(function(item, pos, ary) {
-    //       return !pos || item != ary[pos - 1];
-    //     });
-
-    //     array.forEach(function(fn) {
-    //       fn(data);
-    //     });
-
-    //   }
-    
-    // }
 
 };

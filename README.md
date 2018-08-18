@@ -27,6 +27,7 @@ State management with Redux is really nice.  It's also nice with Vuex.  But it's
 8. [State Events](#state-events)  
 9. [Custom Events](#custom-events)
 10. [Updates to Come](#updates-to-come)
+11. [Pull Requests](#pull-requests)
 
 ## How it Works
 ### Diagram
@@ -131,3 +132,10 @@ Basically to utilitze a custom event, you still need to use `UPDATE_STATE`/`UPDA
 
 ## Updates to come
 Nothin' here, buddy.
+
+## Pull Requests
+1. Make sure you add/update Jest tests
+2. Make sure that you submit an issue first
+3. Create a branch (obviously)
+4. The PR Title format should go `[issue #] - [short descr]` 
+5. I will very carefully review all PRs, so this may take some time

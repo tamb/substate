@@ -20,7 +20,7 @@ if (typeof Object.assign != 'function') {
     };
 }
 
-import bystring from 'object-bystring';
+import 'object-bystring';
 import PubSub from './PubSub.js';
 
 
@@ -33,88 +33,88 @@ export default class SubState extends PubSub {
     /( '0')/
         `);
 
-        const $obj = objParam || {};
+        const obj = objParam || {};
 
-        this.$name = $obj.name || "SubStateInstance";
-        this.$loaded = false;
+        this.name = obj.name || "SubStateInstance";
+        this.loaded = false;
 
-        this.$currentState = $obj.currentState || 0;
-        this.$stateStorage = $obj.stateStorage || [];
-        this.$saveOnChange = $obj.saveOnChange || null;
-        this.$pullFromLocal = $obj.pullFromLocal || null;
+        this.currentState = obj.currentState || 0;
+        this.stateStorage = obj.stateStorage || [];
+        this.saveOnChange = obj.saveOnChange || null;
+        this.pullFromLocal = obj.pullFromLocal || null;
 
-        if ($obj.state) this.$stateStorage.push($obj.state);
-        this.$init();
+        if (obj.state) this.stateStorage.push(obj.state);
+        this.init();
    
     }
 
-    $init() {
-      if (!this.$loaded){
-        this.$on('UPDATE_STATE', this.$updateState.bind(this));
-        this.$on('CHANGE_STATE', this.$changeState.bind(this));
-        this.$on('UPDATE_CHUNK', this.$updateChunk.bind(this));
+    init() {
+      if (!this.loaded){
+        this.on('UPDATE_STATE', this.updateState.bind(this));
+        this.on('CHANGE_STATE', this.changeState.bind(this));
+        this.on('UPDATE_CHUNK', this.updateChunk.bind(this));
 
         if (this.pullFromLocal) {
             if (window.localStorage[this.name]) {
                 const state = JSON.parse(window.localStorage.getItem(this.name));
-                this.$currentState = state.currentState;
-                this.$stateStorage = state.stateStorage;
+                this.currentState = state.currentState;
+                this.stateStorage = state.stateStorage;
             }
         }
-        this.$loaded = true;
+        this.loaded = true;
       }
     }
 
-    $getState(index) {
-        return this.$stateStorage[index];
+    getState(index) {
+        return this.stateStorage[index];
     }
 
-    $getCurrentState(s) {
-        return this.$getState(this.$currentState);
+    getCurrentState(s) {
+        return this.getState(this.currentState);
     }
 
-    $getProp(prop) {
+    getProp(prop) {
         //TODO does not work need to rewrite since object.bystring is rewritten
-        return this.$getCurrentState().byString(prop);
+        return this.getCurrentState().byString(prop);
     }
 
-    $changeState(action) {
-        this.$currentState = action.requestedState;
-        this.$emit((action.$type || 'STATE_CHANGED'), this.$getCurrentState());
+    changeState(action) {
+        this.currentState = action.requestedState;
+        this.emit((action.$type || 'STATE_CHANGED'), this.getCurrentState());
     }
 
-    $saveState() {
+    saveState() {
         const obj = {
-            currentState: this.$currentState,
-            stateStorage: this.$stateStorage,
+            currentState: this.currentState,
+            stateStorage: this.stateStorage,
         };
 
-        window.localStorage.setItem(this.$name, JSON.stringify(obj));
-        this.$emit('STATE_SAVED', this.$getCurrentState());
+        window.localStorage.setItem(this.name, JSON.stringify(obj));
+        this.emit('STATE_SAVED', this.getCurrentState());
     }
 
-    $removeSavedState() {
+    removeSavedState() {
         window.localStorage.removeItem(this.name);
-        this.$emit('STATE_REMOVED_SAVED_STATE');
+        this.emit('STATE_REMOVED_SAVED_STATE');
     }
 
-    $resetState() {
-        this.$currentState = 0;
-        this.$stateStorage = [this.$stateStorage[0]];
-        this.$emit('STATE_RESET');
+    resetState() {
+        this.currentState = 0;
+        this.stateStorage = [this.stateStorage[0]];
+        this.emit('STATE_RESET');
     }
 
     // Updates the state history array and sets the currentState pointer properly
-    $pushState(newState) {
-      this.$stateStorage.push(newState);
-      this.$currentState = (this.$stateStorage.length -1);
+    pushState(newState) {
+      this.stateStorage.push(newState);
+      this.currentState = (this.stateStorage.length -1);
       console.log('State Pushed');
     }
 
-    $updateChunk(action) {//DOESNT WORK
+    updateChunk(action) {//DOESNT WORK
        
         const newChunk = {};
-        const newState = Object.assign({}, this.$getCurrentState());//clone state
+        const newState = Object.assign({}, this.getCurrentState());//clone state
 
         //update temp new state
         for (let key in action) {
@@ -134,7 +134,7 @@ export default class SubState extends PubSub {
         if(!action.$type) newState.$type = 'UPDATE_CHUNK';
 
         //pushes new state
-        this.$pushState(newState);
+        this.pushState(newState);
 
         // //retrieve only chunk
         //**NOTE: State: 01-AB** this is the legit way to do it.  See note 01-AA
@@ -145,13 +145,13 @@ export default class SubState extends PubSub {
         //     }
         // }
 
-        this.$emit((action.$type || 'CHUNK_UPDATED'), newChunk);//emit with latest data
+        this.emit((action.$type || 'CHUNK_UPDATED'), newChunk);//emit with latest data
 
-        if (this.$saveOnChange) this.$saveState();
+        if (this.saveOnChange) this.saveState();
     }
 
-    $updateState(action) {
-        const newState = Object.assign({}, this.$getCurrentState());//clone state
+    updateState(action) {
+        const newState = Object.assign({}, this.getCurrentState());//clone state
 
         //update temp new state
         for (let key in action) {
@@ -165,11 +165,11 @@ export default class SubState extends PubSub {
         if(!action.$type) newState.$type = 'UPDATE_STATE'; 
 
         //pushes new state
-        this.$pushState(newState);
+        this.pushState(newState);
         
-        this.$emit((action.$type || 'STATE_UPDATED'), this.$getCurrentState());//emit with latest data
+        this.emit((action.$type || 'STATE_UPDATED'), this.getCurrentState());//emit with latest data
         
 
-        if (this.$saveOnChange) this.$saveState();
+        if (this.saveOnChange) this.saveState();
     }
 }
