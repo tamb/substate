@@ -29,6 +29,23 @@ test('SPEAK array to contain function of name whisper', ()=>{
     expect(pub.events.SPEAK).toContain(whisper);
 });
 
-// test('Emitting SPEAK should call both shout and whisper', ()=>{
-    
-// });
+test('Emitting SPEAK should call both shout and whisper', ()=>{
+    pub.emit('SPEAK');
+    expect(shout.mock.calls.length).toBe(1);
+    expect(whisper.mock.calls.length).toBe(1);
+    pub.emit('SPEAK');
+    expect(shout.mock.calls.length).toBe(2);
+    expect(whisper.mock.calls.length).toBe(2);
+
+});
+
+test('SPEAK array to contain function of name whisper', ()=>{
+    pub.off('SPEAK', whisper);
+    expect(pub.events.SPEAK).not.toContain(whisper);
+});
+
+test('Emitting SPEAK should call shout and not whisper', ()=>{
+    pub.emit('SPEAK');
+    expect(shout.mock.calls.length).toBe(3);
+    expect(whisper.mock.calls.length).toBe(2);
+});
