@@ -11,14 +11,15 @@ if (typeof Object.assign != 'function') {
                 for (var nextKey in nextSource) {
                     // Avoid bugs when hasOwnProperty is shadowed
                     if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) to[nextKey] = nextSource[nextKey];
-                        
-                    
                 }
             }
         }
         return to;
     };
 }
+
+const S = 'UPDATE_STATE';
+const C = 'UPDATE_CHUNK';
 
 import 'object-bystring';
 import PubSub from './PubSub.js';
@@ -36,12 +37,9 @@ export default class SubState extends PubSub {
         const obj = objParam || {};
 
         this.name = obj.name || "SubStateInstance";
-        this.loaded = false;
 
         this.currentState = obj.currentState || 0;
         this.stateStorage = obj.stateStorage || [];
-        this.saveOnChange = obj.saveOnChange || null;
-        this.pullFromLocal = obj.pullFromLocal || null;
 
         if (obj.state) this.stateStorage.push(obj.state);
         this.init();
@@ -49,20 +47,17 @@ export default class SubState extends PubSub {
     }
 
     init() {
-      if (!this.loaded){
-        this.on('UPDATE_STATE', this.updateState.bind(this));
-        this.on('CHANGE_STATE', this.changeState.bind(this));
-        this.on('UPDATE_CHUNK', this.updateChunk.bind(this));
+        this.on(S, this.updateState.bind(this));
+        this.on(C, this.updateChunk.bind(this));
 
         if (this.pullFromLocal) {
             if (window.localStorage[this.name]) {
                 const state = JSON.parse(window.localStorage.getItem(this.name));
                 this.currentState = state.currentState;
                 this.stateStorage = state.stateStorage;
+                this.emit('PULLED_FROM_LOCAL');
             }
         }
-        this.loaded = true;
-      }
     }
 
     getState(index) {
@@ -131,7 +126,7 @@ export default class SubState extends PubSub {
             }
         }
         
-        if(!action.$type) newState.$type = 'UPDATE_CHUNK';
+        if(!action.$type) newState.$type = C;
 
         //pushes new state
         this.pushState(newState);
@@ -162,14 +157,13 @@ export default class SubState extends PubSub {
 
         console.log('New State: ', newState);
 
-        if(!action.$type) newState.$type = 'UPDATE_STATE'; 
+        if(!action.$type) newState.$type = U; 
 
         //pushes new state
         this.pushState(newState);
         
         this.emit((action.$type || 'STATE_UPDATED'), this.getCurrentState());//emit with latest data
         
-
         if (this.saveOnChange) this.saveState();
     }
 }

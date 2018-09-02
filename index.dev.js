@@ -86,9 +86,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _objectBystring = __webpack_require__(1);
-
-var _objectBystring2 = _interopRequireDefault(_objectBystring);
+__webpack_require__(1);
 
 var _PubSub2 = __webpack_require__(2);
 
@@ -125,6 +123,9 @@ if (typeof Object.assign != 'function') {
     };
 }
 
+var S = 'UPDATE_STATE';
+var C = 'UPDATE_CHUNK';
+
 var SubState = function (_PubSub) {
     _inherits(SubState, _PubSub);
 
@@ -135,103 +136,98 @@ var SubState = function (_PubSub) {
 
         console.warn('\n        "Yoooo. You are using a Development version of SubState (npm substate, etc.).\n    /( \'0\')/\n        ');
 
-        var $obj = objParam || {};
+        var obj = objParam || {};
 
-        _this.$name = $obj.name || "SubStateInstance";
-        _this.$loaded = false;
+        _this.name = obj.name || "SubStateInstance";
 
-        _this.$currentState = $obj.currentState || 0;
-        _this.$stateStorage = $obj.stateStorage || [];
-        _this.$saveOnChange = $obj.saveOnChange || null;
-        _this.$pullFromLocal = $obj.pullFromLocal || null;
+        _this.currentState = obj.currentState || 0;
+        _this.stateStorage = obj.stateStorage || [];
+        _this.saveOnChange = obj.saveOnChange || null;
+        _this.pullFromLocal = obj.pullFromLocal || null;
 
-        if ($obj.state) _this.$stateStorage.push($obj.state);
-        _this.$init();
+        if (obj.state) _this.stateStorage.push(obj.state);
+        _this.init();
 
         return _this;
     }
 
     _createClass(SubState, [{
-        key: '$init',
-        value: function $init() {
-            if (!this.$loaded) {
-                this.$on('UPDATE_STATE', this.$updateState.bind(this));
-                this.$on('CHANGE_STATE', this.$changeState.bind(this));
-                this.$on('UPDATE_CHUNK', this.$updateChunk.bind(this));
+        key: 'init',
+        value: function init() {
+            this.on(S, this.updateState.bind(this));
+            this.on(C, this.updateChunk.bind(this));
 
-                if (this.pullFromLocal) {
-                    if (window.localStorage[this.name]) {
-                        var state = JSON.parse(window.localStorage.getItem(this.name));
-                        this.$currentState = state.currentState;
-                        this.$stateStorage = state.stateStorage;
-                    }
+            if (this.pullFromLocal) {
+                if (window.localStorage[this.name]) {
+                    var state = JSON.parse(window.localStorage.getItem(this.name));
+                    this.currentState = state.currentState;
+                    this.stateStorage = state.stateStorage;
                 }
-                this.$loaded = true;
             }
         }
     }, {
-        key: '$getState',
-        value: function $getState(index) {
-            return this.$stateStorage[index];
+        key: 'getState',
+        value: function getState(index) {
+            return this.stateStorage[index];
         }
     }, {
-        key: '$getCurrentState',
-        value: function $getCurrentState(s) {
-            return this.$getState(this.$currentState);
+        key: 'getCurrentState',
+        value: function getCurrentState(s) {
+            return this.getState(this.currentState);
         }
     }, {
-        key: '$getProp',
-        value: function $getProp(prop) {
+        key: 'getProp',
+        value: function getProp(prop) {
             //TODO does not work need to rewrite since object.bystring is rewritten
-            return this.$getCurrentState().byString(prop);
+            return this.getCurrentState().byString(prop);
         }
     }, {
-        key: '$changeState',
-        value: function $changeState(action) {
-            this.$currentState = action.requestedState;
-            this.$emit(action.$type || 'STATE_CHANGED', this.$getCurrentState());
+        key: 'changeState',
+        value: function changeState(action) {
+            this.currentState = action.requestedState;
+            this.emit(action.$type || 'STATE_CHANGED', this.getCurrentState());
         }
     }, {
-        key: '$saveState',
-        value: function $saveState() {
+        key: 'saveState',
+        value: function saveState() {
             var obj = {
-                currentState: this.$currentState,
-                stateStorage: this.$stateStorage
+                currentState: this.currentState,
+                stateStorage: this.stateStorage
             };
 
-            window.localStorage.setItem(this.$name, JSON.stringify(obj));
-            this.$emit('STATE_SAVED', this.$getCurrentState());
+            window.localStorage.setItem(this.name, JSON.stringify(obj));
+            this.emit('STATE_SAVED', this.getCurrentState());
         }
     }, {
-        key: '$removeSavedState',
-        value: function $removeSavedState() {
+        key: 'removeSavedState',
+        value: function removeSavedState() {
             window.localStorage.removeItem(this.name);
-            this.$emit('STATE_REMOVED_SAVED_STATE');
+            this.emit('STATE_REMOVED_SAVED_STATE');
         }
     }, {
-        key: '$resetState',
-        value: function $resetState() {
-            this.$currentState = 0;
-            this.$stateStorage = [this.$stateStorage[0]];
-            this.$emit('STATE_RESET');
+        key: 'resetState',
+        value: function resetState() {
+            this.currentState = 0;
+            this.stateStorage = [this.stateStorage[0]];
+            this.emit('STATE_RESET');
         }
 
         // Updates the state history array and sets the currentState pointer properly
 
     }, {
-        key: '$pushState',
-        value: function $pushState(newState) {
-            this.$stateStorage.push(newState);
-            this.$currentState = this.$stateStorage.length - 1;
+        key: 'pushState',
+        value: function pushState(newState) {
+            this.stateStorage.push(newState);
+            this.currentState = this.stateStorage.length - 1;
             console.log('State Pushed');
         }
     }, {
-        key: '$updateChunk',
-        value: function $updateChunk(action) {
+        key: 'updateChunk',
+        value: function updateChunk(action) {
             //DOESNT WORK
 
             var newChunk = {};
-            var newState = Object.assign({}, this.$getCurrentState()); //clone state
+            var newState = Object.assign({}, this.getCurrentState()); //clone state
 
             //update temp new state
             for (var key in action) {
@@ -248,10 +244,10 @@ var SubState = function (_PubSub) {
                 }
             }
 
-            if (!action.$type) newState.$type = 'UPDATE_CHUNK';
+            if (!action.$type) newState.$type = C;
 
             //pushes new state
-            this.$pushState(newState);
+            this.pushState(newState);
 
             // //retrieve only chunk
             //**NOTE: State: 01-AB** this is the legit way to do it.  See note 01-AA
@@ -262,14 +258,14 @@ var SubState = function (_PubSub) {
             //     }
             // }
 
-            this.$emit(action.$type || 'CHUNK_UPDATED', newChunk); //emit with latest data
+            this.emit(action.$type || 'CHUNK_UPDATED', newChunk); //emit with latest data
 
-            if (this.$saveOnChange) this.$saveState();
+            if (this.saveOnChange) this.saveState();
         }
     }, {
-        key: '$updateState',
-        value: function $updateState(action) {
-            var newState = Object.assign({}, this.$getCurrentState()); //clone state
+        key: 'updateState',
+        value: function updateState(action) {
+            var newState = Object.assign({}, this.getCurrentState()); //clone state
 
             //update temp new state
             for (var key in action) {
@@ -280,15 +276,14 @@ var SubState = function (_PubSub) {
 
             console.log('New State: ', newState);
 
-            if (!action.$type) newState.$type = 'UPDATE_STATE';
+            if (!action.$type) newState.$type = U;
 
             //pushes new state
-            this.$pushState(newState);
+            this.pushState(newState);
 
-            this.$emit(action.$type || 'STATE_UPDATED', this.$getCurrentState()); //emit with latest data
+            this.emit(action.$type || 'STATE_UPDATED', this.getCurrentState()); //emit with latest data
 
-
-            if (this.$saveOnChange) this.$saveState();
+            if (this.saveOnChange) this.saveState();
         }
     }]);
 
@@ -325,71 +320,39 @@ var PubSub = function () {
     function PubSub() {
         _classCallCheck(this, PubSub);
 
-        this.$events = {};
+        this.events = {};
     }
 
     _createClass(PubSub, [{
-        key: '$on',
-        value: function $on(eventName, fn) {
+        key: 'on',
+        value: function on(eventName, fn) {
 
-            this.$events[eventName] = this.$events[eventName] || [];
-            this.$events[eventName].push(fn);
+            this.events[eventName] = this.events[eventName] || [];
+            this.events[eventName].push(fn);
         }
     }, {
-        key: '$off',
-        value: function $off(eventName, fn) {
-            if (this.$events[eventName]) {
-                for (var i = 0; i < this.$events[eventName].length; i++) {
-                    if (this.$events[eventName][i] === fn) {
-                        this.$events[eventName].splice(i, 1);
+        key: 'off',
+        value: function off(eventName, fn) {
+            if (this.events[eventName]) {
+                for (var i = 0; i < this.events[eventName].length; i++) {
+                    if (this.events[eventName][i] === fn) {
+                        this.events[eventName].splice(i, 1);
                         break;
                     }
                 }
             }
         }
     }, {
-        key: '$emit',
-        value: function $emit(eventName, data) {
-            console.log('in $emit: ', data);
-            if (this.$events[eventName]) {
-                this.$events[eventName].forEach(function (fn, i) {
+        key: 'emit',
+        value: function emit(eventName, data) {
+            console.log('in emit: ', data);
+            if (this.events[eventName]) {
+                this.events[eventName].forEach(function (fn, i) {
                     console.log(i, eventName, data);
                     fn(data);
                 });
             }
         }
-
-        // react(eventName, data, fn){
-        //   this.events[eventName] = this.events[eventName] || [];  
-        //   this.events[eventName].push(fn);
-
-        //   if (this.events[eventName]) {
-        //     this.events[eventName].forEach(function(fn) {
-        //       fn(data);
-        //     });
-        //   }
-
-        // }
-
-        // once(eventName, data, fn){
-
-        //   this.events[eventName] = this.events[eventName] || [];
-        //   this.events[eventName].push(fn);
-
-        //   if (this.events[eventName]) {
-
-        //     var array = this.events[eventName].sort().filter(function(item, pos, ary) {
-        //       return !pos || item != ary[pos - 1];
-        //     });
-
-        //     array.forEach(function(fn) {
-        //       fn(data);
-        //     });
-
-        //   }
-
-        // }
-
     }]);
 
     return PubSub;
