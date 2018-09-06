@@ -1,22 +1,24 @@
-if (typeof Object.assign != 'function') {
-    Object.assign = function(target, varArgs) { // .length of function is 2
-        'use strict';
-        if (target == null) throw new TypeError('Cannot convert undefined or null to object');
-        var to = Object(target);
+// import React from 'react';
 
-        for (var index = 1; index < arguments.length; index++) {
-            var nextSource = arguments[index];
+// if (typeof Object.assign != 'function') {
+//     Object.assign = function(target, varArgs) { // .length of function is 2
+//         'use strict';
+//         if (target == null) throw new TypeError('Cannot convert undefined or null to object');
+//         var to = Object(target);
 
-            if (nextSource != null) { // Skip over if undefined or null
-                for (var nextKey in nextSource) {
-                    // Avoid bugs when hasOwnProperty is shadowed
-                    if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) to[nextKey] = nextSource[nextKey];
-                }
-            }
-        }
-        return to;
-    };
-}
+//         for (var index = 1; index < arguments.length; index++) {
+//             var nextSource = arguments[index];
+
+//             if (nextSource != null) { // Skip over if undefined or null
+//                 for (var nextKey in nextSource) {
+//                     // Avoid bugs when hasOwnProperty is shadowed
+//                     if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) to[nextKey] = nextSource[nextKey];
+//                 }
+//             }
+//         }
+//         return to;
+//     };
+// }
 
 const S = 'UPDATE_STATE';
 const C = 'UPDATE_CHUNK';
@@ -167,3 +169,31 @@ export default class SubState extends PubSub {
         if (this.saveOnChange) this.saveState();
     }
 }
+
+/**
+ * 
+ * @param {React Component} Comp 
+ * @param {Substate Instance} state 
+ * @param {object} chunk - object of keys (prop names) to root state slice (by string) 
+ */
+const mapToProps = (Comp,state,chunk)=>{
+    return class extends Component{
+        render(){
+            const props = {};
+            for (let key in chunk){
+                props[key] = state.getProp(chunk[key]);
+            }
+            if(typeof chunk === 'object'){
+                return(
+                    <Comp {...props}/>
+                );
+            } else {
+                console.error('You have not passed mapToProps a chunk of type object');
+            }
+        }
+    }
+};
+
+export {
+    mapToProps
+};
