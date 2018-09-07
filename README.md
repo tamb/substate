@@ -133,7 +133,12 @@ _note: the object of data that is passed, cannot have a key called '$type'_
 Basically to utilitze a custom event, you still need to use `UPDATE_STATE`/`UPDATE_CHUNK` but the data object needs a `$type` with an event name you want the State to emit _when updated_
 
 ## Updates to come
-Nothin' here, buddy.
+* Stripping `$`from all class methods
+* Creating an easier local storage feature, which will allow for certain state fields to be omitted from local storage
+* Additional option to omit certain fields from local storage
+* Better documentation on how to deal with very large data in state
+* Jest tests as part of the library
+* better dev instructions and console warnings/errors
 
 ## Pull Requests
 1. Make sure you add/update Jest tests
