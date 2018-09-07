@@ -1,6 +1,6 @@
 {
   "name": "substate",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "description": "Hybrid Flux and Pub/Sub state management",
   "main": "index.js",
   "scripts": {
@@ -24,7 +24,9 @@
     "jest": "^23.5.0",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
-    "webpack": "^3.10.0"
+    "substate-connect": "^3.0.0",
+    "webpack": "^4.17.2",
+    "webpack-cli": "^3.1.0"
   },
   "dependencies": {
     "object-bystring": "^2.1.2"

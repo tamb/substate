@@ -1,4 +1,5 @@
  var webpack = require('webpack');
+ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
  var path = require('path');
 
 module.exports = [{
@@ -69,7 +70,7 @@ module.exports = [{
     },
 
 
-    plugins: pluginForEnvironment(true),
+    optimization: pluginForEnvironment(true),
 
 
 }];
@@ -77,19 +78,32 @@ module.exports = [{
 
 function pluginForEnvironment(bool){
 
-    return(
-        [
-                new webpack.optimize.UglifyJsPlugin({ //plugin that minifies js
-                    // Eliminate comments
-                    comments: false,
-                    compress: {
-                        warnings: false, //remove warnings
-                        drop_console: bool //remove console.logs
-                    },
-                    sourceMap: true //generate a source map for each minified file
-                })
-            ]
+    return({
+        // minimizer: [
+        //         { //plugin that minifies js
+        //             // Eliminate comments
+        //             comments: false,
+        //             compress: {
+        //                 warnings: false, //remove warnings
+        //                 drop_console: bool //remove console.logs
+        //             },
+        //             sourceMap: true //generate a source map for each minified file
+        //         }
+        //     ]
+        minimizer: [
+            // we specify a custom UglifyJsPlugin here to get source maps in production
+            new UglifyJsPlugin({
+              uglifyOptions: {
+                compress: {
+                    warnings: false,
+                    drop_console: bool
+                },
+                comments: false
+              },
+              sourceMap: true
+            })
+          ]
 
-    )
+    })
 
 }

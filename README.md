@@ -11,7 +11,7 @@ State management with Redux is really nice.  It's also nice with Vuex.  But it's
 * To allow for manipulation of deeply nested state properties through use of strings `{'my[index]deeply.nests.state': 'new value'}` (we're sending this to SubState to _not mutate_ the state, but make a new copy (Flux-y)!
 * Maintain a small size.  Currently it's 6kb minified and 2kb gzipped!
 
-## For v3 docs https://github.com/TomSaporito/substate/blob/master/oldreadme.md
+## For v3 docs -- DO NOT USE V4 https://github.com/TomSaporito/substate/blob/master/oldreadme.md
 
 ## _note:_ anything marked _| no docs |_ means I haven't documented it yet.
 
