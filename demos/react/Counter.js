@@ -1,4 +1,6 @@
-import React, {Component} from 'react';
+import React from 'react';
+import { connect } from 'substate-connect';
+
 import AppState from './state';
 
 // const addProps = specialProps => Wrapped => props => <Wrapped {...specialProps} {...props} />
@@ -6,13 +8,13 @@ import AppState from './state';
 // const SpecialCount = withSpecialProps(Counter)
 // <SpecialCount name="Nanny" />
 
-const mapToProps = (state, chunk)=> Comp => props =>{
-    const newProps = {};
-    for (let key in chunk){
-        newProps[key] = state.getProp(chunk[key]);
-    }
-    return (<Comp {...newProps} {...props} />)
-};
+// const mapToProps = (state, chunk)=> Comp => props =>{
+//     const newProps = {};
+//     for (let key in chunk){
+//         newProps[key] = state.getProp(chunk[key]);
+//     }
+//     return (<Comp {...newProps} {...props} />)
+// };
 
 const Counter = (props) => {
     console.log('PROPS on I:', props)
@@ -26,4 +28,4 @@ const Counter = (props) => {
     );
 }
 
-export default mapToProps(AppState, {clicks: 'clicks'})(Counter);
+export default connect(AppState, {clicks: 'clicks'})(Counter);
