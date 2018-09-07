@@ -11,8 +11,6 @@ State management with Redux is really nice.  It's also nice with Vuex.  But it's
 * To allow for manipulation of deeply nested state properties through use of strings `{'my[index]deeply.nests.state': 'new value'}` (we're sending this to SubState to _not mutate_ the state, but make a new copy (Flux-y)!
 * Maintain a small size.  Currently it's 6kb minified and 2kb gzipped!
 
-## For v3 docs ()[see here]
-
 ## _note:_ anything marked _| no docs |_ means I haven't documented it yet.
 
 ## Contents
@@ -29,7 +27,6 @@ State management with Redux is really nice.  It's also nice with Vuex.  But it's
 8. [State Events](#state-events)  
 9. [Custom Events](#custom-events)
 10. [Updates to Come](#updates-to-come)
-11. [Pull Requests](#pull-requests)
 
 ## How it Works
 ### Diagram
@@ -95,13 +92,13 @@ These are the possible options
 
 | Method           | Desc                                                                      | Returns              |
 | ---------------- |---------------------------------------------------------------------------| --------------------:|
-| getState         | get a state `@param*` - index of state needed                             | state                |
-| getcurrentState  | get the current state                                                     | current state object |
-| getProp          | get a prop from current state `@param*` - string path to prop             | property you request |
-| changeState      | change the version of the state `@param*` - `{requestedState: index of state, action: (optional name of event to emit)}`| emits `action` parameter event or 'STATE_CHANGED' event with the new current state    |
-| saveState        | save stateStorage array to localStorage.  Will use instance param of name | emits 'STATE_SAVED'  |
-| removeSavedState | removed state from LocalStorage                                           |emits 'STATE_REMOVED_SAVED_STATE'|
-| resetState       | resets the `stateStorage` array to an empty array                         |emits 'STATE_RESET'   |
+| $getState         | get a state `@param*` - index of state needed                             | state                |
+| $getcurrentState  | get the current state                                                     | current state object |
+| $getProp          | get a prop from current state `@param*` - string path to prop             | property you request |
+| $changeState      | change the version of the state `@param*` - `{requestedState: index of state, action: (optional name of event to emit)}`| emits `action` parameter event or 'STATE_CHANGED' event with the new current state    |
+| $saveState        | save stateStorage array to localStorage.  Will use instance param of name | emits 'STATE_SAVED'  |
+| $removeSavedState | removed state from LocalStorage                                           |emits 'STATE_REMOVED_SAVED_STATE'|
+| $resetState       | resets the `stateStorage` array to an empty array                         |emits 'STATE_RESET'   |
 
 ## Event Methods
 * `@param` optional method parameter
@@ -110,9 +107,9 @@ These are the possible options
 
 | Method        | Desc                                                                                                                  
 | ------------- |---------------------------------------------------------------------------------------------------------------------
-| on            | `@param1*` STRING of event name to listen to. `@param2*` FUNC handler to execute when this event you listen to happens
-| off           | `@param1*` STRING of event name to remove handler from.` @param2*` FUNC to remove from the execution queue             
-| emit          | `@param1*` STRING event name  `@param2` object of data to pass into your handler event from 'on' method                          
+| $on            | `@param1*` STRING of event name to listen to. `@param2*` FUNC handler to execute when this event you listen to happens
+| $off           | `@param1*` STRING of event name to remove handler from.` @param2*` FUNC to remove from the execution queue             
+| $emit          | `@param1*` STRING event name  `@param2` object of data to pass into your handler event from 'on' method                          
 
 
 ## State Events
@@ -127,7 +124,7 @@ _note: the object of data that is passed, cannot have a key called '$type'_
 
 | Method   | Event                         |  Custom Event                                     | Next                |
 | -------- |-------------------------------| --------------------------------------------------|--------------------:|
-|  emit    | 'UPDATE_CHUNK' _or_ 'UPDATE_STATE' | `@param2` is an object:   `{$type: 'MY_CUSTOM_EVENT'}` | Will update/change state. The `$type` property will then be emitted so you can listen to it like `SubStateInstance.on('MY_CUSTOM_EVENT', func)`|
+|  $emit    | 'UPDATE_CHUNK' _or_ 'UPDATE_STATE' | `@param2` is an object:   `{$type: 'MY_CUSTOM_EVENT'}` | Will update/change state. The `$type` property will then be emitted so you can listen to it like `SubStateInstance.on('MY_CUSTOM_EVENT', func)`|
 
 ### To clear this ^ up :
 Basically to utilitze a custom event, you still need to use `UPDATE_STATE`/`UPDATE_CHUNK` but the data object needs a `$type` with an event name you want the State to emit _when updated_
@@ -139,10 +136,3 @@ Basically to utilitze a custom event, you still need to use `UPDATE_STATE`/`UPDA
 * Better documentation on how to deal with very large data in state
 * Jest tests as part of the library
 * better dev instructions and console warnings/errors
-
-## Pull Requests
-1. Make sure you add/update Jest tests
-2. Make sure that you submit an issue first
-3. Create a branch (obviously)
-4. The PR Title format should go `[issue #] - [short descr]` 
-5. I will very carefully review all PRs, so this may take some time

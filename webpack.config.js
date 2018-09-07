@@ -5,7 +5,7 @@ module.exports = [{
     context: __dirname + '/', // `__dirname` is root of project and `src` is source
 
     entry: {
-        substate: './src/parts/SubState.prod.js'
+        substate: './src/parts/SubState.js'
     },
 
     output: {
@@ -27,7 +27,7 @@ module.exports = [{
             exclude: /node_modules/,
             use: [{
                 loader: 'babel-loader',
-                options: { presets: ['es2015'] }
+                options: { presets: ['env','es2015','react'] }
             }]
         }]
     },
@@ -41,7 +41,7 @@ module.exports = [{
     context: __dirname + '/', // `__dirname` is root of project and `src` is source
 
     entry: {
-        substate: './src/parts/SubState.prod.js'
+        substate: './src/parts/SubState.js'
     },
 
     output: {

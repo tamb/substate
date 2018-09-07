@@ -1,10 +1,10 @@
 {
   "name": "substate",
-  "version": "3.1.6",
+  "version": "4.0.0",
   "description": "Hybrid Flux and Pub/Sub state management",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "build": "webpack"
   },
   "repository": {
@@ -15,9 +15,15 @@
   "author": "Tamb (Tom Saporito) <t.saporito@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "babel-core": "^6.24.1",
+    "babel-core": "^6.26.3",
     "babel-loader": "^7.0.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-preset-env": "^1.7.0",
     "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "jest": "^23.5.0",
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2",
     "webpack": "^3.10.0"
   },
   "dependencies": {
