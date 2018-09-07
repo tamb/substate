@@ -1,4 +1,4 @@
-// import React from 'react';
+// import React, { Component } from 'react';
 
 // if (typeof Object.assign != 'function') {
 //     Object.assign = function(target, varArgs) { // .length of function is 2
@@ -159,7 +159,7 @@ export default class SubState extends PubSub {
 
         console.log('New State: ', newState);
 
-        if(!action.$type) newState.$type = U; 
+        if(!action.$type) newState.$type = S; 
 
         //pushes new state
         this.pushState(newState);
@@ -169,31 +169,3 @@ export default class SubState extends PubSub {
         if (this.saveOnChange) this.saveState();
     }
 }
-
-/**
- * 
- * @param {React Component} Comp 
- * @param {Substate Instance} state 
- * @param {object} chunk - object of keys (prop names) to root state slice (by string) 
- */
-const mapToProps = (Comp,state,chunk)=>{
-    return class extends Component{
-        render(){
-            const props = {};
-            for (let key in chunk){
-                props[key] = state.getProp(chunk[key]);
-            }
-            if(typeof chunk === 'object'){
-                return(
-                    <Comp {...props}/>
-                );
-            } else {
-                console.error('You have not passed mapToProps a chunk of type object');
-            }
-        }
-    }
-};
-
-export {
-    mapToProps
-};
