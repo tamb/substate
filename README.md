@@ -28,8 +28,10 @@ State management with Redux is really nice.  It's also nice with Vuex.  But it's
 7. [Event Methods](#event-methods)
 8. [State Events](#state-events)  
 9. [Custom Events](#custom-events)
-10. [Updates to Come](#updates-to-come)
-11. [Pull Requests](#pull-requests)
+10. [Usage with React](#usage-with-react)
+11. [Updates to Come](#updates-to-come)
+12. [Pull Requests](#pull-requests)
+
 
 ## How it Works
 ### Diagram
@@ -131,6 +133,40 @@ _note: the object of data that is passed, cannot have a key called '$type'_
 
 ### To clear this ^ up :
 Basically to utilitze a custom event, you still need to use `UPDATE_STATE`/`UPDATE_CHUNK` but the data object needs a `$type` with an event name you want the State to emit _when updated_
+
+## Usage with React
+Use the package [`substate-connect`](https://github.com/tamb/substate-connect) and it wires up just like redux does with React. 
+
+### a few thoughts on the _overall_ `react-redux` architecture:
+Currently most of us do this:
+```js
+// MyComponent.js
+
+export default connect(mapStateToProps)(MyComponent)
+```
+This is done in the component file itself!  That should raise a red flag.  Suddenly you're making your _component_ (the thing that should be reusable) literally mapped to the state of this app!  So I have a suggestion:
+
+Do this:
+
+```js
+// MyComponent.js
+
+export default MyComponent;
+```
+
+```js
+// App specific view or where my components are used for purposeful composition
+
+import MyComponent from './components/MyComponent';
+import { connect } from 'substate-connect';
+
+const WiredMyComponent = connect(MapStateToProps)(MyComponent);
+
+... inside some render function
+   <MyComponent />
+```
+
+
 
 ## Updates to come
 * Stripping `$`from all class methods
