@@ -150,12 +150,13 @@ export default MyComponent;
 // App specific view or where my components are used for purposeful composition
 
 import MyComponent from './components/MyComponent';
+import mySubStateInstance from './state.js';
 import { connect } from 'substate-connect';
 
-const WiredMyComponent = connect(MapStateToProps)(MyComponent);
+const WiredMyComponent = connect(mySubStateInstance, MapStateToProps)(MyComponent);
 
 ... inside some render function
-   <MyComponent />
+   <WiredMyComponent />
 ```
 
 
