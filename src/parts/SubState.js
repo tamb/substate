@@ -4,8 +4,6 @@ import 'object-bystring';
 import PubSub from './PubSub.js';
 
 const S = 'UPDATE_STATE';
-const C = 'UPDATE_CHUNK';
-
 
 export default class SubState extends PubSub {
     constructor(objParam, inst) {
@@ -30,16 +28,6 @@ export default class SubState extends PubSub {
 
     init() {
         this.on(S, this.updateState.bind(this));
-        this.on(C, this.updateChunk.bind(this));
-
-        if (this.pullFromLocal) {
-            if (window.localStorage[this.name]) {
-                const state = JSON.parse(window.localStorage.getItem(this.name));
-                this.currentState = state.currentState;
-                this.stateStorage = state.stateStorage;
-                this.emit('PULLED_FROM_LOCAL');
-            }
-        }
     }
 
     getState(index) {
@@ -58,21 +46,6 @@ export default class SubState extends PubSub {
     changeState(action) {
         this.currentState = action.requestedState;
         this.emit((action.$type || 'STATE_CHANGED'), this.getCurrentState());
-    }
-
-    saveState() {
-        const obj = {
-            currentState: this.currentState,
-            stateStorage: this.stateStorage,
-        };
-
-        window.localStorage.setItem(this.name, JSON.stringify(obj));
-        this.emit('STATE_SAVED', this.getCurrentState());
-    }
-
-    removeSavedState() {
-        window.localStorage.removeItem(this.name);
-        this.emit('STATE_REMOVED_SAVED_STATE');
     }
 
     resetState() {
@@ -113,7 +86,5 @@ export default class SubState extends PubSub {
         this.pushState(newState);
         
         this.emit((action.$type || 'STATE_UPDATED'), this.getCurrentState());//emit with latest data
-        
-        if (this.saveOnChange) this.saveState();
     }
 }
