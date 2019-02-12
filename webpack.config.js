@@ -32,11 +32,38 @@ module.exports = [{
             }]
         }]
     },
+},
+{
+    context: __dirname + '/', // `__dirname` is root of project and `src` is source
 
+    entry: {
+        substate: './src/parts/SubState.js'
+    },
 
-    // plugins: pluginForEnvironment(false),
+    output: {
+      path: path.join(__dirname),
+      filename: 'index.min.js',
+      library: ["SubState"],
+      libraryTarget: "umd",
+      libraryExport: "default"
+    },
 
+    resolve: {
+        extensions: ['.js']
+    },
 
+    // maybe for later if writing in ES6>
+    module: {
+        rules: [{
+            test: /\.js?$/, // Check for all js files
+            exclude: /node_modules/,
+            use: [{
+                loader: 'babel-loader',
+                options: { presets: ['es2015'] }
+            }]
+        }]
+    },
+    optimization: pluginForEnvironment(true),
 },
 {
     context: __dirname + '/', // `__dirname` is root of project and `src` is source
@@ -68,11 +95,6 @@ module.exports = [{
             }]
         }]
     },
-
-
-    optimization: pluginForEnvironment(true),
-
-
 }];
 
 
