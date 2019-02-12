@@ -17,7 +17,6 @@ State management with Redux is really nice.  It's also nice with Vuex.  But it's
 
 ## Contents
 1. [How it Works](#how-it-works)
-    * [Diagram](#diagram)
     * [The Steps](#the-steps)
     
 2. [Demos](#demos)
@@ -34,8 +33,6 @@ State management with Redux is really nice.  It's also nice with Vuex.  But it's
 
 
 ## How it Works
-### Diagram
-![](Substate.png?raw=true)
 
 ### The Steps
 1. (if using modules) `import { myInstance } from 'myFile'`
