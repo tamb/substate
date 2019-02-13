@@ -2,7 +2,8 @@
  const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
  var path = require('path');
 
-module.exports = [{
+module.exports = [
+{
     context: __dirname + '/', // `__dirname` is root of project and `src` is source
 
     entry: {
@@ -14,7 +15,8 @@ module.exports = [{
       filename: 'index.dev.js',
       library: ["SubState"],
       libraryTarget: "umd",
-      libraryExport: "default"
+      libraryExport: "default",
+      globalObject: "typeof self !== 'undefined' ? self : this"
     },
 
     resolve: {
@@ -32,11 +34,6 @@ module.exports = [{
             }]
         }]
     },
-
-
-    // plugins: pluginForEnvironment(false),
-
-
 },
 {
     context: __dirname + '/', // `__dirname` is root of project and `src` is source
@@ -50,7 +47,8 @@ module.exports = [{
       filename: 'index.js',
       library: ["SubState"],
       libraryTarget: "umd",
-      libraryExport: "default"
+      libraryExport: "default",
+      globalObject: "typeof self !== 'undefined' ? self : this"
     },
 
     resolve: {
@@ -68,12 +66,9 @@ module.exports = [{
             }]
         }]
     },
-
-
     optimization: pluginForEnvironment(true),
-
-
-}];
+}
+];
 
 
 function pluginForEnvironment(bool){

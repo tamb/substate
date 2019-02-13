@@ -63,7 +63,7 @@ export default class SubState extends PubSub {
 
     updateState(action) {
         let newState;
-        if (actions.$deep || this.defaultDeep){
+        if (action.$deep || this.defaultDeep){
             newState = cloneDeep(this.getCurrentState());// deep clonse
         } else {
             newState = Object.assign({}, this.getCurrentState()); // shallow clone
@@ -76,7 +76,7 @@ export default class SubState extends PubSub {
              //update cloned state
         }
 
-        newState.$deep = false; // reset $deep keyword
+        this.defaultDeep? null : newState.$deep = false; // reset $deep keyword
 
         console.log('New State: ', newState);
 
