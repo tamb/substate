@@ -6,7 +6,7 @@ State management with Redux is really nice.  It's also nice with Vuex.  But it's
 ## Purpose
 * To manage state with a simple PubSub pattern
 * To use the simplicity of Flux
-* For State to return the whole state or just a chunk of state (just what you need).  
+* For State to return a new state (pure function)
 * Message filtering can be applied _without_ a `switch` statement (you create your own event `$type`)
 * To allow for manipulation of deeply nested state properties through use of strings `{'my[index]deeply.nests.state': 'new value'}` (we're sending this to SubState to _not mutate_ the state, but make a new copy (Flux-y)!
 * Maintain a small size.  Currently it's 6kb minified and 2kb gzipped!
@@ -17,7 +17,6 @@ State management with Redux is really nice.  It's also nice with Vuex.  But it's
 
 ## Contents
 1. [How it Works](#how-it-works)
-    * [Diagram](#diagram)
     * [The Steps](#the-steps)
     
 2. [Demos](#demos)
@@ -34,16 +33,14 @@ State management with Redux is really nice.  It's also nice with Vuex.  But it's
 
 
 ## How it Works
-### Diagram
-![](Substate.png?raw=true)
 
 ### The Steps
 1. (if using modules) `import { myInstance } from 'myFile'`
-2. Components will register one or more methods to rerender themselves using your instance (see [instantiation](#instantiation))  using `myInstance.$on('STATE_UPDATED', rerender)` per method
+2. Components will register one or more methods to rerender themselves using your instance (see [instantiation](#instantiation))  using `myInstance.on('STATE_UPDATED', rerender)` per method
 3. Components take UI event ("click", "focus", etc) and pass it off to a Handler/Reducer
 4. The Handler/Reducer figures out what should change in the state (it does not update the state directly).  It also figures out if/what `$type` should be sent to the Pub/Sub module
-5. The Handler/Reducer will then `$emit` `UPDATE_STATE` or `UPDATE_CHUNK` to the Pub/Sub module
-6. The Pub/Sub module will create a _new_ state and will `$emit` `STATE_UPDATED` or `CHUNK_UPDATED` or the specified `$type` to the Components.
+5. The Handler/Reducer will then `emit` `UPDATE_STATE` to the Pub/Sub module
+6. The Pub/Sub module will create a _new_ state and will `emit` `STATE_UPDATED` or the specified `$type` to the Components.
 7. The Components will digest the new State using the method(s) registered in step 2
 
 
@@ -67,7 +64,7 @@ _myFile.js_
 
 Then you instantiate it as such
 
-`export let myInstance = new SubState({options});`
+`export const myInstance = new SubState({options});`
 
 ## Options
 Substate accepts an options object as an optional parameter.
@@ -81,6 +78,7 @@ These are the possible options
 | saveOnChange  | save state to localStorage on change                  | null                |
 | pullFromLocal | pull currentState from localStorage on initialization | null                |
 | state         | object containing the initial state                   | null                |
+| defaultDeep   | default to deep cloning the state everytime           | false               |
                                                                                      
 
 ## State Methods
@@ -113,7 +111,6 @@ These are the possible options
 | Event        | Desc                                                   | Returns             |
 | ------------- |-------------------------------------------------------| -------------------:|
 | 'UPDATE_STATE'|   updates the entire state with the object passed in  | updated state       |
-|'UPDATE_CHUNK' |   updates part of a state, this does not iterate over the entire state object| the data passed in|
 |'CHANGE_STATE' |  fires changeState method above requires same `@param`s|emits 'STATE_CHANGED'|
 
 ## Custom Events  
@@ -121,10 +118,10 @@ _note: the object of data that is passed, cannot have a key called '$type'_
 
 | Method   | Event                         |  Custom Event                                     | Next                |
 | -------- |-------------------------------| --------------------------------------------------|--------------------:|
-|  emit    | 'UPDATE_CHUNK' _or_ 'UPDATE_STATE' | `@param2` is an object:   `{$type: 'MY_CUSTOM_EVENT'}` | Will update/change state. The `$type` property will then be emitted so you can listen to it like `SubStateInstance.on('MY_CUSTOM_EVENT', func)`|
+|  emit    | 'UPDATE_STATE' | `@param2` is an object:   `{$type: 'MY_CUSTOM_EVENT'}` | Will update/change state. The `$type` property will then be emitted so you can listen to it like `SubStateInstance.on('MY_CUSTOM_EVENT', func)`|
 
 ### To clear this ^ up :
-Basically to utilitze a custom event, you still need to use `UPDATE_STATE`/`UPDATE_CHUNK` but the data object needs a `$type` with an event name you want the State to emit _when updated_
+Basically to utilitze a custom event, you still need to use `UPDATE_STATE` but the data object needs a `$type` with an event name you want the State to emit _when updated_
 
 ## Usage with React
 Use the package [`substate-connect`](https://github.com/tamb/substate-connect) and it wires up just like redux does with React. 
@@ -162,12 +159,12 @@ const WiredMyComponent = connect(mySubStateInstance, MapStateToProps)(MyComponen
 
 
 ## Updates to come
-* Stripping `$`from all class methods
-* Creating an easier local storage feature, which will allow for certain state fields to be omitted from local storage
-* Additional option to omit certain fields from local storage
-* Better documentation on how to deal with very large data in state
-* Jest tests as part of the library
-* better dev instructions and console warnings/errors
+- [x] Stripping `$`from all class methods
+- [x] deep cloning option
+- [x] remove localstorage feature  
+- [x] Jest tests for pubsub module
+- [ ] Jest tests for substate module
+- [ ] better dev instructions and console warnings/errors
 
 ## Pull Requests
 1. Make sure you add/update Jest tests
