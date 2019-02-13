@@ -162,7 +162,8 @@ const WiredMyComponent = connect(mySubStateInstance, MapStateToProps)(MyComponen
 - [x] remove localstorage feature  
 - [x] remove `UPDATE_CHUNK`
 - [x] Jest tests for pubsub module
-- [ ] Jest tests for substate module
+- [x] Jest tests for substate module
+- [x] Make compatible with NodeJS AND browser
 - [ ] better dev instructions and console warnings/errors
 
 ## Pull Requests
