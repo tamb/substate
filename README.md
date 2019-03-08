@@ -9,7 +9,7 @@ State management with Redux is really nice.  It's also nice with Vuex.  But it's
 * For State to return a new state (pure function)
 * Message filtering can be applied _without_ a `switch` statement (you create your own event `$type`)
 * To allow for manipulation of deeply nested state properties through use of strings `{'my[index]deeply.nests.state': 'new value'}` (we're sending this to SubState to _not mutate_ the state, but make a new copy (Flux-y)!
-* Maintain a small size.  Currently it's 6kb minified and 2kb gzipped!
+* Maintain a small size relative to deep cloning (13kb! minified, 4kb gzipped)!
 
 ## _note:_ anything marked _| no docs |_ means I haven't documented it yet.
 
@@ -40,6 +40,7 @@ State management with Redux is really nice.  It's also nice with Vuex.  But it's
 5. The Handler/Reducer will then `emit` `UPDATE_STATE` to the Pub/Sub module
 6. The Pub/Sub module will create a _new_ state and will `emit` `STATE_UPDATED` or the specified `$type` to the Components.
 7. The Components will digest the new State using the method(s) registered in step 2
+8. If you want a deep clone pass in `$deep: true` into the state on emit.  OR `defaultDeep: true` in the options. 
 
 
  
