@@ -74,8 +74,6 @@ These are the possible options
 | name          | name of the instance                                  | 'SubStateInstance'  |
 | currentState  | index of state to start on                            |   0                 |
 | stateStorage  | array of all the states                               |    [ ]              |
-| saveOnChange  | save state to localStorage on change                  | null                |
-| pullFromLocal | pull currentState from localStorage on initialization | null                |
 | state         | object containing the initial state                   | null                |
 | defaultDeep   | default to deep cloning the state everytime           | false               |
                                                                                      
@@ -90,8 +88,6 @@ These are the possible options
 | getcurrentState  | get the current state                                                     | current state object |
 | getProp          | get a prop from current state `@param*` - string path to prop             | property you request |
 | changeState      | change the version of the state `@param*` - `{requestedState: index of state, action: (optional name of event to emit)}`| emits `action` parameter event or 'STATE_CHANGED' event with the new current state    |
-| saveState        | save stateStorage array to localStorage.  Will use instance param of name | emits 'STATE_SAVED'  |
-| removeSavedState | removed state from LocalStorage                                           |emits 'STATE_REMOVED_SAVED_STATE'|
 | resetState       | resets the `stateStorage` array to an empty array                         |emits 'STATE_RESET'   |
 
 ## Event Methods
@@ -166,6 +162,8 @@ const WiredMyComponent = connect(mySubStateInstance, MapStateToProps)(MyComponen
 - [x] Jest tests for substate module
 - [x] Make compatible with NodeJS AND browser
 - [ ] better dev instructions and console warnings/errors
+- [ ] seemless compatibility with infernojs, preactjs, stenciljs
+- [ ] demos demos demos
 
 ## Pull Requests
 1. Make sure you add/update Jest tests
