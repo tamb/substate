@@ -1,5 +1,5 @@
 import deepclone from 'deep-clone-simple';
-import 'object-bystring';
+import byString from 'object-bystring';
 
 import PubSub from './PubSub.js';
 
@@ -39,8 +39,7 @@ export default class SubState extends PubSub {
     }
 
     getProp(prop) {
-        //TODO does not work need to rewrite since object.bystring is rewritten
-        return this.getCurrentState().byString(prop);
+        return byString(this.getCurrentState(), prop);
     }
 
     changeState(action) {
@@ -72,7 +71,7 @@ export default class SubState extends PubSub {
         //update temp new state
         for (let key in action) {
             console.log('replacing key ', key);
-            if (action.hasOwnProperty(key)) newState.byString(key, action[key]);
+            if (action.hasOwnProperty(key)) byString(newState, key, action[key]);
              //update cloned state
         }
 
