@@ -1,4 +1,4 @@
-import cloneDeep from 'lodash.clonedeep';
+import deepclone from 'deep-clone-simple';
 import 'object-bystring';
 
 import PubSub from './PubSub.js';
@@ -64,7 +64,7 @@ export default class SubState extends PubSub {
     updateState(action) {
         let newState;
         if (action.$deep || this.defaultDeep){
-            newState = cloneDeep(this.getCurrentState());// deep clonse
+            newState = deepclone(this.getCurrentState());// deep clonse
         } else {
             newState = Object.assign({}, this.getCurrentState()); // shallow clone
         }        
