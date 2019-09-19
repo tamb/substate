@@ -6,17 +6,17 @@ import PubSub from './PubSub.js';
 const S = 'UPDATE_STATE';
 
 export default class SubState extends PubSub {
-    constructor(objParam, inst) {
+    constructor(obj= {}) {
         super();
         console.warn(`
         "Yoooo. You are using a Development version of SubState (npm substate, etc.).
     /( '0')/
         `);
 
-        const obj = objParam || {};
 
         this.name = obj.name || "SubStateInstance";
-
+        this.afterUpdate = obj.afterUpdate || null;
+        this.beforeUpdate = obj.beforeUpdate || null;
         this.currentState = obj.currentState || 0;
         this.stateStorage = obj.stateStorage || [];
         this.defaultDeep = obj.defaultDeep || false;
@@ -61,6 +61,7 @@ export default class SubState extends PubSub {
     }
 
     updateState(action) {
+        this.beforeUpdate? this.beforeUpdate(this) : null;
         let newState;
         if (action.$deep || this.defaultDeep){
             newState = deepclone(this.getCurrentState());// deep clonse
@@ -83,7 +84,8 @@ export default class SubState extends PubSub {
 
         //pushes new state
         this.pushState(newState);
-        
+
+        this.afterUpdate? this.afterUpdate(this) : null;
         this.emit((action.$type || 'STATE_UPDATED'), this.getCurrentState());//emit with latest data
     }
 }
