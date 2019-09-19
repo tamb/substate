@@ -61,7 +61,7 @@ export default class SubState extends PubSub {
     }
 
     updateState(action) {
-        this.beforeUpdate? this.beforeUpdate(this) : null;
+        this.beforeUpdate? this.beforeUpdate(this, action) : null;
         let newState;
         if (action.$deep || this.defaultDeep){
             newState = deepclone(this.getCurrentState());// deep clonse
