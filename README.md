@@ -161,8 +161,8 @@ const WiredMyComponent = connect(mySubStateInstance, MapStateToProps)(MyComponen
 - [x] Jest tests for pubsub module
 - [x] Jest tests for substate module
 - [x] Make compatible with NodeJS AND browser
-- [ ] find smaller deep clone dependency
-- [ ] utilize newer version of `object-bystring`
+- [x] find smaller deep clone dependency
+- [x] utilize newer version of `object-bystring`
 - [ ] create module support for merging different state instances,
 - [ ] global hooks
 - [ ] better dev instructions and console warnings/errors
