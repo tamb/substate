@@ -1,9 +1,5 @@
 import substate from './SubState';
 
-/**
- * test that $type works
- */
-
 const NAME = 'MyName';
 const STATE = {
     name: 'Thomas',
