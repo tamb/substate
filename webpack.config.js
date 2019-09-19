@@ -30,7 +30,6 @@ module.exports = [
             exclude: /node_modules/,
             use: [{
                 loader: 'babel-loader',
-                options: { presets: ['env','es2015'] }
             }]
         }]
     },
@@ -62,7 +61,6 @@ module.exports = [
             exclude: /node_modules/,
             use: [{
                 loader: 'babel-loader',
-                options: { presets: ['es2015'] }
             }]
         }]
     },
@@ -90,7 +88,6 @@ function pluginForEnvironment(bool){
             new UglifyJsPlugin({
               uglifyOptions: {
                 compress: {
-                    warnings: false,
                     drop_console: bool
                 },
                 comments: false
