@@ -89,3 +89,29 @@ export default class SubState extends PubSub {
         this.emit((action.$type || 'STATE_UPDATED'), this.getCurrentState());//emit with latest data
     }
 }
+
+
+function mergeStores(stores, opt) {
+    let newState = {};
+    let newEvents = {};
+    let newDefaultDeep = false;
+    stores.forEach(store => {
+      newState = Object.assign(store.getCurrentState(), newState);
+      newEvents = Object.assign(store.events, newEvents);
+      if (store.defaultDeep) {
+        newDefaultDeep = true;
+      }
+    });
+  
+    opt.state = newState;
+    opt.defaultDeep = opt.defaultDeep || newDefaultDeep;
+    const newStore = new SubState(opt);
+  
+    newStore.events = newEvents;
+  
+    return newStore;
+  }
+
+export {
+    mergeStores
+}
