@@ -1,7 +1,9 @@
-# SubState
+# ☂️ SubState
+
+## State Management that makes sense
 
 ## The Problem
-State management with Redux is really nice.  It's also nice with Vuex.  But it's lacking in filtering.  When using a Pub/Sub you can filter by "topic" or by "content" but you can easily lose track of events being fired.  Well it's hybrid time!
+State management with Redux is really nice.  It's also nice with Vuex.  But it can get convoluted really quickly.  It's almost like a pub/sub may do the trick, but that's missing modules, immutability, etc.  Well it's hybrid time!
 
 ## Purpose
 * To manage state with a simple PubSub pattern
@@ -9,25 +11,24 @@ State management with Redux is really nice.  It's also nice with Vuex.  But it's
 * For State to return a new state (pure function)
 * Message filtering can be applied _without_ a `switch` statement (you create your own event `$type`)
 * To allow for manipulation of deeply nested state properties through use of strings `{'my[index]deeply.nests.state': 'new value'}` (we're sending this to SubState to _not mutate_ the state, but make a new copy (Flux-y)!
-* Maintain a small size relative to deep cloning (13kb! minified, 4kb gzipped)!
+* Maintain a small size relative to deep cloning (5kb! minified, 2kb gzipped)!
 
-## _note:_ anything marked _| no docs |_ means I haven't documented it yet.
 
 ## Contents
-1. [How it Works](#how-it-works)
+* [How it Works](#how-it-works)
     * [The Steps](#the-steps)
     
-2. [Demos](#demos)
-3. [Installation](#installation)
-4. [Instantiation](#instantiation)
-5. [Options](#options)
-6. [State Methods](#state-methods)
-7. [Event Methods](#event-methods)
-8. [State Events](#state-events)  
-9. [Custom Events](#custom-events)
-10. [Usage with React](#usage-with-react)
-11. [Updates to Come](#updates-to-come)
-12. [Pull Requests](#pull-requests)
+* [Installation](#installation)
+* [Instantiation](#instantiation)
+* [Options](#options)
+* [State Methods](#state-methods)
+* [Event Methods](#event-methods)
+* [State Events](#state-events)  
+* [Custom Events](#custom-events)
+* [Modules and Merging Stores](#modules-and-merging-stores)
+* [Usage with React](#usage-with-react)
+* [Updates to Come](#updates-to-come)
+* [Pull Requests](#pull-requests)
 
 
 ## How it Works
@@ -41,13 +42,6 @@ State management with Redux is really nice.  It's also nice with Vuex.  But it's
 6. The Pub/Sub module will create a _new_ state and will `emit` `STATE_UPDATED` or the specified `$type` to the Components.
 7. The Components will digest the new State using the method(s) registered in step 2
 8. If you want a deep clone pass in `$deep: true` into the state on emit.  OR `defaultDeep: true` in the options. 
-
-
- 
-
-
-## Demos
-* [Download and run this:](https://github.com/TomSaporito/substate-demo)
 
 
 ## Installation
@@ -69,15 +63,15 @@ Then you instantiate it as such
 Substate accepts an options object as an optional parameter.
 These are the possible options
 
-| Option        | Desc                                                                                   | Default             |
-| ------------- |--------------------------------------------------------------------------------------- | -------------------:|
-| name          | name of the instance                                                                   | 'SubStateInstance'  |
-| currentState  | index of state to start on                                                             |   0                 |
-| stateStorage  | array of all the states                                                                |    [ ]              |
-| state         | object containing the initial state                                                    | null                |
-| defaultDeep   | default to deep cloning the state everytime                                            | false               |
-| beforeUpdate  | array of middleware before state is updated.Has access to substate instance and action | null                |
-| afterUpdate   | array of middleware for after state is updated. Has access to substate instance        | null                |
+| Option          | Desc                                                                                   | Default             |
+| ---------------- |--------------------------------------------------------------------------------------- | -------------------:|
+| name             | name of the instance                                                                   | 'SubStateInstance'  |
+| currentState     | index of state to start on                                                             |   0                 |
+| stateStorage     | array of all the states                                                                |    [ ]              | 
+| state            | object containing the initial state                                                    | null                |
+| defaultDeep      | default to deep cloning the state everytime                                            | false               |
+| beforeUpdate[ ]  | array of middleware before state is updated.Has access to substate instance and action | []                |
+| afterUpdate[ ]   | array of middleware for after state is updated. Has access to substate instance        | []                |
                                                                                      
 
 ## State Methods
@@ -119,6 +113,19 @@ _note: the object of data that is passed, cannot have a key called '$type'_
 
 ### To clear this ^ up :
 Basically to utilitze a custom event, you still need to use `UPDATE_STATE` but the data object needs a `$type` with an event name you want the State to emit _when updated_
+
+
+## Modules and Merging Stores
+Substate also ofers a method to merge separate substate instances (stores) into one
+```js
+import { mergeStores } from 'substate';
+
+const merged = mergeStores([store1, store2], options);
+
+```
+You simply provide it an array of stores as the first argument.  And the second argument are options that can be used just as with a single store.
+
+This means you can have separate stores for different modules and merge them together when needed.  This allows for you to micromanage state for separate parts of the app.
 
 ## Usage with React
 Use the package [`substate-connect`](https://github.com/tamb/substate-connect) and it wires up just like redux does with React. 
