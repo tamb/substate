@@ -172,9 +172,10 @@ const WiredMyComponent = connect(mySubStateInstance, MapStateToProps)(MyComponen
 - [x] Make compatible with NodeJS AND browser
 - [x] find smaller deep clone dependency
 - [x] utilize newer version of `object-bystring`
-- [ ] create module support for merging different state instances,
+- [x] create module support for merging different state instances,
 - [x] global hooks
 - [ ] better dev instructions and console warnings/errors
 - [ ] seemless compatibility with infernojs, preactjs, stenciljs
 - [ ] demos demos demos
+- [ ] better documentation
 
