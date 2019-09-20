@@ -15,8 +15,8 @@ export default class SubState extends PubSub {
 
 
         this.name = obj.name || "SubStateInstance";
-        this.afterUpdate = obj.afterUpdate || null;
-        this.beforeUpdate = obj.beforeUpdate || null;
+        this.afterUpdate = obj.afterUpdate || [];
+        this.beforeUpdate = obj.beforeUpdate || [];
         this.currentState = obj.currentState || 0;
         this.stateStorage = obj.stateStorage || [];
         this.defaultDeep = obj.defaultDeep || false;
@@ -61,7 +61,7 @@ export default class SubState extends PubSub {
     }
 
     updateState(action) {
-        this.beforeUpdate? this.beforeUpdate(this, action) : null;
+        this.beforeUpdate.length > 0? this.beforeUpdate.forEach(func => func(this, action)) : null;
         let newState;
         if (action.$deep || this.defaultDeep){
             newState = deepclone(this.getCurrentState());// deep clonse
@@ -85,26 +85,39 @@ export default class SubState extends PubSub {
         //pushes new state
         this.pushState(newState);
 
-        this.afterUpdate? this.afterUpdate(this) : null;
+        this.afterUpdate.length > 0? this.afterUpdate.forEach(func => func(this)) : null;
         this.emit((action.$type || 'STATE_UPDATED'), this.getCurrentState());//emit with latest data
     }
 }
 
 
-function mergeStores(stores, opt) {
+// TODO - middleware should merge and should be an array
+function mergeStores(stores, opt = {}) {
     let newState = {};
     let newEvents = {};
     let newDefaultDeep = false;
+    let beforeUpdate = [];
+    let afterUpdate = [];
     stores.forEach(store => {
       newState = Object.assign(store.getCurrentState(), newState);
-      newEvents = Object.assign(store.events, newEvents);
+        for (let key in store.events){
+            if(newEvents[key]){
+                newEvents[key] = store.events[key].concat(newEvents[key]);
+            } else {
+                newEvents[key] = store.events[key].slice(0);
+            }
+        }
       if (store.defaultDeep) {
         newDefaultDeep = true;
       }
+      beforeUpdate = store.beforeUpdate.concat(beforeUpdate);
+      afterUpdate = store.afterUpdate.concat(afterUpdate);
     });
   
     opt.state = newState;
     opt.defaultDeep = opt.defaultDeep || newDefaultDeep;
+    opt.afterUpdate = afterUpdate;
+    opt.beforeUpdate = beforeUpdate;
     const newStore = new SubState(opt);
   
     newStore.events = newEvents;
