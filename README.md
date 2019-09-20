@@ -69,15 +69,15 @@ Then you instantiate it as such
 Substate accepts an options object as an optional parameter.
 These are the possible options
 
-| Option        | Desc                                                                              | Default             |
-| ------------- |---------------------------------------------------------------------------------- | -------------------:|
-| name          | name of the instance                                                              | 'SubStateInstance'  |
-| currentState  | index of state to start on                                                        |   0                 |
-| stateStorage  | array of all the states                                                           |    [ ]              |
-| state         | object containing the initial state                                               | null                |
-| defaultDeep   | default to deep cloning the state everytime                                       | false               |
-| beforeUpdate  | middleware for before state is updated.Has access to substate instance and action | null                |
-| afterUpdate   | middleware for after state is updated. Has access to substate instance            | null                |
+| Option        | Desc                                                                                   | Default             |
+| ------------- |--------------------------------------------------------------------------------------- | -------------------:|
+| name          | name of the instance                                                                   | 'SubStateInstance'  |
+| currentState  | index of state to start on                                                             |   0                 |
+| stateStorage  | array of all the states                                                                |    [ ]              |
+| state         | object containing the initial state                                                    | null                |
+| defaultDeep   | default to deep cloning the state everytime                                            | false               |
+| beforeUpdate  | array of middleware before state is updated.Has access to substate instance and action | null                |
+| afterUpdate   | array of middleware for after state is updated. Has access to substate instance        | null                |
                                                                                      
 
 ## State Methods

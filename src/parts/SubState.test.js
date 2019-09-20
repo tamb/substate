@@ -1,4 +1,5 @@
-import substate from './SubState';
+import substate, { mergeStores } from './SubState';
+import SubState from './SubState';
 
 const func1 =jest.fn(x => {
     x.count? x.count = ++x.count : x.count = 1;
@@ -22,8 +23,8 @@ const A = new substate({
     name: 'HamburgerStore',
     defaultDeep: true,
     state: STATE,
-    beforeUpdate: func1,
-    afterUpdate: func2
+    beforeUpdate: [func1],
+    afterUpdate: [func2]
 
 });
 
@@ -48,8 +49,6 @@ test('events to contain UPDATE_STATE on initialization', ()=>{
 test('get props to return correct value', ()=>{
     expect(A.getProp('nested.double.reason')).toBe('Just the start');
 });
-
-
 
 test('getCurrentState returns current state and fires middleware', ()=>{
     expect(A.getCurrentState()).toMatchObject(STATE);
@@ -86,3 +85,63 @@ test('callback for custom $type contains correct $type value', ()=>{
     A.emit('UPDATE_STATE', {timeOfFun: new Date(), $type: DATEUPDATED});
     expect(A.getProp('$type')).toBe(DATEUPDATED);
 });
+
+
+
+// mergeStores tests
+
+const func3 =jest.fn(x => {
+    x.count? x.count = ++x.count : x.count = 1;
+});
+const func4 =jest.fn(x => {
+    x.count2? ++x.count2 : x.count2 = 1;
+});
+
+const func5 =jest.fn(x => {
+    x.count? x.count = ++x.count : x.count = 1;
+});
+const func6 =jest.fn(x => {
+    x.count2? ++x.count2 : x.count2 = 1;
+});
+
+const Curly = new SubState({
+    state: {
+        stooge: true,
+    },
+    beforeUpdate: [func5]
+});
+
+Curly.on('STATE_UPDATED', func3);
+
+const Papa = new SubState({
+    state: {
+        smurf: true
+    },
+    beforeUpdate: [func6]
+});
+
+Papa.on('STATE_UPDATED', func4);
+
+const merged = mergeStores([Curly, Papa]);
+
+test('merged stores should have merged state', ()=>{
+    expect(merged.getProp('stooge')).toBe(true);
+    expect(merged.getProp('smurf')).toBe(true);
+});
+
+test('merged stores should retain subscriptions', ()=>{
+    expect(merged.events.STATE_UPDATED.length).toBe(2);
+});
+
+test('emerged middleware will be called', ()=>{
+    merged.emit('UPDATE_STATE', {});
+    expect(func3).toBeCalled();
+    expect(func4).toBeCalled();
+});
+
+test('emerged events will be called', ()=>{
+    merged.emit('UPDATE_STATE', {});
+    expect(func3).toBeCalled();
+    expect(func4).toBeCalled();
+});
+
