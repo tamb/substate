@@ -1,6 +1,6 @@
 # ☂️ SubState
 
-## State Management that makes sense
+## pub/sub state management
 
 ## The Problem
 State management with Redux is really nice.  It's also nice with Vuex.  But it can get convoluted really quickly.  It's almost like a pub/sub may do the trick, but that's missing modules, immutability, etc.  Well it's hybrid time!
