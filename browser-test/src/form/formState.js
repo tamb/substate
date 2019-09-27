@@ -1,18 +1,10 @@
-import { substate } from "substate";
-
-const store = new substate({
-  name: "formState",
-  state: {
-    todos: []
-  }
-});
+import { store } from '../state';
 
 export const createTodo = text => {
   const newState = {
-    // $type: "ADD_TODO",
-    todos: [text]
+    $type: "ADD_TODO",
+    todos: store.getProp('todos').concat([text])
   };
   store.emit("UPDATE_STATE", newState);
 };
 
-export default store;

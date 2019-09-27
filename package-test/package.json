@@ -10,6 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "substate": "./../substate-7.0.1.tgz"
+    "substate": "./../substate-8.0.0.tgz"
   }
 }

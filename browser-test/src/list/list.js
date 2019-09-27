@@ -1,13 +1,13 @@
-import store, { addTodoList } from "./listState";
+import { store } from '../state';
+import { addTodoList } from "./listState";
 
 export default function wireList() {
   const list = document.querySelector('[data-ref="list"]');
 
-  function addIt() {
-    console.log("oh");
-    list.innerHTML = addTodoList();
+  function addIt(state) {
+    console.log(state);
+    list.innerHTML = addTodoList(state).flat();
   }
 
-  store.on("STATE_UPDATED", addIt);
-  console.log(store);
+  store.on("ADD_TODO", addIt);
 }

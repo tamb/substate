@@ -25,7 +25,6 @@ State management with Redux is really nice.  But it can get convoluted really qu
 * [Event Methods](#event-methods)
 * [State Events](#state-events)  
 * [Custom Events](#custom-events)
-* [Modules and Merging Stores](#modules-and-merging-stores)
 * [Usage with React](#usage-with-react)
 * [Updates to Come](#updates-to-come)
 * [Pull Requests](#pull-requests)
@@ -113,20 +112,6 @@ _note: the object of data that is passed, cannot have a key called '$type'_
 
 ### To clear this ^ up :
 Basically to utilitze a custom event, you still need to use `UPDATE_STATE` but the data object needs a `$type` with an event name you want the State to emit _when updated_
-
-
-## Modules and Merging Stores
-substate also ofers a method to merge separate substate instances (stores) into one
-```js
-import { mergeStores } from 'substate';
-
-const merged = mergeStores([store1, store2], options);
-
-```
-You simply provide it an array of stores as the first argument.  And the second argument are options that can be used just as with a single store.
-
-This means you can have separate stores for different modules and merge them together when needed.  This allows for you to micromanage state for separate parts of the app.
-
 
 ## Updates to come
 - better dev instructions and console warnings/errors
