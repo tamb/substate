@@ -12,6 +12,9 @@ export default [
       terser({
         compress: true,
         ecma: 8,
+        compress:{
+          drop_console: true,          
+        } 
       }),
     ]
   },

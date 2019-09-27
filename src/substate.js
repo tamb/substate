@@ -99,7 +99,7 @@ function mergeStores(stores, opt = {}) {
     let beforeUpdate = [];
     let afterUpdate = [];
     stores.forEach(store => {
-      newState = Object.assign(store.getCurrentState(), newState);
+      newState = Object.assign(store.getCurrentState() || {}, newState);
         for (let key in store.events){
             if(newEvents[key]){
                 newEvents[key] = store.events[key].concat(newEvents[key]);

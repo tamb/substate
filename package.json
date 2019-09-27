@@ -1,6 +1,6 @@
 {
   "name": "substate",
-  "version": "7.0.0",
+  "version": "7.0.1",
   "description": "pub/sub state management",
   "main": "dist/index.js",
   "scripts": {
