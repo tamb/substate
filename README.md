@@ -1,17 +1,17 @@
-# ☂️ SubState
+# ☂️ substate
 
 ## pub/sub state management
 
 ## The Problem
-State management with Redux is really nice.  It's also nice with Vuex.  But it can get convoluted really quickly.  It's almost like a pub/sub may do the trick, but that's missing modules, immutability, etc.  Well it's hybrid time!
+State management with Redux is really nice.  But it can get convoluted really quickly.  It's almost like a pub/sub may do the trick, but that's missing modules, immutability, etc.  Well it's hybrid time!
 
 ## Purpose
-* To manage state with a simple PubSub pattern
-* To use the simplicity of Flux
+* To manage state with a simple pub/sub pattern
+* To improve upon the pub/sub with unidirectional data flow
 * For State to return a new state (pure function)
 * Message filtering can be applied _without_ a `switch` statement (you create your own event `$type`)
-* To allow for manipulation of deeply nested state properties through use of strings `{'my[index]deeply.nests.state': 'new value'}` (we're sending this to SubState to _not mutate_ the state, but make a new copy (Flux-y)!
-* Maintain a small size relative to deep cloning (5kb! minified, 2kb gzipped)!
+* To allow for manipulation of deeply nested state properties through use of strings `{'my[index]deeply.nests.state': 'new value'}` (we're sending this to substate to _not mutate_ the state, but make a new copy (Flux-y)!
+* Maintain a small size
 
 
 ## Contents
@@ -49,23 +49,23 @@ State management with Redux is really nice.  It's also nice with Vuex.  But it c
 * copy and paste from `index.js` into a `<script>` or external js file
 
 ## Instantiation 
-SubState is a class so you call it like so
+substate is a class so you call it like so
 
 _myFile.js_
 
-`import SubState from 'substate';`
+`import { substate } from 'substate';`
 
 Then you instantiate it as such
 
-`export const myInstance = new SubState({options});`
+`export const myInstance = new substate({options});`
 
 ## Options
-Substate accepts an options object as an optional parameter.
+substate accepts an options object as an optional parameter.
 These are the possible options
 
 | Option          | Desc                                                                                   | Default             |
 | ---------------- |--------------------------------------------------------------------------------------- | -------------------:|
-| name             | name of the instance                                                                   | 'SubStateInstance'  |
+| name             | name of the instance                                                                   | 'substateInstance'  |
 | currentState     | index of state to start on                                                             |   0                 |
 | stateStorage     | array of all the states                                                                |    [ ]              | 
 | state            | object containing the initial state                                                    | null                |
@@ -109,14 +109,14 @@ _note: the object of data that is passed, cannot have a key called '$type'_
 
 | Method   | Event                         |  Custom Event                                     | Next                |
 | -------- |-------------------------------| --------------------------------------------------|--------------------:|
-|  emit    | 'UPDATE_STATE' | `@param2` is an object:   `{$type: 'MY_CUSTOM_EVENT'}` | Will update/change state. The `$type` property will then be emitted so you can listen to it like `SubStateInstance.on('MY_CUSTOM_EVENT', func)`|
+|  emit    | 'UPDATE_STATE' | `@param2` is an object:   `{$type: 'MY_CUSTOM_EVENT'}` | Will update/change state. The `$type` property will then be emitted so you can listen to it like `substateInstance.on('MY_CUSTOM_EVENT', func)`|
 
 ### To clear this ^ up :
 Basically to utilitze a custom event, you still need to use `UPDATE_STATE` but the data object needs a `$type` with an event name you want the State to emit _when updated_
 
 
 ## Modules and Merging Stores
-Substate also ofers a method to merge separate substate instances (stores) into one
+substate also ofers a method to merge separate substate instances (stores) into one
 ```js
 import { mergeStores } from 'substate';
 
@@ -127,55 +127,10 @@ You simply provide it an array of stores as the first argument.  And the second 
 
 This means you can have separate stores for different modules and merge them together when needed.  This allows for you to micromanage state for separate parts of the app.
 
-## Usage with React
-Use the package [`substate-connect`](https://github.com/tamb/substate-connect) and it wires up just like redux does with React. 
-
-### a few thoughts on the _overall_ `react-redux` architecture:
-Currently most of us do this:
-```js
-// MyComponent.js
-
-export default connect(mapStateToProps)(MyComponent)
-```
-This is done in the component file itself!  That should raise a red flag.  Suddenly you're making your _component_ (the thing that should be reusable) literally mapped to the state of this app!  So I have a suggestion:
-
-Do this:
-
-```js
-// MyComponent.js
-
-export default MyComponent;
-```
-
-```js
-// App specific view or where my components are used for purposeful composition
-
-import MyComponent from './components/MyComponent';
-import mySubStateInstance from './state.js';
-import { connect } from 'substate-connect';
-
-const WiredMyComponent = connect(mySubStateInstance, MapStateToProps)(MyComponent);
-
-... inside some render function
-   <WiredMyComponent />
-```
-
-
 
 ## Updates to come
-- [x] Stripping `$`from all class methods
-- [x] deep cloning option
-- [x] remove localstorage feature  
-- [x] remove `UPDATE_CHUNK`
-- [x] Jest tests for pubsub module
-- [x] Jest tests for substate module
-- [x] Make compatible with NodeJS AND browser
-- [x] find smaller deep clone dependency
-- [x] utilize newer version of `object-bystring`
-- [x] create module support for merging different state instances,
-- [x] global hooks
-- [ ] better dev instructions and console warnings/errors
-- [ ] seemless compatibility with infernojs, preactjs, stenciljs
-- [ ] demos demos demos
-- [ ] better documentation
+- better dev instructions and console warnings/errors
+- seemless compatibility with infernojs, preactjs, stenciljs
+- demos demos demos
+- better documentation
 

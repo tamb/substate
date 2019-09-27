@@ -1,5 +1,4 @@
-import substate, { mergeStores } from './SubState';
-import SubState from './SubState';
+import { substate, mergeStores } from './substate';
 
 const func1 =jest.fn(x => {
     x.count? x.count = ++x.count : x.count = 1;
@@ -104,7 +103,7 @@ const func6 =jest.fn(x => {
     x.count2? ++x.count2 : x.count2 = 1;
 });
 
-const Curly = new SubState({
+const Curly = new substate({
     state: {
         stooge: true,
     },
@@ -113,7 +112,7 @@ const Curly = new SubState({
 
 Curly.on('STATE_UPDATED', func3);
 
-const Papa = new SubState({
+const Papa = new substate({
     state: {
         smurf: true
     },

@@ -5,7 +5,7 @@ import PubSub from './PubSub.js';
 
 const S = 'UPDATE_STATE';
 
-export default class SubState extends PubSub {
+export class substate extends PubSub {
     constructor(obj= {}) {
         super();
         console.warn(`
@@ -118,7 +118,7 @@ function mergeStores(stores, opt = {}) {
     opt.defaultDeep = opt.defaultDeep || newDefaultDeep;
     opt.afterUpdate = afterUpdate;
     opt.beforeUpdate = beforeUpdate;
-    const newStore = new SubState(opt);
+    const newStore = new substate(opt);
   
     newStore.events = newEvents;
   
