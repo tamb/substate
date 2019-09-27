@@ -1,4 +1,4 @@
-import { substate, mergeStores } from './substate';
+const {substate, mergeStores} = require('./substate');
 
 const func1 =jest.fn(x => {
     x.count? x.count = ++x.count : x.count = 1;
@@ -104,6 +104,7 @@ const func6 =jest.fn(x => {
 });
 
 const Curly = new substate({
+    name: 'Alpha',
     state: {
         stooge: true,
     },
@@ -113,6 +114,7 @@ const Curly = new substate({
 Curly.on('STATE_UPDATED', func3);
 
 const Papa = new substate({
+    name: 'Beta',
     state: {
         smurf: true
     },
@@ -132,15 +134,25 @@ test('merged stores should retain subscriptions', ()=>{
     expect(merged.events.STATE_UPDATED.length).toBe(2);
 });
 
-test('emerged middleware will be called', ()=>{
-    merged.emit('UPDATE_STATE', {});
-    expect(func3).toBeCalled();
-    expect(func4).toBeCalled();
+test('merged middleware will be called', ()=>{
+    merged.emit('UPDATE_STATE', {stooge: false});
+    expect(func3.mock.calls.length).toBe(1);
+    expect(func4.mock.calls.length).toBe(1);
+    expect(func5.mock.calls.length).toBe(1);
+    expect(func6.mock.calls.length).toBe(1);
+
 });
 
-test('emerged events will be called', ()=>{
-    merged.emit('UPDATE_STATE', {});
-    expect(func3).toBeCalled();
-    expect(func4).toBeCalled();
+test('merged events will be called', ()=>{
+    merged.emit('UPDATE_STATE', {smurf: false});
+    expect(func3.mock.calls.length).toBe(2);
+    expect(func4.mock.calls.length).toBe(2);
+    expect(func5.mock.calls.length).toBe(2);
+    expect(func6.mock.calls.length).toBe(2);
 });
+
+test('merged state has been updated', ()=>{
+    expect(merged.getProp('stooge')).toBe(false);
+    expect(merged.getProp('smurf')).toBe(false);
+})
 

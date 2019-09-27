@@ -8,7 +8,7 @@ const S = 'UPDATE_STATE';
 export class substate extends PubSub {
     constructor(obj= {}) {
         super();
-        console.warn(`
+        console.log(`
         "Yoooo. You are using a Development version of SubState (npm substate, etc.).
     /( '0')/
         `);
@@ -110,6 +110,7 @@ function mergeStores(stores, opt = {}) {
       if (store.defaultDeep) {
         newDefaultDeep = true;
       }
+      newEvents.UPDATE_STATE = newEvents.UPDATE_STATE.slice(stores.length -1);
       beforeUpdate = store.beforeUpdate.concat(beforeUpdate);
       afterUpdate = store.afterUpdate.concat(afterUpdate);
     });
@@ -119,8 +120,11 @@ function mergeStores(stores, opt = {}) {
     opt.afterUpdate = afterUpdate;
     opt.beforeUpdate = beforeUpdate;
     const newStore = new substate(opt);
+    console.log('new store BEFORE merge')
+    console.table(newStore);
+    console.table(opt);
   
-    newStore.events = newEvents;
+    newStore.events = Object.assign(newStore.events, newEvents);
   
     return newStore;
   }
