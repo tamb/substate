@@ -1,4 +1,4 @@
-var substate = require('./index.js');
+var substate = require('substate').substate;
 
 
 const t = new substate({

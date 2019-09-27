@@ -1,17 +1,26 @@
 {
   "name": "substate",
-  "version": "6.0.5",
-  "description": "Hybrid Flux and Pub/Sub state management",
-  "main": "index.js",
+  "version": "7.0.0",
+  "description": "pub/sub state management",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "jest",
-    "build": "jest && webpack"
+    "test:base": "jest",
+    "test": "rollup -c rollup.config.js && npm pack && jest",
+    "build": "rollup -c rollup.config.js && npm pack",
+    "quick:build": "rollup -c rollup.config.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/TomSaporito/substate.git"
   },
-  "keywords": ["state", "flux", "pubsub", "immutability", "modules", "state management"],
+  "keywords": [
+    "state",
+    "flux",
+    "pubsub",
+    "immutability",
+    "modules",
+    "state management"
+  ],
   "author": "Tamb (Tom Saporito) <t.saporito@gmail.com>",
   "license": "MIT",
   "devDependencies": {
@@ -20,9 +29,9 @@
     "@babel/preset-env": "^7.6.0",
     "babel-loader": "^8.0.6",
     "jest": "^25.0.0",
-    "uglifyjs-webpack-plugin": "^2.2.0",
-    "webpack": "^4.17.2",
-    "webpack-cli": "^3.1.0"
+    "rollup": "^1.21.4",
+    "rollup-plugin-terser": "^5.1.2",
+    "uglifyjs-webpack-plugin": "^2.2.0"
   },
   "dependencies": {
     "deep-clone-simple": "^1.1.1",
@@ -31,7 +40,6 @@
   "files": [
     "LICENSE",
     "README.md",
-    "index.js",
-    "index.dev.js"
+    "dist"
   ]
 }
