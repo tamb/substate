@@ -1,4 +1,4 @@
-# ☂️ substate
+# ⛱️ substate
 
 ## pub/sub state management
 
