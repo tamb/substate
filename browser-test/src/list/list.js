@@ -6,7 +6,11 @@ export default function wireList() {
 
   function addIt(state) {
     console.log(state);
-    list.innerHTML = addTodoList(state).flat();
+    let html = ``;
+    addTodoList(state).forEach(li => {
+      html += li;
+    });
+    list.innerHTML = html;
   }
 
   store.on("ADD_TODO", addIt);

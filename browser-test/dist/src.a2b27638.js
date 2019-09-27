@@ -276,10 +276,12 @@ function wireForm() {
   var form = document.querySelector('[data-ref="form"]');
   form.addEventListener("submit", function (e) {
     e.preventDefault();
-    var text = e.target.querySelector("input").value;
+    var input = e.target.querySelector("input");
+    var text = input.value;
 
     if (text.length > 0) {
       (0, _formState.createTodo)(text);
+      input.value = '';
     }
   });
 }
@@ -315,7 +317,11 @@ function wireList() {
 
   function addIt(state) {
     console.log(state);
-    list.innerHTML = (0, _listState.addTodoList)(state).flat();
+    var html = "";
+    (0, _listState.addTodoList)(state).forEach(function (li) {
+      html += li;
+    });
+    list.innerHTML = html;
   }
 
   _state.store.on("ADD_TODO", addIt);
@@ -361,7 +367,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "43421" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "43349" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
