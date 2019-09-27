@@ -1,4 +1,4 @@
-var substate = require('substate').substate;
+var substate = require('substate');
 
 
 const t = new substate({

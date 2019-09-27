@@ -1,4 +1,4 @@
-const {substate, mergeStores} = require('substate');
+const substate = require('substate');
 
 const func1 =jest.fn(x => {
     x.count? x.count = ++x.count : x.count = 1;
@@ -84,75 +84,3 @@ test('callback for custom $type contains correct $type value', ()=>{
     A.emit('UPDATE_STATE', {timeOfFun: new Date(), $type: DATEUPDATED});
     expect(A.getProp('$type')).toBe(DATEUPDATED);
 });
-
-
-
-// mergeStores tests
-
-const func3 =jest.fn(x => {
-    x.count? x.count = ++x.count : x.count = 1;
-});
-const func4 =jest.fn(x => {
-    x.count2? ++x.count2 : x.count2 = 1;
-});
-
-const func5 =jest.fn(x => {
-    x.count? x.count = ++x.count : x.count = 1;
-});
-const func6 =jest.fn(x => {
-    x.count2? ++x.count2 : x.count2 = 1;
-});
-
-const Curly = new substate({
-    name: 'Alpha',
-    state: {
-        stooge: true,
-    },
-    beforeUpdate: [func5]
-});
-
-Curly.on('STATE_UPDATED', func3);
-
-const Papa = new substate({
-    name: 'Beta',
-    state: {
-        smurf: true
-    },
-    beforeUpdate: [func6]
-});
-
-Papa.on('STATE_UPDATED', func4);
-
-const merged = mergeStores([Curly, Papa]);
-
-test('merged stores should have merged state', ()=>{
-    expect(merged.getProp('stooge')).toBe(true);
-    expect(merged.getProp('smurf')).toBe(true);
-});
-
-test('merged stores should retain subscriptions', ()=>{
-    expect(merged.events.STATE_UPDATED.length).toBe(2);
-});
-
-test('merged middleware will be called', ()=>{
-    merged.emit('UPDATE_STATE', {stooge: false});
-    expect(func3.mock.calls.length).toBe(1);
-    expect(func4.mock.calls.length).toBe(1);
-    expect(func5.mock.calls.length).toBe(1);
-    expect(func6.mock.calls.length).toBe(1);
-
-});
-
-test('merged events will be called', ()=>{
-    merged.emit('UPDATE_STATE', {smurf: false});
-    expect(func3.mock.calls.length).toBe(2);
-    expect(func4.mock.calls.length).toBe(2);
-    expect(func5.mock.calls.length).toBe(2);
-    expect(func6.mock.calls.length).toBe(2);
-});
-
-test('merged state has been updated', ()=>{
-    expect(merged.getProp('stooge')).toBe(false);
-    expect(merged.getProp('smurf')).toBe(false);
-})
-
