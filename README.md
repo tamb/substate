@@ -101,7 +101,7 @@ These are the possible options
 | Event        | Desc                                                   | Returns             |
 | ------------- |-------------------------------------------------------| -------------------:|
 | 'UPDATE_STATE'|   updates the entire state with the object passed in  | updated state       |
-|'CHANGE_STATE' |  fires changeState method above requires same `@param`s|emits 'STATE_CHANGED'|
+|'CHANGE_STATE' |  fires changeState method requires `requestedState` as the index of the state you want.  |emits 'STATE_CHANGED'|
 
 ## Custom Events  
 _note: the object of data that is passed, cannot have a key called '$type'_

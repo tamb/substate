@@ -8,7 +8,7 @@
     "build": "parcel build index.html"
   },
   "dependencies": {
-    "substate": "../substate-8.0.0.tgz"
+    "substate": "../substate-8.1.0.tgz"
   },
   "devDependencies": {
     "@babel/core": "7.2.0",
