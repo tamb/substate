@@ -43,7 +43,7 @@ State management with Redux is really nice.  But it can get convoluted really qu
 8. If you want a deep clone pass in `$deep: true` into the state on emit.  OR `defaultDeep: true` in the options. 
 
 ## Demo
-https://codesandbox.io/embed/todo-with-undo-vgvl0?autoresize=1&fontsize=14&view=preview
+https://codesandbox.io/embed/todo-with-undo-vgvl0?autoresize=1&fontsize=14
 
 ## Installation
 * `npm install substate --save`
