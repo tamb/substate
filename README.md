@@ -17,7 +17,7 @@ State management with Redux is really nice.  But it can get convoluted really qu
 ## Contents
 * [How it Works](#how-it-works)
     * [The Steps](#the-steps)
-    
+* [Demo](#demo)    
 * [Installation](#installation)
 * [Instantiation](#instantiation)
 * [Options](#options)
@@ -42,6 +42,8 @@ State management with Redux is really nice.  But it can get convoluted really qu
 7. The Components will digest the new State using the method(s) registered in step 2
 8. If you want a deep clone pass in `$deep: true` into the state on emit.  OR `defaultDeep: true` in the options. 
 
+## Demo
+https://codesandbox.io/embed/todo-with-undo-vgvl0?autoresize=1&fontsize=14&view=preview
 
 ## Installation
 * `npm install substate --save`
