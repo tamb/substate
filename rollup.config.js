@@ -1,4 +1,5 @@
 import { terser } from "rollup-plugin-terser";
+import babel from 'rollup-plugin-babel';
 
 export default [
   {
@@ -25,5 +26,38 @@ export default [
       format: "umd",
       name: "substate"
     }
+  },
+  {
+    input: "./src/substate.js",
+    output: {
+      file: "dist/index.es5.js",
+      format: "umd",
+      name: "substate"
+    },
+    plugins: [
+      babel({
+        exclude: 'node_modules/**'
+      }),
+      terser({
+        compress: true,
+        ecma: 5,
+        compress:{
+          drop_console: true,          
+        } 
+      }),
+    ]
+  },
+  {
+    input: "./src/substate.js",
+    output: {
+      file: "dist/index.es5.dev.js",
+      format: "umd",
+      name: "substate"
+    },
+    plugins: [
+      babel({
+        exclude: 'node_modules/**'
+      })
+    ]
   },
 ];
