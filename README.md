@@ -49,6 +49,41 @@ https://codesandbox.io/embed/todo-with-undo-vgvl0?autoresize=1&fontsize=14
 * `npm install substate --save`
 * copy and paste from `index.js` into a `<script>` or external js file
 
+ES2015 Version
+```js
+// ES Module
+import substate from 'substate';
+
+// Node
+const substate = require('substate');
+
+// Dev Version
+// ES Module
+import substate from 'substate/dist/index.dev.js';
+
+// Node
+const substate = require('substate/dist/index.dev.js');
+```
+
+ES5 Version
+```js
+// ES Module
+import substate from 'substate/dist/index.es5.js';
+
+// Node
+const substate = require('substate/dist/index.es5.js');
+
+// Dev Version
+// ES Module
+import substate from 'substate/dist/index.es5.dev.js';
+
+// Node
+const substate = require('substate/dist/index.es5.dev.js');
+
+```
+
+
+
 ## Instantiation 
 substate is a class so you call it like so
 
