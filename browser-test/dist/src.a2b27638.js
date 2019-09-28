@@ -220,9 +220,145 @@ function deepcopy(value) {
 var define;
 !function(e){"function"==typeof define&&define.amd?define(e):e()}(function(){"use strict";module.exports=function(e,n,t){for(var i=e,r=(n=(n=n.toString().replace(/\[(\w+)\]/g,".$1")).toString().replace(/^\./,"")).split("."),o=0;o<r.length;++o){var f=r[o];f in i?i.hasOwnProperty(f)&&(void 0!==t&&o===r.length-1&&(i[f]=t),i=i[f]):i[f]=t}return i}});
 
-},{}],"node_modules/substate/dist/index.js":[function(require,module,exports) {
+},{}],"node_modules/substate/dist/index.dev.js":[function(require,module,exports) {
 var define;
-!function(t,e){"object"==typeof exports&&"undefined"!=typeof module?module.exports=e(require("deep-clone-simple"),require("object-bystring")):"function"==typeof define&&define.amd?define(["deep-clone-simple","object-bystring"],e):(t=t||self).substate=e(t.deepclone,t.byString)}(this,(function(t,e){"use strict";t=t&&t.hasOwnProperty("default")?t.default:t,e=e&&e.hasOwnProperty("default")?e.default:e;class s{constructor(){this.events={}}on(t,e){this.events[t]=this.events[t]||[],this.events[t].push(e)}off(t,e){if(this.events[t])for(var s=0;s<this.events[t].length;s++)if(this.events[t][s]===e){this.events[t].splice(s,1);break}}emit(t,e){this.events[t]&&this.events[t].forEach((function(t,s){t(e)}))}}const a="UPDATE_STATE";return class extends s{constructor(t={}){super(),this.name=t.name||"SubStateInstance",this.afterUpdate=t.afterUpdate||[],this.beforeUpdate=t.beforeUpdate||[],this.currentState=t.currentState||0,this.stateStorage=t.stateStorage||[],this.defaultDeep=t.defaultDeep||!1,t.state&&this.stateStorage.push(t.state),this.on(a,this.updateState.bind(this))}getState(t){return this.stateStorage[t]}getCurrentState(t){return this.getState(this.currentState)}getProp(t){return e(this.getCurrentState(),t)}changeState(t){this.currentState=t.requestedState,this.emit(t.$type||"STATE_CHANGED",this.getCurrentState())}resetState(){this.currentState=0,this.stateStorage=[this.stateStorage[0]],this.emit("STATE_RESET")}pushState(t){this.stateStorage.push(t),this.currentState=this.stateStorage.length-1}updateState(s){let r;this.beforeUpdate.length>0&&this.beforeUpdate.forEach(t=>t(this,s)),r=s.$deep||this.defaultDeep?t(this.getCurrentState()):Object.assign({},this.getCurrentState());for(let t in s)s.hasOwnProperty(t)&&e(r,t,s[t]);!this.defaultDeep&&(r.$deep=!1),s.$type||(r.$type=a),this.pushState(r),this.afterUpdate.length>0&&this.afterUpdate.forEach(t=>t(this)),this.emit(s.$type||"STATE_UPDATED",this.getCurrentState())}}}));
+var global = arguments[3];
+(function (global, factory) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('deep-clone-simple'), require('object-bystring')) :
+    typeof define === 'function' && define.amd ? define(['deep-clone-simple', 'object-bystring'], factory) :
+    (global = global || self, global.substate = factory(global.deepclone, global.byString));
+}(this, function (deepclone, byString) { 'use strict';
+
+    deepclone = deepclone && deepclone.hasOwnProperty('default') ? deepclone['default'] : deepclone;
+    byString = byString && byString.hasOwnProperty('default') ? byString['default'] : byString;
+
+    /**
+     * Created by root on 6/27/17.
+     */
+    class PubSub{
+        constructor(){
+            this.events = {};
+
+        }
+
+        on(eventName, fn){
+
+            this.events[eventName] = this.events[eventName] || [];
+            this.events[eventName].push(fn);
+
+        }
+
+        off(eventName, fn) {
+            if (this.events[eventName]) {
+                for (var i = 0; i < this.events[eventName].length; i++) {
+                    if (this.events[eventName][i] === fn) {
+                        this.events[eventName].splice(i, 1);
+                        break;
+                    }
+                }
+            }
+        }
+
+        emit(eventName, data) {
+            // console.log('in emit: ', data);
+            if (this.events[eventName]) {
+                this.events[eventName].forEach(function(fn, i) {
+                    // console.log(i, eventName, data);
+                    fn(data);
+                });
+            }
+        }
+
+    }
+
+    const S = "UPDATE_STATE";
+    const C = "CHANGE_STATE";
+
+    class substate extends PubSub {
+      constructor(obj = {}) {
+        super();
+        console.log("You are using a dev version of substate");
+
+        this.name = obj.name || "SubStateInstance";
+        this.afterUpdate = obj.afterUpdate || [];
+        this.beforeUpdate = obj.beforeUpdate || [];
+        this.currentState = obj.currentState || 0;
+        this.stateStorage = obj.stateStorage || [];
+        this.defaultDeep = obj.defaultDeep || false;
+
+        if (obj.state) this.stateStorage.push(obj.state);
+        this.on(S, this.updateState.bind(this));
+        this.on(C, this.changeState.bind(this));
+      }
+
+      getState(index) {
+        return this.stateStorage[index];
+      }
+
+      getCurrentState(s) {
+        return this.getState(this.currentState);
+      }
+
+      getProp(prop) {
+        return byString(this.getCurrentState(), prop);
+      }
+
+      changeState(action) {
+        this.currentState = action.requestedState;
+        this.emit(action.$type || "STATE_CHANGED", this.getCurrentState());
+      }
+
+      resetState() {
+        this.currentState = 0;
+        this.stateStorage = [this.stateStorage[0]];
+        this.emit("STATE_RESET");
+      }
+
+      // Updates the state history array and sets the currentState pointer properly
+      pushState(newState) {
+        this.stateStorage.push(newState);
+        this.currentState = this.stateStorage.length - 1;
+        console.log("State Pushed");
+      }
+
+      updateState(action) {
+        this.beforeUpdate.length > 0
+          ? this.beforeUpdate.forEach(func => func(this, action))
+          : null;
+        let newState;
+        if (action.$deep || this.defaultDeep) {
+          newState = deepclone(this.getCurrentState()); // deep clonse
+        } else {
+          newState = Object.assign({}, this.getCurrentState()); // shallow clone
+        }
+
+        //update temp new state
+        for (let key in action) {
+          console.log("replacing key ", key);
+          if (action.hasOwnProperty(key)) byString(newState, key, action[key]);
+          //update cloned state
+        }
+
+        this.defaultDeep ? null : (newState.$deep = false); // reset $deep keyword
+
+        console.log("New State: ", newState);
+        console.log('Inside this store: ', this.name);
+
+        if (!action.$type) newState.$type = S;
+
+        //pushes new state
+        this.pushState(newState);
+
+        this.afterUpdate.length > 0
+          ? this.afterUpdate.forEach(func => func(this))
+          : null;
+        this.emit(action.$type || "STATE_UPDATED", this.getCurrentState()); //emit with latest data
+      }
+    }
+
+    return substate;
+
+}));
 
 },{"deep-clone-simple":"node_modules/deep-clone-simple/index.js","object-bystring":"node_modules/object-bystring/dist/index.js"}],"src/state.js":[function(require,module,exports) {
 "use strict";
@@ -232,37 +368,17 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.store = void 0;
 
-var _substate = _interopRequireDefault(require("substate"));
+var _indexDev = _interopRequireDefault(require("substate/dist/index.dev.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var store = new _substate.default({
+var store = new _indexDev.default({
   state: {
     todos: []
   }
 });
 exports.store = store;
-},{"substate":"node_modules/substate/dist/index.js"}],"src/form/formState.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.createTodo = void 0;
-
-var _state = require("../state");
-
-var createTodo = function createTodo(text) {
-  var newState = {
-    $type: "ADD_TODO",
-    todos: _state.store.getProp('todos').concat([text])
-  };
-
-  _state.store.emit("UPDATE_STATE", newState);
-};
-
-exports.createTodo = createTodo;
-},{"../state":"src/state.js"}],"src/form/form.js":[function(require,module,exports) {
+},{"substate/dist/index.dev.js":"node_modules/substate/dist/index.dev.js"}],"src/form/form.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -270,7 +386,18 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = wireForm;
 
-var _formState = require("./formState");
+var _state = require("../state");
+
+function createTodo(text) {
+  var newState = {
+    $type: "UPDATE_TODO",
+    todos: _state.store.getProp('todos').concat([text])
+  };
+
+  _state.store.emit("UPDATE_STATE", newState);
+}
+
+;
 
 function wireForm() {
   var form = document.querySelector('[data-ref="form"]');
@@ -280,27 +407,12 @@ function wireForm() {
     var text = input.value;
 
     if (text.length > 0) {
-      (0, _formState.createTodo)(text);
+      createTodo(text);
       input.value = '';
     }
   });
 }
-},{"./formState":"src/form/formState.js"}],"src/list/listState.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.addTodoList = void 0;
-
-var addTodoList = function addTodoList(state) {
-  return state.todos.map(function (todo) {
-    return "<li>".concat(todo, "</li>");
-  });
-};
-
-exports.addTodoList = addTodoList;
-},{}],"src/list/list.js":[function(require,module,exports) {
+},{"../state":"src/state.js"}],"src/list/list.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -310,23 +422,54 @@ exports.default = wireList;
 
 var _state = require("../state");
 
-var _listState = require("./listState");
+var list = null;
 
 function wireList() {
-  var list = document.querySelector('[data-ref="list"]');
+  list = document.querySelector('[data-ref="list"]');
 
-  function addIt(state) {
-    console.log(state);
-    var html = "";
-    (0, _listState.addTodoList)(state).forEach(function (li) {
-      html += li;
-    });
-    list.innerHTML = html;
-  }
-
-  _state.store.on("ADD_TODO", addIt);
+  _state.store.on('UPDATE_TODO', addIt);
 }
-},{"../state":"src/state.js","./listState":"src/list/listState.js"}],"src/index.js":[function(require,module,exports) {
+
+function addIt(state) {
+  var html = "";
+  state.todos.map(function (todo) {
+    return "<li>".concat(todo, "</li>");
+  }).forEach(function (li) {
+    html += li;
+  });
+  list.innerHTML = html;
+}
+},{"../state":"src/state.js"}],"src/undoredo/undoredo.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = wireUndoRedo;
+
+var _state = require("../state");
+
+function wireUndoRedo() {
+  var undo = document.querySelector('[data-ref="undo"]');
+  var redo = document.querySelector('[data-ref="redo"]');
+  redo.addEventListener("click", function () {
+    if (_state.store.currentState !== _state.store.stateStorage.length - 1) {
+      _state.store.emit("CHANGE_STATE", {
+        requestedState: _state.store.currentState + 1,
+        $type: "UPDATE_TODO"
+      });
+    }
+  });
+  undo.addEventListener("click", function () {
+    if (_state.store.currentState !== 0) {
+      _state.store.emit("CHANGE_STATE", {
+        requestedState: _state.store.currentState - 1,
+        $type: "UPDATE_TODO"
+      });
+    }
+  });
+}
+},{"../state":"src/state.js"}],"src/index.js":[function(require,module,exports) {
 "use strict";
 
 require("./styles.css");
@@ -335,11 +478,14 @@ var _form = _interopRequireDefault(require("./form/form"));
 
 var _list = _interopRequireDefault(require("./list/list"));
 
+var _undoredo = _interopRequireDefault(require("./undoredo/undoredo"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 (0, _form.default)();
 (0, _list.default)();
-},{"./styles.css":"src/styles.css","./form/form":"src/form/form.js","./list/list":"src/list/list.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+(0, _undoredo.default)();
+},{"./styles.css":"src/styles.css","./form/form":"src/form/form.js","./list/list":"src/list/list.js","./undoredo/undoredo":"src/undoredo/undoredo.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -367,7 +513,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "33119" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "40851" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

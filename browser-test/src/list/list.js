@@ -1,17 +1,21 @@
-import { store } from '../state';
-import { addTodoList } from "./listState";
+import { store } from "../state";
+
+let list = null;
 
 export default function wireList() {
-  const list = document.querySelector('[data-ref="list"]');
+  list = document.querySelector('[data-ref="list"]');
 
-  function addIt(state) {
-    console.log(state);
-    let html = ``;
-    addTodoList(state).forEach(li => {
-      html += li;
-    });
-    list.innerHTML = html;
-  }
+  store.on('UPDATE_TODO', addIt);
 
-  store.on("ADD_TODO", addIt);
+}
+
+
+function addIt(state) {
+  let html = ``;
+  state.todos.map(todo => {
+    return `<li>${todo}</li>`;
+  }).forEach(li => {
+    html += li;
+  });
+  list.innerHTML = html;
 }

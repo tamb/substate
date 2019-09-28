@@ -1,4 +1,13 @@
-import { createTodo } from "./formState";
+import { store } from '../state';
+
+function createTodo (text) {
+  const newState = {
+    $type: "UPDATE_TODO",
+    todos: store.getProp('todos').concat([text])
+  };
+  store.emit("UPDATE_STATE", newState);
+};
+
 export default function wireForm() {
   const form = document.querySelector('[data-ref="form"]');
   form.addEventListener("submit", e => {

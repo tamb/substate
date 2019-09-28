@@ -47,6 +47,7 @@
     }
 
     const S = "UPDATE_STATE";
+    const C = "CHANGE_STATE";
 
     class substate extends PubSub {
       constructor(obj = {}) {
@@ -62,6 +63,7 @@
 
         if (obj.state) this.stateStorage.push(obj.state);
         this.on(S, this.updateState.bind(this));
+        this.on(C, this.changeState.bind(this));
       }
 
       getState(index) {

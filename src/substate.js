@@ -4,6 +4,7 @@ import byString from "object-bystring";
 import PubSub from "./PubSub.js";
 
 const S = "UPDATE_STATE";
+const C = "CHANGE_STATE";
 
 export default class substate extends PubSub {
   constructor(obj = {}) {
@@ -19,6 +20,7 @@ export default class substate extends PubSub {
 
     if (obj.state) this.stateStorage.push(obj.state);
     this.on(S, this.updateState.bind(this));
+    this.on(C, this.changeState.bind(this));
   }
 
   getState(index) {
