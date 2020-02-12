@@ -15,6 +15,7 @@ State management with Redux is really nice.  But it can get convoluted really qu
 
 
 ## Contents
+* [Flow](#flow)
 * [How it Works](#how-it-works)
     * [The Steps](#the-steps)
 * [Demo](#demo)    
@@ -29,6 +30,9 @@ State management with Redux is really nice.  But it can get convoluted really qu
 * [Updates to Come](#updates-to-come)
 * [Pull Requests](#pull-requests)
 
+
+## Flow
+![flow](https://github.com/tamb/substate/blob/master/substate-flow.png)
 
 ## How it Works
 
