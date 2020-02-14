@@ -37,7 +37,20 @@ State management with Redux is really nice.  But it can get convoluted really qu
 ## How it Works
 
 ### The Steps
-1. (if using modules) `import { myInstance } from 'myFile'`
+1. (if using modules) 
+```js
+//store.js
+import substate from 'substate';
+
+export const store = new substate({
+  state: {
+    todos: []
+  }
+});
+
+// MyComponent.js
+import { store } from './store.js';
+```
 2. Components will register one or more methods to rerender themselves using your instance (see [instantiation](#instantiation))  using `myInstance.on('STATE_UPDATED', rerender)` per method
 3. Components take UI event ("click", "focus", etc) and pass it off to a Handler/Reducer
 4. The Handler/Reducer figures out what should change in the state (it does not update the state directly).  It also figures out if/what `$type` should be sent to the Pub/Sub module
