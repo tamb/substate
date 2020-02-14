@@ -52,8 +52,33 @@ export const store = new substate({
 import { store } from './store.js';
 ```
 2. Components will register one or more methods to rerender themselves using your instance (see [instantiation](#instantiation))  using `myInstance.on('STATE_UPDATED', rerender)` per method
+```js
+// MyComponent.js
+
+store.on('STATE_UPDATED', rerenderFunction);
+```
 3. Components take UI event ("click", "focus", etc) and pass it off to a Handler/Reducer
+```js
+// MyComponent.js
+element.addEventListener('click', clickHandler);
+```
 4. The Handler/Reducer figures out what should change in the state (it does not update the state directly).  It also figures out if/what `$type` should be sent to the Pub/Sub module
+```js
+// MyComponent.js
+
+clickHandler = () => {
+  // define which fields should be updated and to what values
+  // you can use string notation because of the underlying technology in substate!
+  
+  const newState = {
+    name: 'Pablo',
+    'height.inches': 62,
+    'height.centimeters': 157.48
+  };
+  
+  store.emit('UPDATE_STATE', newState);
+}
+```
 5. The Handler/Reducer will then `emit` `UPDATE_STATE` to the Pub/Sub module
 6. The Pub/Sub module will create a _new_ state and will `emit` `STATE_UPDATED` or the specified `$type` to the Components.
 7. The Components will digest the new State using the method(s) registered in step 2
