@@ -85,10 +85,21 @@ clickHandler = () => {
   store.emit('UPDATE_STATE', newState);
 }
 ```
-5. The Handler/Reducer will then `emit` `UPDATE_STATE` to the Pub/Sub module
-6. The Pub/Sub module will create a _new_ state and will `emit` `STATE_UPDATED` or the specified `$type` to the Components.
-7. The Components will digest the new State using the method(s) registered in step 2
-8. If you want a deep clone pass in `$deep: true` into the state on emit.  OR `defaultDeep: true` in the options. 
+__A couple notes:__
+If you want a deep clone pass in `$deep: true` into the state on emit.  OR `defaultDeep: true` in the options. 
+```js
+const newState={
+  $deep: true,
+};
+```
+
+If you want to emit a custom event, you can pass in a `$type`
+If you want a deep clone pass in `$deep: true` into the state on emit.  OR `defaultDeep: true` in the options. 
+```js
+const newState={
+  $type: 'HEIGHT_CHANGE',
+};
+```
 
 ## Demo
 https://codesandbox.io/embed/todo-with-undo-vgvl0?autoresize=1&fontsize=14
