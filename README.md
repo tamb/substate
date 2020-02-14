@@ -51,11 +51,17 @@ export const store = new substate({
 // MyComponent.js
 import { store } from './store.js';
 ```
-2. Components will register one or more methods to rerender themselves using your instance (see [instantiation](#instantiation))  using `myInstance.on('STATE_UPDATED', rerender)` per method
+2. Components will register one or more methods to rerender themselves using your instance (see [instantiation](#instantiation)) 
+using `myInstance.on('STATE_UPDATED', rerender)` per method
+You can register to a custom event as well
 ```js
 // MyComponent.js
 
+// default state event
 store.on('STATE_UPDATED', rerenderFunction);
+
+// custom state event
+store.on('HEIGHT_CHANGE', rerenderFunction);
 ```
 3. Components take UI event ("click", "focus", etc) and pass it off to a Handler/Reducer
 ```js
