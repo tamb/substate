@@ -89,6 +89,7 @@ __A couple notes:__
 If you want a deep clone pass in `$deep: true` into the state on emit.  OR `defaultDeep: true` in the options. 
 ```js
 const newState={
+  ...newValues,
   $deep: true,
 };
 ```
@@ -97,6 +98,7 @@ If you want to emit a custom event, you can pass in a `$type`
 If you want a deep clone pass in `$deep: true` into the state on emit.  OR `defaultDeep: true` in the options. 
 ```js
 const newState={
+  ...newValues,
   $type: 'HEIGHT_CHANGE',
 };
 ```
