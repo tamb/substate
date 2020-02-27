@@ -16,18 +16,18 @@ State management with Redux is really nice.  But it can get convoluted really qu
 
 ## Contents
 * [Flow](#flow)
-* [How it Works](#how-it-works)
-    * [The Steps](#the-steps)
-* [Demo](#demo)    
-* [Installation](#installation)
-* [Instantiation](#instantiation)
-* [Options](#options)
 * [Terms](#terms)
    * [store](#store)
    * [emit](#emit)
    * [on](#on)
    * [off](#off)
    * [payload](#payload)
+* [How it Works](#how-it-works)
+    * [The Steps](#the-steps)
+* [Demo](#demo)    
+* [Installation](#installation)
+* [Instantiation](#instantiation)
+* [Options](#options)
 * [State Methods](#state-methods)
 * [Event Methods](#event-methods)
 * [State Events](#state-events)  
@@ -39,6 +39,49 @@ State management with Redux is really nice.  But it can get convoluted really qu
 
 ## Flow
 ![flow](https://github.com/tamb/substate/blob/master/substate-flow.png)
+
+## Terms
+### store
+The `store` is the substate instance.  It has methods and state storage.  It basically handles all your changes for you and acts as a mediator between different parts of your application.  It's really a simple pub/sub pattern with data in it.  That's all.  
+
+```js
+store - "I'll handle this!"
+  ___________________
+ |                   |
+ | message queues    |
+ | application state |
+ |___________________|
+```
+
+### emit
+A method that shoots a `$type` and `payload` to the `store`.
+This method tells the `store`: 
+"Hey store.  I need you to send this message `$type` out.  And here's a `payload` of data to send with it!"
+
+```js
+store.emit($type, payload)
+```
+### on
+A method that listens for the above `$type` and fires a callback function that gets passed the `emit` methods `payload`
+"Hello store.  When you send out a message of this `$type`, please fire this `callbackFunction` and pass it your `payload`! Thanks!"
+
+```js
+store.on($type, callbackFunction)
+```
+
+### off
+A method that stops a certain `callbackFunction` on a specific `$type` 
+"Howdy store.  When you send out a message of this `$type`, you don't need to fire this `callbackFunction`.  Please remove the function from your queue."
+
+```js
+store.off($type, callbackFunction)
+```
+
+### payload
+An object of data.  You can put any data in there that you want.  The idea is that you would put your updated `state` object in there.  The `store` will save your old state and `emit` your make updates to your new state according to this object.  When triggering a state change with `UPDATE_STATE` you have the option of passing 2 fields into your `payload`
+
+* `$type` - this is a String value of a message `$type` that the `store` will `emit`.  So if you pass it `$type: "SAY_HI"`, the `store` will emit `store.emit("SAY_HI", data)`  and any callbacks that have been registered with `store.on("SAY_HI", callback)` will be fired _in registration order_.
+* `$deep` - this is a boolean that, when set to `true` will deep clone your state object.  In the guts of the store we use `Object.assign`, which does not deep clone the state object.  But the store has a special trick that can deep clone for you.  So that means you don't have to normalize your state.  You can have it as nested and complicated as you want. This is a huge plus for people who want their state to reflect their complex dataset.
 
 ## How it Works
 
@@ -162,48 +205,6 @@ Then you instantiate it as such
 
 `export const myInstance = new substate({options});`
 
-## Terms
-### store
-The `store` is the substate instance.  It has methods and state storage.  It basically handles all your changes for you and acts as a mediator between different parts of your application.  It's really a simple pub/sub pattern with data in it.  That's all.  
-
-```js
-store - "I'll handle this!"
-  ___________________
- |                   |
- | message queues    |
- | application state |
- |___________________|
-```
-
-### emit
-A method that shoots a `$type` and `payload` to the `store`.
-This method tells the `store`: 
-"Hey store.  I need you to send this message `$type` out.  And here's a `payload` of data to send with it!"
-
-```js
-store.emit($type, payload)
-```
-### on
-A method that listens for the above `$type` and fires a callback function that gets passed the `emit` methods `payload`
-"Hello store.  When you send out a message of this `$type`, please fire this `callbackFunction` and pass it your `payload`! Thanks!"
-
-```js
-store.on($type, callbackFunction)
-```
-
-### off
-A method that stops a certain `callbackFunction` on a specific `$type` 
-"Howdy store.  When you send out a message of this `$type`, you don't need to fire this `callbackFunction`.  Please remove the function from your queue."
-
-```js
-store.off($type, callbackFunction)
-```
-
-### payload
-An object of data.  You can put any data in there that you want.  The idea is that you would put your updated `state` object in there.  The `store` will save your old state and `emit` your make updates to your new state according to this object.  When triggering a state change with `UPDATE_STATE` you have the option of passing 2 fields into your `payload`
-
-* `$type` - this is a String value of a message `$type` that the `store` will `emit`.  So if you pass it `$type: "SAY_HI"`, the `store` will emit `store.emit("SAY_HI", data)`  and any callbacks that have been registered with `store.on("SAY_HI", callback)` will be fired _in registration order_.
-* `$deep` - this is a boolean that, when set to `true` will deep clone your state object.  In the guts of the store we use `Object.assign`, which does not deep clone the state object.  But the store has a special trick that can deep clone for you.  So that means you don't have to normalize your state.  You can have it as nested and complicated as you want. This is a huge plus for people who want their state to reflect their complex dataset.
 
 ## Options
 substate accepts an options object as an optional parameter.
