@@ -22,6 +22,9 @@ State management with Redux is really nice.  But it can get convoluted really qu
 * [Installation](#installation)
 * [Instantiation](#instantiation)
 * [Options](#options)
+* [emit](#emit)
+* [on](#on)
+* [off](#off)
 * [State Methods](#state-methods)
 * [Event Methods](#event-methods)
 * [State Events](#state-events)  
@@ -155,6 +158,25 @@ _myFile.js_
 Then you instantiate it as such
 
 `export const myInstance = new substate({options});`
+
+## emit
+The `emit` method shoots a `$type` and `payload` to the `store`.
+This method tells the `store`/substate instance: 
+"Hey store.  I need you to send this message `$type` out.  And here's a `payload` of data to send with it!"
+
+`store.emit($type, payload)`
+
+## on
+The `on` method listens for the above `$type` and fires a callback function that gets passed the `emit` methods `payload`
+"Hello store.  When you send out a message of this `$type`, please fire this `callbackFunction` and pass it your `payload`! Thanks!"
+
+`store.on($type, callbackFunction)`
+
+## off
+The `off` method stops a certain `callbackFunction` on a specific `$type` 
+"Howdy store.  When you send out a message of this `$type`, you don't need to fire this `callbackFunction`.  Please remove the function from your queue."
+
+`store.off($type, callbackFunction)`
 
 ## Options
 substate accepts an options object as an optional parameter.
