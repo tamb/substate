@@ -175,7 +175,7 @@ store - "I'll handle this!"
 ```
 
 ### emit
-The `emit` method shoots a `$type` and `payload` to the `store`.
+A emthod that shoots a `$type` and `payload` to the `store`.
 This method tells the `store`: 
 "Hey store.  I need you to send this message `$type` out.  And here's a `payload` of data to send with it!"
 
@@ -183,7 +183,7 @@ This method tells the `store`:
 store.emit($type, payload)
 ```
 ### on
-The `on` method listens for the above `$type` and fires a callback function that gets passed the `emit` methods `payload`
+A emthod that listens for the above `$type` and fires a callback function that gets passed the `emit` methods `payload`
 "Hello store.  When you send out a message of this `$type`, please fire this `callbackFunction` and pass it your `payload`! Thanks!"
 
 ```js
@@ -191,7 +191,7 @@ store.on($type, callbackFunction)
 ```
 
 ### off
-The `off` method stops a certain `callbackFunction` on a specific `$type` 
+A emthod that stops a certain `callbackFunction` on a specific `$type` 
 "Howdy store.  When you send out a message of this `$type`, you don't need to fire this `callbackFunction`.  Please remove the function from your queue."
 
 ```js
