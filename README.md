@@ -23,6 +23,7 @@ State management with Redux is really nice.  But it can get convoluted really qu
 * [Instantiation](#instantiation)
 * [Options](#options)
 * [Terms](#terms)
+   * [store](#store)
    * [emit](#emit)
    * [on](#on)
    * [off](#off)
