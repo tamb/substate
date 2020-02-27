@@ -263,7 +263,8 @@ Basically to utilitze a custom event, you still need to use `UPDATE_STATE` but t
 
 ## Updates to come
 - better dev instructions and console warnings/errors
-- seemless compatibility with infernojs, preactjs, stenciljs
+- typescript support
+- seemless compatibility with react, infernojs, preactjs, stenciljs
 - demos demos demos
 - better documentation
 
