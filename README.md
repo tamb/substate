@@ -179,19 +179,24 @@ The `emit` method shoots a `$type` and `payload` to the `store`.
 This method tells the `store`: 
 "Hey store.  I need you to send this message `$type` out.  And here's a `payload` of data to send with it!"
 
-`store.emit($type, payload)`
-
+```js
+store.emit($type, payload)
+```
 ### on
 The `on` method listens for the above `$type` and fires a callback function that gets passed the `emit` methods `payload`
 "Hello store.  When you send out a message of this `$type`, please fire this `callbackFunction` and pass it your `payload`! Thanks!"
 
-`store.on($type, callbackFunction)`
+```js
+store.on($type, callbackFunction)
+```
 
 ### off
 The `off` method stops a certain `callbackFunction` on a specific `$type` 
 "Howdy store.  When you send out a message of this `$type`, you don't need to fire this `callbackFunction`.  Please remove the function from your queue."
 
-`store.off($type, callbackFunction)`
+```js
+store.off($type, callbackFunction)
+```
 
 ### payload
 A `payload` is just an object.  You can put any data in there that you want.  The idea is that you would put your `state` object in there.  When triggering a state change with `UPDATE_STATE` you have the option of passing 2 fields into your `payload`
