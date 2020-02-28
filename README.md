@@ -3,7 +3,7 @@
 ## pub/sub state management
 
 ## The Problem
-State management with Redux is really nice.  But it can get convoluted really quickly.  It's almost like a pub/sub may do the trick, but that's missing modules, immutability, etc.  Well it's hybrid time!
+State management with Redux is really nice but sometimes there's a lot of boilerplate that people don't want.  It also requires a hands-on approach to updating state.  How do we abstract away the cloning and deep cloning of state?
 
 ## Purpose
 * To manage state with a simple pub/sub pattern
