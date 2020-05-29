@@ -8,7 +8,7 @@ const C:string = "CHANGE_STATE";
 
 interface IAction{
   $type?: string;
-  $defaultDeep?: boolean;
+  $deep?: boolean;
 }
 
 interface IChangeStateAction extends IAction{
@@ -63,13 +63,13 @@ export default class substate extends PubSub {
   }
 
   // Updates the state history array and sets the currentState pointer properly
-  pushState(newState) {
+  pushState(newState: Object) {
     this.stateStorage.push(newState);
     this.currentState = this.stateStorage.length - 1;
     console.log("State Pushed");
   }
 
-  updateState(action) {
+  updateState(action: IAction) {
     this.beforeUpdate.length > 0
       ? this.beforeUpdate.forEach(func => func(this, action))
       : null;
