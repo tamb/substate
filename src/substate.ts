@@ -3,10 +3,26 @@ import byString from "object-bystring";
 
 import PubSub from "./PubSub.js";
 
-const S = "UPDATE_STATE";
-const C = "CHANGE_STATE";
+const S:string = "UPDATE_STATE";
+const C:string = "CHANGE_STATE";
+
+interface IAction{
+  $type?: string;
+  $defaultDeep?: boolean;
+}
+
+interface IChangeStateAction extends IAction{
+  $requestedState: number;
+}
 
 export default class substate extends PubSub {
+  name: string;
+  afterUpdate: [Function]|[];
+  beforeUpdate: [Function]|[];
+  currentState: number;
+  stateStorage: [Object]|[];
+  defaultDeep: boolean;
+
   constructor(obj = {}) {
     super();
     console.log("You are using a dev version of substate");
@@ -23,20 +39,20 @@ export default class substate extends PubSub {
     this.on(C, this.changeState.bind(this));
   }
 
-  getState(index) {
+  getState(index: number): {} {
     return this.stateStorage[index];
   }
 
-  getCurrentState(s) {
+  getCurrentState(): {} {
     return this.getState(this.currentState);
   }
 
-  getProp(prop) {
+  getProp(prop: string): any {
     return byString(this.getCurrentState(), prop);
   }
 
-  changeState(action) {
-    this.currentState = action.requestedState;
+  changeState(action: IChangeStateAction) {
+    this.currentState = action.$requestedState;
     this.emit(action.$type || "STATE_CHANGED", this.getCurrentState());
   }
 
