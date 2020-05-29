@@ -1,14 +1,15 @@
 {
   "name": "substate",
-  "version": "8.1.1",
-  "description": "pub/sub state management",
+  "version": "0.0.0-alpha.1",
+  "description": "Simple State Management with Optional Deep Cloning",
   "main": "dist/index.js",
   "scripts": {
     "deploy": "cd browser-test && npm install && npm run build && cd .. && node clean && gh-pages -d browser-test/dist",
     "start": "node clean && npm run build && cd browser-test && npm install && npm start",
     "test": "npm run build && jest",
     "build": "npm run quick:build && npm pack",
-    "quick:build": "rollup -c rollup.config.js"
+    "quick:build": "rollup -c rollup.config.js",
+    "publish": "npm run test && npm publish"
   },
   "repository": {
     "type": "git",
@@ -28,13 +29,15 @@
     "@babel/core": "^7.6.0",
     "@babel/plugin-proposal-class-properties": "^7.5.5",
     "@babel/preset-env": "^7.6.0",
+    "@types/jest": "^25.2.3",
     "babel-loader": "^8.0.6",
     "gh-pages": "^2.1.1",
-    "jest": "^25.0.0",
+    "jest": "^25.5.4",
     "rimraf": "^3.0.0",
     "rollup": "^1.21.4",
     "rollup-plugin-babel": "^4.3.3",
-    "rollup-plugin-terser": "^5.1.2"
+    "rollup-plugin-terser": "^5.1.2",
+    "ts-jest": "^26.0.0"
   },
   "dependencies": {
     "deep-clone-simple": "^1.1.1",

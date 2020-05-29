@@ -1,20 +1,27 @@
 /**
  * Created by root on 6/27/17.
  */
+
+interface IEvents{
+    [id: string]: Function[];
+}
+
 export default class PubSub{
+    events: IEvents;
+
     constructor(){
         this.events = {};
 
     }
 
-    on(eventName, fn){
+    on(eventName: string, fn: Function){
 
         this.events[eventName] = this.events[eventName] || [];
         this.events[eventName].push(fn);
 
     }
 
-    off(eventName, fn) {
+    off(eventName:string, fn: Function) {
         if (this.events[eventName]) {
             for (var i = 0; i < this.events[eventName].length; i++) {
                 if (this.events[eventName][i] === fn) {
@@ -25,7 +32,7 @@ export default class PubSub{
         }
     }
 
-    emit(eventName, data) {
+    emit(eventName: string, data: Object) {
         // console.log('in emit: ', data);
         if (this.events[eventName]) {
             this.events[eventName].forEach(function(fn, i) {
