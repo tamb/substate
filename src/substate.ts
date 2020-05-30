@@ -11,19 +11,29 @@ interface IAction{
   $deep?: boolean;
 }
 
+interface IConfig {
+  name?: string;
+  afterUpdate?: Function[]|[];
+  beforeUpdate?: Function[]|[];
+  currentState?: number;
+  stateStorage?: object[];
+  defaultDeep?: boolean;
+  state?: object;
+};
+
 interface IChangeStateAction extends IAction{
   $requestedState: number;
 }
 
 export default class substate extends PubSub {
   name: string;
-  afterUpdate: [Function]|[];
-  beforeUpdate: [Function]|[];
+  afterUpdate: Function[]|[];
+  beforeUpdate: Function[]|[];
   currentState: number;
-  stateStorage: [Object]|[];
+  stateStorage: object[];
   defaultDeep: boolean;
 
-  constructor(obj = {}) {
+  constructor(obj: IConfig ) {
     super();
     console.log("You are using a dev version of substate");
 
