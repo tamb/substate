@@ -1,5 +1,11 @@
 import { terser } from "rollup-plugin-terser";
-import babel from 'rollup-plugin-babel';
+import babel from '@rollup/plugin-babel';
+import typescript from '@rollup/plugin-typescript';
+
+const  typescript =  typescript({
+  declaration: true,
+  
+})
 
 export default [
   {
@@ -17,18 +23,24 @@ export default [
           drop_console: true,          
         } 
       }),
+
     ]
   },
   {
-    input: "./src/substate.js",
+    input: "./src/substate.ts",
     output: {
       file: "dist/index.dev.js",
       format: "umd",
       name: "substate"
-    }
+    },
+    plugins: [
+      typescript({
+        declaration: true,
+      })
+    ]
   },
   {
-    input: "./src/substate.js",
+    input: "./src/substate.ts",
     output: {
       file: "dist/index.es5.js",
       format: "umd",
@@ -45,10 +57,13 @@ export default [
           drop_console: true,          
         } 
       }),
+       typescript({
+        declaration: true,
+      })
     ]
   },
   {
-    input: "./src/substate.js",
+    input: "./src/substate.ts",
     output: {
       file: "dist/index.es5.dev.js",
       format: "umd",
@@ -57,6 +72,9 @@ export default [
     plugins: [
       babel({
         exclude: 'node_modules/**'
+      }),
+      typescript({
+        declaration: true,
       })
     ]
   },
