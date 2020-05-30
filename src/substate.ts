@@ -6,9 +6,10 @@ import PubSub from "./PubSub.js";
 const S:string = "UPDATE_STATE";
 const C:string = "CHANGE_STATE";
 
-interface IAction{
+interface IAction {
   $type?: string;
   $deep?: boolean;
+  [key: string]: any;
 }
 
 interface IConfig {

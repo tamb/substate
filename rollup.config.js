@@ -3,7 +3,7 @@ import babel from 'rollup-plugin-babel';
 
 export default [
   {
-    input: "./src/substate.js",
+    input: "./src/substate.ts",
     output: {
       file: "dist/index.js",
       format: "umd",
