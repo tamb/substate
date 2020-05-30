@@ -40,7 +40,7 @@
   },
   "dependencies": {
     "deep-clone-simple": "^1.1.1",
-    "object-bystring": "^4.0.1"
+    "object-bystring": "^4.1.0"
   },
   "files": [
     "LICENSE",
