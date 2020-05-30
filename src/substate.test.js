@@ -1,4 +1,4 @@
-const substate = require('substate');
+const substate = require('./../dist/index');
 
 const func1 =jest.fn(x => {
     x.count? x.count = ++x.count : x.count = 1;
