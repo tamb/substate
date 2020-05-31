@@ -1,15 +1,11 @@
 {
   "name": "substate",
-  "version": "0.0.0-alpha.1",
+  "version": "9.0.0-alpha.1",
   "description": "Simple State Management with Optional Deep Cloning",
   "main": "dist/index.js",
   "scripts": {
-    "deploy": "cd browser-test && npm install && npm run build && cd .. && node clean && gh-pages -d browser-test/dist",
-    "start": "node clean && npm run build && cd browser-test && npm install && npm start",
-    "test": "npm run build && jest",
-    "build": "npm run quick:build && npm pack",
-    "quick:build": "rollup -c rollup.config.js",
-    "publish": "npm run test && npm publish"
+    "test": "node clean && npx rollup -c rollup.config.js && jest && node addExports.js",
+    "safe-publish": "npm test && npm publish"
   },
   "repository": {
     "type": "git",
@@ -26,28 +22,43 @@
   "author": "Tamb (Tom Saporito) <t.saporito@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "@babel/core": "^7.6.0",
-    "@babel/plugin-proposal-class-properties": "^7.5.5",
-    "@babel/preset-env": "^7.6.0",
+    "@babel/preset-env": "^7.10.2",
     "@rollup/plugin-babel": "^5.0.2",
-    "@rollup/plugin-typescript": "^4.1.2",
     "@types/jest": "^25.2.3",
-    "babel-loader": "^8.0.6",
-    "gh-pages": "^2.1.1",
+    "@types/rfdc": "^1.1.0",
+    "husky": "^4.2.5",
     "jest": "^26.0.1",
-    "rimraf": "^3.0.0",
-    "rollup": "^1.21.4",
+    "prettier": "^2.0.5",
+    "pretty-quick": "^2.0.1",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.11.2",
     "rollup-plugin-terser": "^6.1.0",
-    "ts-jest": "^26.0.0",
+    "rollup-plugin-typescript2": "^0.27.1",
+    "ts-jest": "^26.1.0",
     "typescript": "^3.9.3"
   },
   "dependencies": {
-    "deep-clone-simple": "^1.1.1",
-    "object-bystring": "^5.0.0"
+    "object-bystring": "^5.0.0",
+    "rfdc": "^1.1.4"
   },
   "files": [
     "LICENSE",
     "README.md",
     "dist"
-  ]
+  ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
+  },
+  "types": "dist/index.d.ts",
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ]
+  }
 }

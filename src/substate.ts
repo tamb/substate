@@ -1,10 +1,10 @@
-import deepclone from "deep-clone-simple";
+import deepclone from "rfdc";
 import byString from "object-bystring";
 
-import PubSub from "./PubSub.js";
+import PubSub from "./PubSub";
 
-const S:string = "UPDATE_STATE";
-const C:string = "CHANGE_STATE";
+const S: string = "UPDATE_STATE";
+const C: string = "CHANGE_STATE";
 
 interface IAction {
   $type?: string;
@@ -14,27 +14,27 @@ interface IAction {
 
 interface IConfig {
   name?: string;
-  afterUpdate?: Function[]|[];
-  beforeUpdate?: Function[]|[];
+  afterUpdate?: Function[] | [];
+  beforeUpdate?: Function[] | [];
   currentState?: number;
   stateStorage?: object[];
   defaultDeep?: boolean;
   state?: object;
-};
+}
 
-interface IChangeStateAction extends IAction{
+interface IChangeStateAction extends IAction {
   $requestedState: number;
 }
 
 export default class substate extends PubSub {
   name: string;
-  afterUpdate: Function[]|[];
-  beforeUpdate: Function[]|[];
+  afterUpdate: Function[] | [];
+  beforeUpdate: Function[] | [];
   currentState: number;
   stateStorage: object[];
   defaultDeep: boolean;
 
-  constructor(obj: IConfig ) {
+  constructor(obj: IConfig) {
     super();
     console.log("You are using a dev version of substate");
 
@@ -82,7 +82,7 @@ export default class substate extends PubSub {
 
   updateState(action: IAction) {
     this.beforeUpdate.length > 0
-      ? this.beforeUpdate.forEach(func => func(this, action))
+      ? this.beforeUpdate.forEach((func) => func(this, action))
       : null;
     let newState;
     if (action.$deep || this.defaultDeep) {
@@ -101,7 +101,7 @@ export default class substate extends PubSub {
     this.defaultDeep ? null : (newState.$deep = false); // reset $deep keyword
 
     console.log("New State: ", newState);
-    console.log('Inside this store: ', this.name);
+    console.log("Inside this store: ", this.name);
 
     if (!action.$type) newState.$type = S;
 
@@ -109,7 +109,7 @@ export default class substate extends PubSub {
     this.pushState(newState);
 
     this.afterUpdate.length > 0
-      ? this.afterUpdate.forEach(func => func(this))
+      ? this.afterUpdate.forEach((func) => func(this))
       : null;
     this.emit(action.$type || "STATE_UPDATED", this.getCurrentState()); //emit with latest data
   }
