@@ -38,8 +38,8 @@
     "typescript": "^3.9.3"
   },
   "dependencies": {
-    "object-bystring": "^5.0.0",
-    "rfdc": "^1.1.4"
+    "deep-clone-simple": "^1.1.1",
+    "object-bystring": "^5.0.0"
   },
   "files": [
     "LICENSE",

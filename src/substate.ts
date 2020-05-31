@@ -1,4 +1,4 @@
-import deepclone from "rfdc";
+const deepclone = require("deep-clone-simple");
 import byString from "object-bystring";
 
 import PubSub from "./PubSub";
