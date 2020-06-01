@@ -1,4 +1,6 @@
-const substate = require("./index.ts");
+//FizzBuzz.test.ts
+/// <reference types="jest" />
+import substate from "./index";
 
 const func1 = jest.fn((x) => {
   x.count ? (x.count = ++x.count) : (x.count = 1);

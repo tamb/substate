@@ -12,3 +12,4 @@ export default class PubSub {
   emit(eventName: string, data?: object): void;
 }
 export {};
+//# sourceMappingURL=PubSub.d.ts.map
