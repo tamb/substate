@@ -89,6 +89,9 @@
   var substate = /** @class */ (function (_super) {
     __extends(substate, _super);
     function substate(obj) {
+      if (obj === void 0) {
+        obj = {};
+      }
       var _this = _super.call(this) || this;
       console.log("You are using a dev version of substate");
       _this.name = obj.name || "SubStateInstance";

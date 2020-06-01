@@ -34,7 +34,7 @@ export default class substate extends PubSub {
   stateStorage: object[];
   defaultDeep: boolean;
 
-  constructor(obj: IConfig) {
+  constructor(obj: IConfig = {}) {
     super();
     console.log("You are using a dev version of substate");
 

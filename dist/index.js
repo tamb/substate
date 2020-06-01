@@ -61,6 +61,7 @@
     o = "UPDATE_STATE";
   return (function (n) {
     function i(t) {
+      void 0 === t && (t = {});
       var e = n.call(this) || this;
       return (
         (e.name = t.name || "SubStateInstance"),

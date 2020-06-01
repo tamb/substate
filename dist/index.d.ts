@@ -23,7 +23,7 @@ export default class substate extends PubSub {
   currentState: number;
   stateStorage: object[];
   defaultDeep: boolean;
-  constructor(obj: IConfig);
+  constructor(obj?: IConfig);
   getState(index: number): {};
   getCurrentState(): {};
   getProp(prop: string): any;
