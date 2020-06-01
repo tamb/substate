@@ -33,4 +33,3 @@ export default class substate extends PubSub {
   updateState(action: IAction): void;
 }
 export {};
-//# sourceMappingURL=substate.d.ts.map
