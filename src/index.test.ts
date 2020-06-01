@@ -47,8 +47,8 @@ test("get props to return correct value", () => {
 test("getCurrentState returns current state and fires middleware", () => {
   expect(A.getCurrentState()).toMatchObject(STATE);
   A.emit("UPDATE_STATE", { timeOfFun: new Date() });
-  expect(A.count).toBe(1);
-  expect(A.count2).toBe(1);
+  expect(func1).toBeCalledTimes(1);
+  expect(func2).toBeCalledTimes(1);
   expect(A.getCurrentState()).not.toMatchObject(STATE);
 });
 
@@ -59,8 +59,8 @@ test("getState returns correct state from array", () => {
 test("deep clonse works and does not alter older nested state", () => {
   const NEWTEXT = "This has changed";
   A.emit("UPDATE_STATE", { "nested.double.reason": NEWTEXT });
-  expect(A.count).toBe(2);
-  expect(A.count2).toBe(2);
+  expect(func1).toBeCalledTimes(2);
+  expect(func2).toBeCalledTimes(2);
   expect(A.getState(0)).not.toBe(NEWTEXT);
 });
 

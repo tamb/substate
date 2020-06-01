@@ -1,11 +1,11 @@
 {
   "name": "substate",
-  "version": "8.2.0-alpha.1",
+  "version": "8.2.0-alpha.2",
   "description": "Simple State Management with Optional Deep Cloning",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "test": "node clean && npx rollup -c rollup.config.js && jest && node addExports.js",
+    "test": "node clean && npx rollup -c rollup.config.js && jest",
     "safe-publish": "npm test && npm publish"
   },
   "repository": {
@@ -20,7 +20,7 @@
     "modules",
     "state management"
   ],
-  "author": "Tamb (Tom Saporito) <t.saporito@gmail.com>",
+  "author": "Tamb (Tom Saporito) <tsaporito@protonmail.com>",
   "license": "MIT",
   "devDependencies": {
     "@babel/preset-env": "^7.10.2",
