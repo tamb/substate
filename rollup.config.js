@@ -4,11 +4,14 @@ import typescript from "rollup-plugin-typescript2";
 
 export default [
   {
-    input: "./src/substate.ts",
+    input: "./src/index.ts",
     output: {
       file: "dist/index.js",
       format: "umd",
       name: "substate",
+      globals: {
+        "object-bystring": "byString",
+      },
     },
     plugins: [
       terser({
@@ -22,20 +25,26 @@ export default [
     ],
   },
   {
-    input: "./src/substate.ts",
+    input: "./src/index.ts",
     output: {
       file: "dist/index.dev.js",
       format: "umd",
       name: "substate",
+      globals: {
+        "object-bystring": "byString",
+      },
     },
     plugins: [typescript()],
   },
   {
-    input: "./src/substate.ts",
+    input: "./src/index.ts",
     output: {
       file: "dist/index.es5.js",
       format: "umd",
       name: "substate",
+      globals: {
+        "object-bystring": "byString",
+      },
     },
     plugins: [
       babel({
@@ -52,11 +61,14 @@ export default [
     ],
   },
   {
-    input: "./src/substate.ts",
+    input: "./src/index.ts",
     output: {
       file: "dist/index.es5.dev.js",
       format: "umd",
       name: "substate",
+      globals: {
+        "object-bystring": "byString",
+      },
     },
     plugins: [
       babel({
