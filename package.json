@@ -3,6 +3,7 @@
   "version": "9.0.0-alpha.1",
   "description": "Simple State Management with Optional Deep Cloning",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "node clean && npx rollup -c rollup.config.js && jest && node addExports.js",
     "safe-publish": "npm test && npm publish"
@@ -51,10 +52,9 @@
       "pre-commit": "pretty-quick --staged"
     }
   },
-  "types": "dist/index.d.ts",
   "jest": {
     "transform": {
-      ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+      ".(ts|tsx)": "ts-jest"
     },
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
     "moduleFileExtensions": [
