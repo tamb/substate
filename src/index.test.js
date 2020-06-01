@@ -1,4 +1,4 @@
-const substate = require("./index.ts");
+import substate from "./index";
 
 const func1 = jest.fn((x) => {
   x.count ? (x.count = ++x.count) : (x.count = 1);
