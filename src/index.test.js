@@ -1,4 +1,4 @@
-const substate = require("./../dist");
+const substate = require("./index.ts");
 
 const func1 = jest.fn((x) => {
   x.count ? (x.count = ++x.count) : (x.count = 1);

@@ -49,6 +49,7 @@ export default [
     plugins: [
       babel({
         exclude: "node_modules/**",
+        babelHelpers: "bundled",
       }),
       terser({
         compress: true,
@@ -73,6 +74,7 @@ export default [
     plugins: [
       babel({
         exclude: "node_modules/**",
+        babelHelpers: "bundled",
       }),
       typescript(),
     ],
