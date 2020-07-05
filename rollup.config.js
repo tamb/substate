@@ -1,6 +1,7 @@
 import { terser } from "rollup-plugin-terser";
 import babel from "@rollup/plugin-babel";
 import typescript from "rollup-plugin-typescript2";
+import stripCode from "rollup-plugin-strip-code";
 
 export default [
   {
@@ -20,6 +21,10 @@ export default [
         compress: {
           drop_console: true,
         },
+      }),
+      stripCode({
+        start_comment: "START.DEV",
+        end_comment: "END.DEV",
       }),
       typescript(),
     ],
@@ -50,6 +55,10 @@ export default [
       babel({
         exclude: "node_modules/**",
         babelHelpers: "bundled",
+      }),
+      stripCode({
+        start_comment: "START.DEV",
+        end_comment: "END.DEV",
       }),
       terser({
         compress: true,

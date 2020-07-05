@@ -34,6 +34,7 @@
     "pretty-quick": "^2.0.1",
     "rimraf": "^3.0.2",
     "rollup": "^2.11.2",
+    "rollup-plugin-strip-code": "^0.2.7",
     "rollup-plugin-terser": "^6.1.0",
     "rollup-plugin-typescript2": "^0.27.1",
     "ts-jest": "^26.1.0",
@@ -42,6 +43,9 @@
   "dependencies": {
     "deep-clone-simple": "^1.1.1",
     "object-bystring": "^5.0.1"
+  },
+  "peerDependencies": {
+    "deep-object-diff": "^1.1.0"
   },
   "files": [
     "LICENSE",

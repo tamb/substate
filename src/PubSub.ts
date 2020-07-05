@@ -2,44 +2,44 @@
  * Created by root on 6/27/17.
  */
 
-interface IEvents{
-    [id: string]: Function[];
+interface IEvents {
+  [id: string]: Function[];
 }
 
-export default class PubSub{
-    events: IEvents;
+export default class PubSub {
+  events: IEvents;
 
-    constructor(){
-        this.events = {};
+  constructor() {
+    this.events = {};
+  }
 
-    }
+  on(eventName: string, fn: Function) {
+    this.events[eventName] = this.events[eventName] || [];
+    this.events[eventName].push(fn);
+  }
 
-    on(eventName: string, fn: Function){
-
-        this.events[eventName] = this.events[eventName] || [];
-        this.events[eventName].push(fn);
-
-    }
-
-    off(eventName:string, fn: Function) {
-        if (this.events[eventName]) {
-            for (var i = 0; i < this.events[eventName].length; i++) {
-                if (this.events[eventName][i] === fn) {
-                    this.events[eventName].splice(i, 1);
-                    break;
-                }
-            }
+  off(eventName: string, fn: Function) {
+    if (this.events[eventName]) {
+      for (var i = 0; i < this.events[eventName].length; i++) {
+        if (this.events[eventName][i] === fn) {
+          this.events[eventName].splice(i, 1);
+          break;
         }
+      }
     }
+  }
 
-    emit(eventName: string, data?: object) {
-        // console.log('in emit: ', data);
-        if (this.events[eventName]) {
-            this.events[eventName].forEach(function(fn, i) {
-                // console.log(i, eventName, data);
-                fn(data);
-            });
-        }
+  emit(eventName: string, data?: object) {
+    // console.log('in emit: ', data);
+    if (this.events[eventName]) {
+      // /*START.DEV*/
+      // console.info(`EMIT: ${eventName}`);
+      // console.table(Object.assign({$type: eventName}, data));
+      /*END.DEV*/
+      this.events[eventName].forEach(function (fn, i) {
+        // console.log(i, eventName, data);
+        fn(data);
+      });
     }
-
-};
+  }
+}
