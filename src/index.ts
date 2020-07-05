@@ -1,7 +1,10 @@
 const deepclone = require("deep-clone-simple");
 import byString from "object-bystring";
 
+/*START.DEV*/
 import { updatedDiff } from "deep-object-diff";
+import Stacktrace from "stacktrace-js";
+/*END.DEV*/
 
 import PubSub from "./PubSub";
 
@@ -120,8 +123,10 @@ export default class substate extends PubSub {
 
     /*START.DEV*/
     console.info(
-      "[substate] - ",
+      Stacktrace.getSync()[3].functionName,
+      " emits ",
       newState.$type,
+      "with new data: ",
       updatedDiff(this.getCurrentState(), newState)
     );
     /*END.DEV*/

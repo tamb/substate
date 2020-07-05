@@ -30,14 +30,8 @@ export default class PubSub {
   }
 
   emit(eventName: string, data?: object) {
-    // console.log('in emit: ', data);
     if (this.events[eventName]) {
-      // /*START.DEV*/
-      // console.info(`EMIT: ${eventName}`);
-      // console.table(Object.assign({$type: eventName}, data));
-      /*END.DEV*/
-      this.events[eventName].forEach(function (fn, i) {
-        // console.log(i, eventName, data);
+      this.events[eventName].forEach(function (fn) {
         fn(data);
       });
     }
