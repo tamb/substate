@@ -1,6 +1,6 @@
 {
   "name": "substate",
-  "version": "8.2.0-alpha.4",
+  "version": "8.2.0-alpha.6",
   "description": "Simple State Management with Optional Deep Cloning",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -42,10 +42,8 @@
   },
   "dependencies": {
     "deep-clone-simple": "^1.1.1",
+    "deep-object-diff": "^1.1.0",
     "object-bystring": "^5.0.1"
-  },
-  "peerDependencies": {
-    "deep-object-diff": "^1.1.0"
   },
   "files": [
     "LICENSE",
