@@ -122,7 +122,7 @@ export default class substate extends PubSub {
     if (!action.$type) newState.$type = S;
 
     /*START.DEV*/
-    console.info(
+    console.debug(
       Stacktrace.getSync()[3].functionName,
       " emits ",
       newState.$type,
