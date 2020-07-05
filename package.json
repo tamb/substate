@@ -1,6 +1,6 @@
 {
   "name": "substate",
-  "version": "8.2.0-alpha.3",
+  "version": "8.2.0-alpha.4",
   "description": "Simple State Management with Optional Deep Cloning",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
