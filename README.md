@@ -1,10 +1,14 @@
 # ⛱️ substate
 
-## pub/sub state management
+## Automatically clone or deep clone your state
 
 ## The Problem
 
-State management with Redux is really nice but sometimes there's a lot of boilerplate that people don't want. It also requires a hands-on approach to updating state. How do we abstract away the cloning and deep cloning of state?
+Most state management libraries don't clone your state for you.  
+Most don't optionally deep clone your state.
+Most don't offer an entire messaging system either.
+Most don't come as a 3kb package.
+This one does.
 
 ## Purpose
 
