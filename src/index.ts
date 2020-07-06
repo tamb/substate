@@ -17,17 +17,6 @@ interface IAction {
   [key: string]: any;
 }
 
-/*START.DEV*/
-interface IDebug {
-  actions?: boolean;
-  emits?: boolean; //all emit types
-  emitWithData?: boolean; // same but with all data
-  previousState?: boolean; // on all updates show previous state
-  newState?: boolean; // on all updates show the new state
-  diffState?: boolean; // on update show only the updated fields
-}
-/*END.DEV*/
-
 interface IConfig {
   name?: string;
   afterUpdate?: Function[] | [];
@@ -36,9 +25,6 @@ interface IConfig {
   stateStorage?: object[];
   defaultDeep?: boolean;
   state?: object;
-  /*START.DEV*/
-  debug?: IDebug;
-  /*END.DEV*/
 }
 
 interface IChangeStateAction extends IAction {
@@ -56,7 +42,7 @@ export default class substate extends PubSub {
   constructor(obj: IConfig = {}) {
     super();
     /*START.DEV*/
-    console.warn("[substate] - You are using a dev version of substate");
+    console.debug("You are using a DEVELOPMENT version () of substate");
     /*END.DEV*/
 
     this.name = obj.name || "SubStateInstance";

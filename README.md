@@ -220,10 +220,10 @@ const substate = require("substate/dist/index.es5.dev.js");
 
 Running the `*.dev.js` versions of substate will output a warning that you are using the developer mode.  
 This will use `console.debug` to display:
-* What data changed
-* What action type caused this change
-* Where was this action fired from
-I've opted for this simpler version as opposed to making a browser extension.
+
+- What data changed
+- What action type caused this change
+- Where was this action fired from
 
 ## Instantiation
 
