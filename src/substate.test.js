@@ -1,5 +1,7 @@
 const substate = require("../dist");
 
+const es5Substate = require("../dist/index.es5");
+
 const func1 = jest.fn((x) => {
   x.count ? (x.count = ++x.count) : (x.count = 1);
 });
@@ -76,4 +78,56 @@ test("callback for custom $type contains correct $type value", () => {
   A.on(DATEUPDATED, myMock);
   A.emit("UPDATE_STATE", { timeOfFun: new Date(), $type: DATEUPDATED });
   expect(A.getProp("$type")).toBe(DATEUPDATED);
+});
+
+describe("ES5 version tests", () => {
+  const deepStore = new es5Substate({
+    state: {
+      a: {
+        b: {
+          c: {
+            d: {
+              e: {
+                f: {
+                  name: "Marco",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    defaultDeep: true,
+  });
+
+  const shallowStore = new es5Substate({
+    state: {
+      a: {
+        b: {
+          c: {
+            d: {
+              e: {
+                f: {
+                  name: "Ruth",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  test("deep clone works by default", () => {
+    deepStore.emit("UPDATE_STATE", { "a.b.c.d.e.f.name": "Frank" });
+    expect(deepStore.getCurrentState().a.b.c.d.e.f.name).toMatch("Frank");
+  });
+
+  test("deep clone when passed in", () => {
+    shallowStore.emit("UPDATE_STATE", {
+      "a.b.c.d.e.f.name": "Danny",
+      $deep: true,
+    });
+    expect(shallowStore.getCurrentState().a.b.c.d.e.f.name).toMatch("Danny");
+  });
 });
