@@ -264,9 +264,9 @@ These are the possible options
 | Method          | Desc                                                                                                                     |                                                                            Returns |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------: |
 | getState        | get a state `@param*` - index of state needed                                                                            |                                                                              state |
-| getcurrentState | get the current state                                                                                                    |                                                               current state object |
+| getCurrentState | get the current state                                                                                                    |                                                               current state object |
 | getProp         | get a prop from current state `@param*` - string path to prop                                                            |                                                               property you request |
-| changeState     | change the version of the state `@param*` - `{requestedState: index of state, action: (optional name of event to emit)}` | emits `action` parameter event or 'STATE_CHANGED' event with the new current state |
+| changeState (WIP)    | change the version of the state `@param*` - `{requestedState: index of state, action: (optional name of event to emit)}` | emits `action` parameter event or 'STATE_CHANGED' event with the new current state |
 | resetState      | resets the `stateStorage` array to an empty array                                                                        |                                                                emits 'STATE_RESET' |
 
 ## Event Methods
