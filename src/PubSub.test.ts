@@ -51,3 +51,10 @@ test("Emitting SPEAK should call shout and not whisper", () => {
   expect(shout.mock.calls.length).toBe(3);
   expect(whisper.mock.calls.length).toBe(2);
 });
+
+test("emit without data contains empty object", () => {
+  const mockFn = jest.fn((obj) => obj);
+  pub.on("HELLO", mockFn);
+  pub.emit("HELLO");
+  expect(mockFn).toReturnWith({});
+});
