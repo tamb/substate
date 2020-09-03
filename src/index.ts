@@ -11,7 +11,7 @@ import PubSub from "./PubSub";
 const S: string = "UPDATE_STATE";
 const C: string = "CHANGE_STATE";
 
-interface IAction {
+interface IAction extends Object {
   $type?: string;
   $deep?: boolean;
   [key: string]: any;

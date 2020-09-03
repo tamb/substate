@@ -6,6 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "node clean && npx rollup -c rollup.config.js && jest",
+    "test:dev": "jest --watch",
     "pre": "npm test && npm publish --tag next",
     "safe-publish": "npm test && npm publish"
   },
