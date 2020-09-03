@@ -130,4 +130,18 @@ describe("ES5 version tests", () => {
     });
     expect(shallowStore.getCurrentState().a.b.c.d.e.f.name).toMatch("Danny");
   });
+
+  test("instance deep clone when passed reverts to false", () => {
+    shallowStore.emit("UPDATE_STATE", {
+      "a.b.c.d.e.f.name": "Charlie",
+    });
+    expect(shallowStore.getCurrentState().a.b.c.d.e.f.name).toMatch("Charlie");
+  });
+
+  test("emit without data contains empty object", () => {
+    const mockFn = jest.fn((obj) => obj);
+    shallowStore.on("HELLO", mockFn);
+    shallowStore.emit("HELLO");
+    expect(mockFn).toReturnWith({});
+  });
 });

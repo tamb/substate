@@ -29,7 +29,7 @@ export default class PubSub {
     }
   }
 
-  emit(eventName: string, data?: object) {
+  emit(eventName: string, data: object = {}) {
     if (this.events[eventName]) {
       this.events[eventName].forEach(function (fn) {
         fn(data);
