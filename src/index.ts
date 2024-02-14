@@ -1,10 +1,5 @@
-const deepclone = require("deep-clone-simple");
+import rfdc from "rfdc";
 import byString from "object-bystring";
-
-/*START.DEV*/
-import { updatedDiff } from "deep-object-diff";
-import Stacktrace from "stacktrace-js";
-/*END.DEV*/
 
 import PubSub from "./PubSub";
 
@@ -90,9 +85,9 @@ export default class substate extends PubSub {
     this.beforeUpdate.length > 0
       ? this.beforeUpdate.forEach((func) => func(this, action))
       : null;
-    let newState;
+    let newState: IAction;
     if (action.$deep || this.defaultDeep) {
-      newState = deepclone(this.getCurrentState()); // deep clonse
+      newState = rfdc(this.getCurrentState()); // deep clone
     } else {
       newState = Object.assign({}, this.getCurrentState()); // shallow clone
     }
@@ -106,16 +101,6 @@ export default class substate extends PubSub {
     this.defaultDeep ? null : (newState.$deep = false); // reset $deep keyword
 
     if (!action.$type) newState.$type = S;
-
-    /*START.DEV*/
-    console.debug(
-      Stacktrace.getSync()[3].functionName,
-      " emits ",
-      newState.$type,
-      "with new data: ",
-      updatedDiff(this.getCurrentState(), newState)
-    );
-    /*END.DEV*/
 
     //pushes new state
     this.pushState(newState);

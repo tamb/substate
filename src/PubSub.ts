@@ -29,6 +29,14 @@ export default class PubSub {
     }
   }
 
+  removeAll() {
+    this.events = {};
+  }
+
+  removeAllOf(eventName: string) {
+    this.events[eventName] = [];
+  }
+
   emit(eventName: string, data: object = {}) {
     if (this.events[eventName]) {
       this.events[eventName].forEach(function (fn) {

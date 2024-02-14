@@ -58,3 +58,24 @@ test("emit without data contains empty object", () => {
   pub.emit("HELLO");
   expect(mockFn).toReturnWith({});
 });
+
+test("emit with data contains data object", () => {
+  const mockFn = jest.fn((obj) => obj);
+  pub.on("HELLO", mockFn);
+  pub.emit("HELLO", { name: "world" });
+  expect(mockFn).toReturnWith({ name: "world" });
+});
+
+test("remove all events", () => {
+  pub.on("HELLO", shout);
+  pub.on("SPEAK", whisper);
+  pub.removeAll();
+  expect(Object.keys(pub.events).length).toBe(0);
+});
+
+test("remove all events of a specific type", () => {
+  pub.on("HELLO", shout);
+  pub.on("HELLO", whisper);
+  pub.removeAllOf("HELLO");
+  expect(pub.events.HELLO).toEqual([]);
+});

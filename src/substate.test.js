@@ -1,6 +1,4 @@
-const substate = require("../dist");
-
-const es5Substate = require("../dist/index.es5");
+const substate = require("index.js");
 
 const func1 = jest.fn((x) => {
   x.count ? (x.count = ++x.count) : (x.count = 1);
