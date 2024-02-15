@@ -6,7 +6,16 @@ interface IEvents {
   [id: string]: Function[];
 }
 
-export default class PubSub {
+export interface IPubSub {
+  events: IEvents;
+  on(eventName: string, fn: Function): void;
+  off(eventName: string, fn: Function): void;
+  removeAll(): void;
+  removeAllOf(eventName: string): void;
+  emit(eventName: string, data: object): void;
+}
+
+export default class PubSub implements IPubSub {
   events: IEvents;
 
   constructor() {
@@ -27,6 +36,14 @@ export default class PubSub {
         }
       }
     }
+  }
+
+  removeAll() {
+    this.events = {};
+  }
+
+  removeAllOf(eventName: string) {
+    this.events[eventName] = [];
   }
 
   emit(eventName: string, data: object = {}) {

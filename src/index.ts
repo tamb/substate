@@ -1,15 +1,24 @@
-const deepclone = require("deep-clone-simple");
+import rfdc from "rfdc";
 import byString from "object-bystring";
 
-/*START.DEV*/
-import { updatedDiff } from "deep-object-diff";
-import Stacktrace from "stacktrace-js";
-/*END.DEV*/
-
-import PubSub from "./PubSub";
+import PubSub, { IPubSub } from "./PubSub";
 
 const S: string = "UPDATE_STATE";
 const C: string = "CHANGE_STATE";
+
+interface ISubstate extends IPubSub {
+  name: string;
+  afterUpdate: Function[] | [];
+  beforeUpdate: Function[] | [];
+  currentState: number;
+  stateStorage: object[];
+  defaultDeep: boolean;
+  getState(index: number): {};
+  getCurrentState(): {};
+  getProp(prop: string): any;
+  resetState(): void;
+  updateState(action: IAction): void;
+}
 
 interface IAction extends Object {
   $type?: string;
@@ -31,7 +40,7 @@ interface IChangeStateAction extends IAction {
   $requestedState: number;
 }
 
-export default class substate extends PubSub {
+export default class substate extends PubSub implements ISubstate {
   name: string;
   afterUpdate: Function[] | [];
   beforeUpdate: Function[] | [];
@@ -41,9 +50,6 @@ export default class substate extends PubSub {
 
   constructor(obj: IConfig = {}) {
     super();
-    /*START.DEV*/
-    console.debug("You are using a DEVELOPMENT version () of substate");
-    /*END.DEV*/
 
     this.name = obj.name || "SubStateInstance";
     this.afterUpdate = obj.afterUpdate || [];
@@ -54,7 +60,6 @@ export default class substate extends PubSub {
 
     if (obj.state) this.stateStorage.push(obj.state);
     this.on(S, this.updateState.bind(this));
-    this.on(C, this.changeState.bind(this));
   }
 
   getState(index: number): {} {
@@ -69,11 +74,6 @@ export default class substate extends PubSub {
     return byString(this.getCurrentState(), prop);
   }
 
-  changeState(action: IChangeStateAction) {
-    this.currentState = action.$requestedState;
-    this.emit(action.$type || "STATE_CHANGED", this.getCurrentState());
-  }
-
   resetState() {
     this.currentState = 0;
     this.stateStorage = [this.stateStorage[0]];
@@ -81,7 +81,7 @@ export default class substate extends PubSub {
   }
 
   // Updates the state history array and sets the currentState pointer properly
-  pushState(newState: Object) {
+  private pushState(newState: Object) {
     this.stateStorage.push(newState);
     this.currentState = this.stateStorage.length - 1;
   }
@@ -90,9 +90,9 @@ export default class substate extends PubSub {
     this.beforeUpdate.length > 0
       ? this.beforeUpdate.forEach((func) => func(this, action))
       : null;
-    let newState;
+    let newState: IAction;
     if (action.$deep || this.defaultDeep) {
-      newState = deepclone(this.getCurrentState()); // deep clonse
+      newState = rfdc(this.getCurrentState()); // deep clone
     } else {
       newState = Object.assign({}, this.getCurrentState()); // shallow clone
     }
@@ -106,16 +106,6 @@ export default class substate extends PubSub {
     this.defaultDeep ? null : (newState.$deep = false); // reset $deep keyword
 
     if (!action.$type) newState.$type = S;
-
-    /*START.DEV*/
-    console.debug(
-      Stacktrace.getSync()[3].functionName,
-      " emits ",
-      newState.$type,
-      "with new data: ",
-      updatedDiff(this.getCurrentState(), newState)
-    );
-    /*END.DEV*/
 
     //pushes new state
     this.pushState(newState);
