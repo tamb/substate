@@ -1,7 +1,5 @@
 import { terser } from "rollup-plugin-terser";
-import babel from "@rollup/plugin-babel";
 import typescript from "rollup-plugin-typescript2";
-import stripCode from "rollup-plugin-strip-code";
 
 export default [
   {
@@ -12,6 +10,7 @@ export default [
       name: "substate",
       globals: {
         "object-bystring": "byString",
+        rfdc: "rfdc",
       },
     },
     plugins: [

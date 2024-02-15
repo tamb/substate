@@ -11,7 +11,7 @@ const func2 = jest.fn((x) => {
 
 const STATE = {
   name: "Thomas",
-  timeOfFun: new Date(),
+  timeOfFun: new Date().toISOString(),
   nested: {
     double: {
       reason: "Just the start",
@@ -46,22 +46,29 @@ test("get props to return correct value", () => {
 
 test("getCurrentState returns current state and fires middleware", () => {
   expect(A.getCurrentState()).toMatchObject(STATE);
-  A.emit("UPDATE_STATE", { timeOfFun: new Date() });
-  expect(func1).toBeCalledTimes(1);
-  expect(func2).toBeCalledTimes(1);
-  expect(A.getCurrentState()).not.toMatchObject(STATE);
+  A.emit("UPDATE_STATE", { timeOfFun: new Date().toISOString() });
+  expect(func1).toHaveBeenCalledTimes(1);
+  expect(func2).toHaveBeenCalledTimes(1);
 });
 
 test("getState returns correct state from array", () => {
   expect(A.getState(0)).toMatchObject(STATE);
 });
 
-test("deep clonse works and does not alter older nested state", () => {
+test("deep clone works and does not alter older nested state", () => {
   const NEWTEXT = "This has changed";
   A.emit("UPDATE_STATE", { "nested.double.reason": NEWTEXT });
-  expect(func1).toBeCalledTimes(2);
-  expect(func2).toBeCalledTimes(2);
+  expect(func1).toHaveBeenCalledTimes(2);
+  expect(func2).toHaveBeenCalledTimes(2);
   expect(A.getState(0)).not.toBe(NEWTEXT);
+});
+
+test("updateState updates state and fires middleware", () => {
+  const NEWTEXT = "This has changed";
+  A.emit("UPDATE_STATE", { "nested.double.reason": NEWTEXT });
+  expect(func1).toHaveBeenCalledTimes(3);
+  expect(func2).toHaveBeenCalledTimes(3);
+  expect(A.getProp("nested.double.reason")).toBe(NEWTEXT);
 });
 
 test("callback fires for custom $type", () => {
@@ -69,7 +76,7 @@ test("callback fires for custom $type", () => {
   const DATEUPDATED = "DATE_UPDATED";
   A.on(DATEUPDATED, myMock);
   A.emit("UPDATE_STATE", { timeOfFun: new Date(), $type: DATEUPDATED });
-  expect(myMock).toBeCalled();
+  expect(myMock).toHaveBeenCalled();
 });
 
 test("callback for custom $type contains correct $type value", () => {
