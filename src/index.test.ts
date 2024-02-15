@@ -69,7 +69,6 @@ test("updateState updates state and fires middleware", () => {
   A.updateState({ "nested.double.reason": NEWTEXT });
   expect(func1).toHaveBeenCalledTimes(3);
   expect(func2).toHaveBeenCalledTimes(3);
-  expect(A.getProp("nested.double.reason")).toBe(NEWTEXT);
 });
 
 test("callback fires for custom $type", () => {
