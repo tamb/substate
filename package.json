@@ -4,12 +4,17 @@
   "description": "Simple State Management with Optional Deep Cloning",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "LICENSE",
+    "README.md",
+    "dist"
+  ],
   "scripts": {
     "test": "jest",
     "build": "rollup -c",
     "test.dev": "jest --watch",
     "pre": "npm test && npm run build && npm publish --tag next",
-    "safe-publish": "npm test && npm publish"
+    "safe-publish": "npm test && npm run build && npm publish"
   },
   "repository": {
     "type": "git",
@@ -45,11 +50,6 @@
     "object-bystring": "^5.0.1",
     "rfdc": "^1.3.1"
   },
-  "files": [
-    "LICENSE",
-    "README.md",
-    "dist"
-  ],
   "husky": {
     "hooks": {
       "pre-commit": "pretty-quick --staged"
