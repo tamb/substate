@@ -12,17 +12,17 @@ interface IState {
 }
 
 export interface ISubstate extends IPubSub {
-  name: string;
-  afterUpdate: Function[] | [];
-  beforeUpdate: Function[] | [];
-  currentState: number;
-  stateStorage: IState[];
-  defaultDeep: boolean;
-  getState(index: number): {};
-  getCurrentState(): IState;
-  getProp(prop: string): any;
-  resetState(): void;
-  updateState(action: IState): void;
+  name: string; // name of the instance
+  afterUpdate: Function[] | []; // array of functions to be called after state update
+  beforeUpdate: Function[] | []; // array of functions to be called before state update
+  currentState: number; // index of the current state
+  stateStorage: IState[]; // array of states
+  defaultDeep: boolean; // default deep clone setting
+  getState(index: number): {}; // get state by index
+  getCurrentState(): IState; // get current state
+  getProp(prop: string): any; // get property from current state
+  resetState(): void; // reset state to initial state
+  updateState(action: IState): void; // update state with action
 }
 
 export interface IConfig {
@@ -30,7 +30,7 @@ export interface IConfig {
   afterUpdate?: Function[] | [];
   beforeUpdate?: Function[] | [];
   currentState?: number;
-  stateStorage?: object[];
+  stateStorage?: IState[];
   defaultDeep?: boolean;
   state?: object;
 }
@@ -44,7 +44,7 @@ export default class Substate extends PubSub implements ISubstate {
   afterUpdate: Function[] | [];
   beforeUpdate: Function[] | [];
   currentState: number;
-  stateStorage: object[];
+  stateStorage: IState[];
   defaultDeep: boolean;
 
   constructor(obj: IConfig = {}) {

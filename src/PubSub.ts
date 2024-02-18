@@ -7,12 +7,12 @@ interface IEvents {
 }
 
 export interface IPubSub {
-  events: IEvents;
-  on(eventName: string, fn: Function): void;
-  off(eventName: string, fn: Function): void;
-  removeAll(): void;
-  removeAllOf(eventName: string): void;
-  emit(eventName: string, data: object): void;
+  events: IEvents; //Holds the events and their listeners
+  on(eventName: string, fn: Function): void; //Adds a listener to an event
+  off(eventName: string, fn: Function): void; //Removes a listener from an event
+  removeAll(): void; //Removes all listeners from all events
+  removeAllOf(eventName: string): void; //Removes all listeners from a specific event
+  emit(eventName: string, data: object): void; //Emits an event with data
 }
 
 export default class PubSub implements IPubSub {
