@@ -7,7 +7,7 @@
 Most state management libraries don't clone your state for you.  
 Most don't optionally deep clone your state.
 Most don't offer an entire messaging system either.
-Most don't come as a 3kb package.
+Most don't come as a 2kb gzipped package.
 This one does.
 
 ## Purpose
@@ -18,34 +18,6 @@ This one does.
 - Message filtering can be applied _without_ a `switch` statement (you create your own event `$type`)
 - To allow for manipulation of deeply nested state properties through use of strings `{'my[index]deeply.nests.state': 'new value'}` (we're sending this to substate to _not mutate_ the state, but make a new copy (Flux-y)!
 - Maintain a small size
-
-## Contents
-
-- [Flow](#flow)
-- [Terms](#terms)
-  - [store](#store)
-  - [emit](#emit)
-  - [on](#on)
-  - [off](#off)
-  - [payload](#payload)
-- [How it Works](#how-it-works)
-  - [The Steps](#the-steps)
-- [Demo](#demo)
-- [Installation](#installation)
-- [Development Mode](#development-mode)
-- [Instantiation](#instantiation)
-- [Options](#options)
-- [State Methods](#state-methods)
-- [Event Methods](#event-methods)
-- [State Events](#state-events)
-- [Custom Events](#custom-events)
-- [Usage with React](#usage-with-react)
-- [Updates to Come](#updates-to-come)
-- [Pull Requests](#pull-requests)
-
-## Flow
-
-![flow](https://github.com/tamb/substate/blob/master/substate-flow.png)
 
 ## Terms
 
@@ -105,9 +77,13 @@ An object of data. You can put any data in there that you want. The idea is that
 
 ```js
 //store.js
-import substate from "substate";
+import Substate from "substate";
 
-export const store = new substate({
+export const store = new Substate({
+  name: "storeExample",
+  defaultDeep: true,
+  afterUpdate: [myMiddleware],
+  beforeUpdate: [myBeforeMiddleware],
   state: {
     todos: [],
   },
@@ -151,9 +127,14 @@ clickHandler = () => {
     name: "Pablo",
     "height.inches": 62,
     "height.centimeters": 157.48,
+    //$type: "HEIGHT_CHANGE", -- tells the store to emit a custom event when the state is updated
+    //$deep: true, -- tells the store to deep clone the state
   };
 
+  store.updateState(newState);
+  // OR use the UPDATE_STATE event
   store.emit("UPDATE_STATE", newState);
+  // OR use a custom event
 };
 ```
 
@@ -177,133 +158,71 @@ const newState = {
 };
 ```
 
-## Demo
+## Interfaces
 
-https://codesandbox.io/s/substate-example-6qfbx
+### IPubSub
 
-## Installation
-
-- `npm install substate --save`
-- copy and paste from `index.js` into a `<script>` or external js file
-
-ES2015 Version
-
-```js
-// ES Module
-import substate from "substate";
-
-// Node
-const substate = require("substate");
-
-// Dev Version
-// ES Module
-import substate from "substate/dist/index.dev.js";
-
-// Node
-const substate = require("substate/dist/index.dev.js");
+```ts
+interface IPubSub {
+  events: IEvents; //Holds the events and their listeners
+  on(eventName: string, fn: Function): void; //Adds a listener to an event
+  off(eventName: string, fn: Function): void; //Removes a listener from an event
+  removeAll(): void; //Removes all listeners from all events
+  removeAllOf(eventName: string): void; //Removes all listeners from a specific event
+  emit(eventName: string, data: object): void; //Emits an event with data
+}
 ```
 
-ES5 Version
+### ISubstate
 
-```js
-// ES Module
-import substate from "substate/dist/index.es5.js";
+The Substate instance is a pub/sub pattern with a state storage. It has methods and state storage. It basically handles all your changes for you and acts as a mediator between different parts of your application. It's really a simple pub/sub pattern with data in it. That's all.
 
-// Node
-const substate = require("substate/dist/index.es5.js");
-
-// Dev Version
-// ES Module
-import substate from "substate/dist/index.es5.dev.js";
-
-// Node
-const substate = require("substate/dist/index.es5.dev.js");
+```ts
+export interface ISubstate extends IPubSub {
+  name: string; // name of the instance
+  afterUpdate: Function[] | []; // array of functions to be called after state update
+  beforeUpdate: Function[] | []; // array of functions to be called before state update
+  currentState: number; // index of the current state
+  stateStorage: IState[]; // array of states
+  defaultDeep: boolean; // default deep clone setting
+  getState(index: number): {}; // get state by index
+  getCurrentState(): IState; // get current state
+  getProp(prop: string): any; // get property from current state
+  resetState(): void; // reset state to initial state
+  updateState(action: IState): void; // update state with action
+}
 ```
 
-## Development Mode
+### IConfig
 
-Running the `*.dev.js` versions of substate will output a warning that you are using the developer mode.  
-This will use `console.debug` to display:
+The configuration object for the Substate instance. You pass is into the Substate instance
 
-- What data changed
-- What action type caused this change
-- Where was this action fired from
+```ts
+export interface IConfig {
+  name?: string;
+  afterUpdate?: Function[] | [];
+  beforeUpdate?: Function[] | [];
+  currentState?: number;
+  stateStorage?: IState[];
+  defaultDeep?: boolean;
+  state?: object;
+}
+```
 
-## Instantiation
+### IState
 
-substate is a class so you call it like so
+```ts
+interface IState {
+  [key: string]: any;
+  $type?: string;
+  $deep?: boolean;
+}
+```
 
-_myFile.js_
+### IEvents
 
-`import { substate } from 'substate';`
-
-Then you instantiate it as such
-
-`export const myInstance = new substate({options});`
-
-## Options
-
-substate accepts an options object as an optional parameter.
-These are the possible options
-
-| Option          | Desc                                                                                   |            Default |
-| --------------- | -------------------------------------------------------------------------------------- | -----------------: |
-| name            | name of the instance                                                                   | 'substateInstance' |
-| currentState    | index of state to start on                                                             |                  0 |
-| stateStorage    | array of all the states                                                                |                [ ] |
-| state           | object containing the initial state                                                    |               null |
-| defaultDeep     | default to deep cloning the state everytime                                            |              false |
-| beforeUpdate[ ] | array of middleware before state is updated.Has access to substate instance and action |                 [] |
-| afterUpdate[ ]  | array of middleware for after state is updated. Has access to substate instance        |                 [] |
-
-## State Methods
-
-- `@param` optional method parameter
-- `@param*` required method parameter
-
-| Method            | Desc                                                                                                                     |                                                                            Returns |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------: |
-| getState          | get a state `@param*` - index of state needed                                                                            |                                                                              state |
-| getCurrentState   | get the current state                                                                                                    |                                                               current state object |
-| getProp           | get a prop from current state `@param*` - string path to prop                                                            |                                                               property you request |
-| changeState (WIP) | change the version of the state `@param*` - `{requestedState: index of state, action: (optional name of event to emit)}` | emits `action` parameter event or 'STATE_CHANGED' event with the new current state |
-| resetState        | resets the `stateStorage` array to an empty array                                                                        |                                                                emits 'STATE_RESET' |
-
-## Event Methods
-
-- `@param` optional method parameter
-- `@param*` required method parameter
-- `@param[num]` order of method parameter
-
-| Method | Desc                                                                                                                   |
-| ------ | ---------------------------------------------------------------------------------------------------------------------- |
-| on     | `@param1*` STRING of event name to listen to. `@param2*` FUNC handler to execute when this event you listen to happens |
-| off    | `@param1*` STRING of event name to remove handler from.`@param2*` FUNC to remove from the execution queue              |
-| emit   | `@param1*` STRING event name `@param2` object of data to pass into your handler event from 'on' method                 |
-
-## State Events
-
-| Event          | Desc                                                                                   |               Returns |
-| -------------- | -------------------------------------------------------------------------------------- | --------------------: |
-| 'UPDATE_STATE' | updates the entire state with the object passed in                                     |         updated state |
-| 'CHANGE_STATE' | fires changeState method requires `requestedState` as the index of the state you want. | emits 'STATE_CHANGED' |
-
-## Custom Events
-
-_note: the object of data that is passed, cannot have a key called '\$type'_
-
-| Method | Event          | Custom Event                                         |                                                                                                                                            Next |
-| ------ | -------------- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------: |
-| emit   | 'UPDATE_STATE' | `@param2` is an object: `{$type: 'MY_CUSTOM_EVENT'}` | Will update/change state. The `$type` property will then be emitted so you can listen to it like `substateInstance.on('MY_CUSTOM_EVENT', func)` |
-
-### To clear this ^ up :
-
-Basically to utilitze a custom event, you still need to use `UPDATE_STATE` but the data object needs a `$type` with an event name you want the State to emit _when updated_
-
-## Updates to come
-
-- better dev instructions and console warnings/errors
-- typescript support
-- seemless compatibility with react, infernojs, preactjs, stenciljs
-- demos demos demos
-- better documentation
+```ts
+interface IEvents {
+  [id: string]: Function[];
+}
+```
