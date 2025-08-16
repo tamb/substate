@@ -1,5 +1,5 @@
-import { terser } from "rollup-plugin-terser";
-import typescript from "rollup-plugin-typescript2";
+import terser from "@rollup/plugin-terser";
+import typescript from "@rollup/plugin-typescript";
 
 export default [
   {
@@ -10,18 +10,18 @@ export default [
       name: "substate",
       globals: {
         "object-bystring": "byString",
+        "clone-deep": "cloneDeep",
         rfdc: "rfdc",
       },
     },
     plugins: [
+      typescript(),
       terser({
-        compress: true,
-        ecma: 8,
         compress: {
           drop_console: true,
         },
+        ecma: 2020,
       }),
-      typescript(),
     ],
   },
 ];

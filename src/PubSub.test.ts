@@ -1,13 +1,13 @@
 //FizzBuzz.test.ts
-/// <reference types="jest" />
+import { test, expect, vi } from "vitest";
 
 import PubSub from "./PubSub";
 
 // https://jestjs.io/docs/en/es6-class-mocks
 
 const pub = new PubSub();
-const shout = jest.fn();
-const whisper = jest.fn();
+const shout = vi.fn();
+const whisper = vi.fn();
 
 test("creates new instance of pubsub", () => {
   expect(pub instanceof PubSub).toBe(true);
@@ -53,14 +53,14 @@ test("Emitting SPEAK should call shout and not whisper", () => {
 });
 
 test("emit without data contains empty object", () => {
-  const mockFn = jest.fn((obj) => obj);
+  const mockFn = vi.fn((obj) => obj);
   pub.on("HELLO", mockFn);
   pub.emit("HELLO");
   expect(mockFn).toReturnWith({});
 });
 
 test("emit with data contains data object", () => {
-  const mockFn = jest.fn((obj) => obj);
+  const mockFn = vi.fn((obj) => obj);
   pub.on("HELLO", mockFn);
   pub.emit("HELLO", { name: "world" });
   expect(mockFn).toReturnWith({ name: "world" });
