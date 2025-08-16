@@ -4,6 +4,7 @@ import typescript from "@rollup/plugin-typescript";
 export default [
   {
     input: "./src/index.ts",
+    external: ["clone-deep", "object-bystring"],
     output: {
       file: "dist/index.js",
       format: "umd",

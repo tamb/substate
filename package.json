@@ -5,6 +5,12 @@
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "files": [
     "LICENSE",
     "README.md",
@@ -49,7 +55,7 @@
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"
   },
-  "dependencies": {
+  "peerDependencies": {
     "clone-deep": "^4.0.1",
     "object-bystring": "^6.0.2"
   }
