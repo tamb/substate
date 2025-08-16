@@ -15,7 +15,13 @@
     "build": "rollup -c",
     "test.watch": "vitest",
     "pre": "npm test && npm run build && npm publish --tag next",
-    "safe-publish": "npm test && npm run build && npm publish"
+    "safe-publish": "npm test && npm run build && npm publish",
+    "lint": "biome lint src/",
+    "lint:fix": "biome lint --write src/",
+    "format": "biome format src/",
+    "format:fix": "biome format --write src/",
+    "check": "biome check src/",
+    "check:fix": "biome check --write src/"
   },
   "repository": {
     "type": "git",
@@ -32,6 +38,7 @@
   "author": "Tamb (Tom Saporito) <tsaporito@protonmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "@biomejs/biome": "^2.2.0",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.1.1",
     "@types/clone-deep": "^4.0.4",

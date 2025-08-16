@@ -1,5 +1,13 @@
 // Export the createStore function and its types
-export { createStore, type ICreateStoreConfig } from "./createStore";
-
+export { createStore } from './core/createStore/createStore'
+export type { ICreateStoreConfig } from './core/createStore/createStore.interface'
+export type { IEvents, IPubSub } from './core/PubSub/PubSub.interface'
 // Export the Substate class and its types
-export { default as Substate, type ISubstate, type IConfig, type IChangeStateAction } from "./Substate";
+export { Substate } from './core/Substate/Substate'
+export type {
+  IChangeStateAction,
+  IConfig,
+  IState,
+  ISubstate,
+  ISyncConfig,
+} from './core/Substate/Substate.interface'
