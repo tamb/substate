@@ -93,8 +93,8 @@ jobs:
             
             ### 🔗 Links
             - [NPM Package](https://www.npmjs.com/package/substate/v/${{ steps.version.outputs.VERSION }})
-            - [Documentation](https://github.com/TomSaporito/substate#readme)
-            - [Performance Benchmarks](https://github.com/TomSaporito/substate/actions/runs/${{ github.run_id }})
+            - [Documentation](https://github.com/tamb/substate#readme)
+            - [Performance Benchmarks](https://github.com/tamb/substate/actions/runs/${{ github.run_id }})
             
           draft: false
           prerelease: ${{ contains(steps.version.outputs.VERSION, 'alpha') || contains(steps.version.outputs.VERSION, 'beta') || contains(steps.version.outputs.VERSION, 'rc') }}

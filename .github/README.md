@@ -15,7 +15,7 @@ This directory contains the automated workflows for Substate's continuous integr
 - **Security auditing**: Dependency vulnerability scanning
 
 ### 2. **Performance Monitoring** (`performance.yml`)
-**Triggers**: Push, PR, Daily schedule (2 AM UTC), Manual dispatch
+**Triggers**: Push, PR, Manual dispatch
 
 **Features**:
 - **Automated benchmarks**: Shallow and deep state performance
@@ -62,7 +62,6 @@ Recommended branch protection rules for `main`:
 The performance workflow provides:
 - **Benchmark results** on every PR
 - **Regression detection** with configurable thresholds
-- **Historical tracking** with daily automated runs
 - **Artifact storage** for performance analysis
 
 ### Thresholds

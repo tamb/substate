@@ -77,4 +77,4 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 🔗 Links" >> $GITHUB_STEP_SUMMARY
           echo "- [NPM Package](https://www.npmjs.com/package/substate/v/${{ steps.version.outputs.ALPHA_VERSION }})" >> $GITHUB_STEP_SUMMARY
-          echo "- [GitHub Repository](https://github.com/TomSaporito/substate)" >> $GITHUB_STEP_SUMMARY
+          echo "- [GitHub Repository](https://github.com/tamb/substate)" >> $GITHUB_STEP_SUMMARY
