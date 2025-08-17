@@ -109,6 +109,18 @@ describe('Substate state management', () => {
     expect(A.getProp('nested.double')).toMatch(NEWTEXT);
   });
 
+  test('update via object notation works', () => {
+    const NEWDATE = new Date().toISOString();
+    A.emit('UPDATE_STATE', { timeOfFun: NEWDATE });
+    expect(A.getProp('timeOfFun')).toMatch(NEWDATE);
+  });
+
+  test('nested update without string notation works', () => {
+    const NEWTEXT = 'This has changed';
+    A.emit('UPDATE_STATE', { nested: { double: NEWTEXT } });
+    expect(A.getProp('nested.double')).toMatch(NEWTEXT);
+  });
+
   test('updateState updates state updates nested string', () => {
     const NEWTEXT = 'foobar';
     A.updateState({ 'nested.double': NEWTEXT });

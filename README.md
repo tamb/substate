@@ -37,7 +37,7 @@ Substate provides a simple yet powerful way to manage application state with bui
 - 🎯 **Immutable** - Automatic deep cloning prevents accidental state mutations
 - 🔗 **Sync** - Unidirectional data binding with middleware transformations
 - 🎪 **Middleware** - Extensible with before/after update hooks
-- 🌳 **Nested Props** - Easy access to nested properties with dot notation
+- 🌳 **Nested Props** - Easy access to nested properties with optional dot notation or standard object spread
 - 📦 **Framework Agnostic** - Works with any JavaScript framework or vanilla JS
 
 ## Installation
@@ -308,10 +308,33 @@ const userStore = createStore({
   defaultDeep: true
 });
 
-// Update nested properties using dot notation
+// Update nested properties using dot notation (convenient for simple updates)
 userStore.updateState({ 'profile.personal.name': 'Jane Doe' });
 userStore.updateState({ 'profile.preferences.theme': 'light' });
 userStore.updateState({ 'settings.privacy.publicProfile': true });
+
+// Or update nested properties using object spread (no string notation required)
+userStore.updateState({ 
+  profile: { 
+    ...userStore.getProp('profile'),
+    personal: { 
+      ...userStore.getProp('profile.personal'),
+      name: 'Jane Doe' 
+    }
+  }
+});
+
+// Both approaches work - choose what feels more natural for your use case
+userStore.updateState({ 'profile.preferences.theme': 'light' }); // Dot notation
+userStore.updateState({ 
+  profile: { 
+    ...userStore.getProp('profile'),
+    preferences: { 
+      ...userStore.getProp('profile.preferences'),
+      theme: 'light' 
+    }
+  }
+}); // Object spread
 
 // Get nested properties
 console.log(userStore.getProp('profile.personal.name')); // 'Jane Doe'
@@ -598,8 +621,19 @@ Updates the current state with new values. Supports both shallow and deep mergin
 // Simple update
 store.updateState({ count: 5 });
 
-// Nested property update with dot notation
+// Nested property update with dot notation (optional convenience feature)
 store.updateState({ 'user.profile.name': 'John' });
+
+// Or update nested properties using standard object spread (no strings required)
+store.updateState({ 
+  user: { 
+    ...store.getProp('user'),
+    profile: { 
+      ...store.getProp('user.profile'),
+      name: 'John' 
+    }
+  }
+});
 
 // Force deep cloning for this update
 store.updateState({ 
@@ -1130,7 +1164,7 @@ The default settings are optimized for most use cases:
 | **Sync/Binding** | ✅ Built-in | ❌ No | ❌ No | ❌ No | ✅ Yes |
 | **Framework Agnostic** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
 | **Middleware** | ✅ Simple | ✅ Complex | ✅ Simple | ❌ No | ✅ Yes |
-| **Nested Updates** | ✅ Dot notation | ⚡ Reducers | ⚡ Manual | ✅ Direct | ✅ Direct |
+| **Nested Updates** | ✅ Dot notation + Object spread | ⚡ Reducers | ⚡ Manual | ✅ Direct | ✅ Direct |
 | **Tagged States** | ✅ Built-in | ❌ No | ❌ No | ❌ No | ❌ No |
 
 ### When to Use Substate
@@ -1196,7 +1230,7 @@ Substate is the **only state management library** that combines all these featur
 3. **🕰️ Zero-Config Time Travel** - Full debugging without external tools
 4. **🏷️ Tagged State Checkpoints** - Named snapshots for easy navigation
 5. **📊 Performance Monitoring** - Built-in memory usage tracking
-6. **🌳 Dot Notation Updates** - Intuitive nested state management
+6. **🌳 Flexible Nested Updates** - Intuitive nested state management with dot notation or object spread
 7. **⚡ Production Ready** - Optimized defaults that scale from prototype to enterprise
 
 > **💡 Key Insight**: Most libraries make you choose between features and simplicity. Substate gives you enterprise-grade capabilities with a learning curve measured in minutes, not weeks.
