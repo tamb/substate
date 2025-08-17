@@ -612,6 +612,12 @@ store.updateState({
   items: newItems,
   $type: 'BULK_UPDATE'
 });
+
+// Adding a tag
+store.updateState({
+  items: importantItem,
+  $tag: 'important-item-added'
+});
 ```
 
 **Parameters:**
