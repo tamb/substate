@@ -1,6 +1,6 @@
-import { Substate } from '../Substate/Substate'
-import type { IConfig } from '../Substate/Substate.interface'
-import type { ICreateStoreConfig } from './createStore.interface'
+import { Substate } from '../Substate/Substate';
+import type { IConfig } from '../Substate/Substate.interface';
+import type { ICreateStoreConfig } from './createStore.interface';
 
 /**
  * Factory function to create a new Substate store
@@ -14,9 +14,10 @@ function createStore(config: ICreateStoreConfig): Substate {
     defaultDeep: config.defaultDeep ?? false,
     beforeUpdate: config.beforeUpdate || [],
     afterUpdate: config.afterUpdate || [],
-  }
+    maxHistorySize: config.maxHistorySize ?? 50,
+  };
 
-  return new Substate(substateConfig)
+  return new Substate(substateConfig);
 }
 
-export { createStore }
+export { createStore };
