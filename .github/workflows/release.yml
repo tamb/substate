@@ -1,0 +1,111 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run full test suite
+        run: |
+          npm run check
+          npm test
+          npm run test:builds
+          npm run test:performance
+          
+      - name: Build package
+        run: npm run build
+        
+      - name: Verify build outputs
+        run: |
+          test -f dist/index.esm.js
+          test -f dist/index.umd.js
+          test -f dist/index.d.ts
+          echo "✅ All build outputs verified"
+          
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        
+      - name: Update package.json version
+        run: npm version ${{ steps.version.outputs.VERSION }} --no-git-tag-version
+        
+      - name: Verify package integrity
+        run: npm pack --dry-run
+        
+      - name: Publish to npm
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          
+      - name: Generate changelog
+        id: changelog
+        run: |
+          if [ -f CHANGELOG.md ]; then
+            echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
+            cat CHANGELOG.md >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "CHANGELOG=No changelog available" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ steps.version.outputs.VERSION }}
+          body: |
+            ## 🎉 Substate v${{ steps.version.outputs.VERSION }}
+            
+            ### 📦 Installation
+            ```bash
+            npm install substate@${{ steps.version.outputs.VERSION }}
+            ```
+            
+            ### 📋 Changes
+            ${{ steps.changelog.outputs.CHANGELOG }}
+            
+            ### 🔗 Links
+            - [NPM Package](https://www.npmjs.com/package/substate/v/${{ steps.version.outputs.VERSION }})
+            - [Documentation](https://github.com/TomSaporito/substate#readme)
+            - [Performance Benchmarks](https://github.com/TomSaporito/substate/actions/runs/${{ github.run_id }})
+            
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.VERSION, 'alpha') || contains(steps.version.outputs.VERSION, 'beta') || contains(steps.version.outputs.VERSION, 'rc') }}
+          
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-artifacts-${{ steps.version.outputs.VERSION }}
+          path: |
+            dist/
+            package.json
+            README.md
+            LICENSE
+          retention-days: 90

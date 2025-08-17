@@ -16,6 +16,7 @@
   "files": [
     "LICENSE",
     "README.md",
+    "CHANGELOG.md",
     "dist/index.esm.js",
     "dist/index.umd.js",
     "dist/index.d.ts",
@@ -36,16 +37,20 @@
     "pre": "npm test && npm run build && npm publish --tag next",
     "safe-publish": "npm test && npm run build && npm publish",
     "test": "vitest --run",
-    "test:all": "npm run test && npm run test:builds",
+    "test:all": "npm run test && npm run test:builds && npm run test:performance",
+    "test:ci": "npm run check && npm run test && npm run test:builds",
     "test:builds": "npm run test:esm && npm run test:umd",
     "test:coverage": "vitest --coverage",
     "test:esm": "node build-tests/test-esm.mjs",
     "test:umd": "node build-tests/test-umd.cjs",
-    "test.watch": "vitest"
+    "test.watch": "vitest",
+    "test:performance": "npm run test:perf:shallow && npm run test:perf:deep",
+    "test:perf:shallow": "node performance-tests/shallow-state.mjs",
+    "test:perf:deep": "node performance-tests/deep-state.mjs"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TomSaporito/substate.git"
+    "url": "git+https://github.com/tamb/substate.git"
   },
   "keywords": [
     "state",
@@ -53,7 +58,16 @@
     "pubsub",
     "immutability",
     "modules",
-    "state management"
+    "state management",
+    "state management library",
+    "state management library for javascript",
+    "state management library for typescript",
+    "performance",
+    "memory management",
+    "memory",
+    "memory usage",
+    "memory management",
+    "memory usage"
   ],
   "author": "Tamb (Tom Saporito) <tsaporito@protonmail.com>",
   "license": "MIT",
@@ -69,6 +83,7 @@
     "@rollup/plugin-typescript": "^12.1.1",
     "@types/clone-deep": "^4.0.4",
     "@vitest/coverage-v8": "^3.2.4",
+    "audit-ci": "^7.1.0",
     "rimraf": "^6.0.1",
     "rollup": "^4.46.2",
     "stacktrace-js": "^2.0.2",

@@ -1,0 +1,128 @@
+name: Performance Monitoring
+
+on:
+  push:
+    branches: [ main, v10 ]
+  pull_request:
+    branches: [ main, v10 ]
+  schedule:
+    # Run performance tests daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    # Allow manual trigger
+
+jobs:
+  performance:
+    name: Performance Benchmarks
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build package
+        run: npm run build
+        
+      - name: Run performance benchmarks
+        run: |
+          echo "🏃‍♂️ Running performance benchmarks..."
+          npm run test:performance > performance-results.txt 2>&1
+          
+      - name: Extract performance metrics
+        id: metrics
+        run: |
+          # Extract key metrics from performance output
+          echo "SHALLOW_SMALL_UPDATE=$(grep "Small State:" performance-results.txt -A 1 | grep "Avg Update:" | sed 's/.*: //')" >> $GITHUB_OUTPUT
+          echo "SHALLOW_MEDIUM_MEMORY=$(grep "Medium State:" performance-results.txt -A 4 | grep "Memory Usage:" | sed 's/.*: //')" >> $GITHUB_OUTPUT
+          echo "DEEP_MEDIUM_CLONE=$(grep "Medium Deep" performance-results.txt -A 5 | grep "Avg Deep Clone:" | sed 's/.*: //')" >> $GITHUB_OUTPUT
+          
+      - name: Upload performance results
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-results-${{ github.sha }}
+          path: performance-results.txt
+          retention-days: 30
+          
+      - name: Comment performance results on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const results = fs.readFileSync('performance-results.txt', 'utf8');
+            
+            // Extract summary metrics
+            const shallowSmallUpdate = '${{ steps.metrics.outputs.SHALLOW_SMALL_UPDATE }}';
+            const shallowMediumMemory = '${{ steps.metrics.outputs.SHALLOW_MEDIUM_MEMORY }}';
+            const deepMediumClone = '${{ steps.metrics.outputs.DEEP_MEDIUM_CLONE }}';
+            
+            const comment = `## 🏃‍♂️ Performance Benchmark Results
+            
+            ### Key Metrics
+            - **Shallow Small Update**: ${shallowSmallUpdate}
+            - **Medium State Memory**: ${shallowMediumMemory}
+            - **Deep Clone Time**: ${deepMediumClone}
+            
+            ### Benchmarks Status
+            ✅ Performance tests completed successfully
+            
+            <details>
+            <summary>📊 Full Performance Report</summary>
+            
+            \`\`\`
+            ${results.slice(0, 3000)}...
+            \`\`\`
+            
+            </details>
+            
+            _Performance benchmarks run on every PR to ensure no regressions._`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+            
+      - name: Performance regression check
+        run: |
+          echo "🔍 Checking for performance regressions..."
+          
+          # Define performance thresholds
+          SHALLOW_UPDATE_THRESHOLD=50  # microseconds
+          MEMORY_THRESHOLD=2000        # KB for medium state
+          DEEP_CLONE_THRESHOLD=5       # milliseconds
+          
+          # Extract numeric values (simplified for demo)
+          CURRENT_UPDATE=$(echo "${{ steps.metrics.outputs.SHALLOW_SMALL_UPDATE }}" | grep -o '[0-9.]*')
+          CURRENT_MEMORY=$(echo "${{ steps.metrics.outputs.SHALLOW_MEDIUM_MEMORY }}" | grep -o '[0-9]*')
+          CURRENT_CLONE=$(echo "${{ steps.metrics.outputs.DEEP_MEDIUM_CLONE }}" | grep -o '[0-9.]*')
+          
+          echo "Current metrics:"
+          echo "- Update time: ${CURRENT_UPDATE}μs (threshold: ${SHALLOW_UPDATE_THRESHOLD}μs)"
+          echo "- Memory usage: ${CURRENT_MEMORY}KB (threshold: ${MEMORY_THRESHOLD}KB)"
+          echo "- Clone time: ${CURRENT_CLONE}ms (threshold: ${DEEP_CLONE_THRESHOLD}ms)"
+          
+          # Simple threshold checking (in real scenario, you'd compare with baseline)
+          if (( $(echo "$CURRENT_UPDATE > $SHALLOW_UPDATE_THRESHOLD" | bc -l 2>/dev/null || echo 0) )); then
+            echo "⚠️ Warning: Update time regression detected"
+          fi
+          
+          if (( ${CURRENT_MEMORY:-0} > $MEMORY_THRESHOLD )); then
+            echo "⚠️ Warning: Memory usage regression detected"
+          fi
+          
+          if (( $(echo "$CURRENT_CLONE > $DEEP_CLONE_THRESHOLD" | bc -l 2>/dev/null || echo 0) )); then
+            echo "⚠️ Warning: Deep clone performance regression detected"
+          fi
+          
+          echo "✅ Performance regression check completed"
