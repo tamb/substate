@@ -160,7 +160,9 @@ describe('Substate state management', () => {
     });
 
     // The $deep property should override the defaultDeep setting
-    expect(shallowStore.getCurrentState().nested.value).toBe('updated');
+    expect(
+      (shallowStore.getCurrentState().nested as unknown as Record<string, unknown>).value
+    ).toBe('updated');
 
     // Create a store with deep cloning by default
     const deepStore = new Substate({
@@ -176,6 +178,8 @@ describe('Substate state management', () => {
     });
 
     // The $deep property should override the defaultDeep setting
-    expect(deepStore.getCurrentState().nested.value).toBe('updated');
+    expect((deepStore.getCurrentState().nested as unknown as Record<string, unknown>).value).toBe(
+      'updated'
+    );
   });
 });
