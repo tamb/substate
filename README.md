@@ -762,7 +762,7 @@ if (debugMode) {
 
 ---
 
-#### `getMemoryUsage(): { stateCount: number; estimatedSizeKB: number }`
+#### `getMemoryUsage(): { stateCount: number; taggedCount: number; estimatedSizeKB: number }`
 
 Returns estimated memory usage information for performance monitoring.
 
@@ -908,12 +908,34 @@ console.log(store.stateStorage.length); // Still has all states
 
 #### `on(event: string, callback: Function): void`
 
-Subscribe to store events. The primary event is `UPDATE_STATE`.
+Subscribe to store events. Substate emits several built-in events for different operations.
+
+**Built-in Events:**
+
+| Event | When Emitted | Data Payload |
+|-------|--------------|--------------|
+| `STATE_UPDATED` | After any state update | `newState: IState` |
+| `STATE_RESET` | When `resetState()` is called | None |
+| `TAG_JUMPED` | When `jumpToTag()` is called | `{ tag: string, state: IState }` |
+| `TAG_REMOVED` | When `removeTag()` removes an existing tag | `{ tag: string }` |
+| `TAGS_CLEARED` | When `clearTags()` is called | `{ clearedCount: number }` |
+| `HISTORY_CLEARED` | When `clearHistory()` is called | `{ previousLength: number }` |
+| `HISTORY_LIMIT_CHANGED` | When `limitHistory()` is called | `{ newLimit: number, oldLimit: number, trimmed: number }` |
 
 ```typescript
-// Listen to all state updates
-store.on('UPDATE_STATE', (newState: IState) => {
+// Listen to state updates
+store.on('STATE_UPDATED', (newState: IState) => {
   console.log('State changed:', newState);
+});
+
+// Listen to tagging events
+store.on('TAG_JUMPED', ({ tag, state }) => {
+  console.log(`Jumped to tag: ${tag}`, state);
+});
+
+// Listen to memory management events
+store.on('HISTORY_CLEARED', ({ previousLength }) => {
+  console.log(`Cleared ${previousLength} states from history`);
 });
 
 // Listen to custom events
@@ -1103,6 +1125,7 @@ The default settings are optimized for most use cases:
 | **Framework Agnostic** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
 | **Middleware** | ✅ Simple | ✅ Complex | ✅ Simple | ❌ No | ✅ Yes |
 | **Nested Updates** | ✅ Dot notation | ⚡ Reducers | ⚡ Manual | ✅ Direct | ✅ Direct |
+| **Tagged States** | ✅ Built-in | ❌ No | ❌ No | ❌ No | ❌ No |
 
 ### When to Use Substate
 
@@ -1388,7 +1411,7 @@ Contributions are welcome! Please read our contributing guidelines and submit pu
 
 ## 📄 License
 
-MIT © [Tom Saporito](https://github.com/TomSaporito)
+MIT © [Tom Saporito "Tamb"](https://github.com/tamb)
 
 ---
 
