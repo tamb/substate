@@ -38,6 +38,6 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["src/**/*.ts", "src/**/*.js", "*.json", "*.md"]
+    "includes": ["src/**/*.ts", "src/**/*.js", "*.json", "*.md", "rollup.esm.config.js", "rollup.umd.config.js", "build-tests/**/*.js"]
   }
 }

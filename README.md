@@ -1120,8 +1120,8 @@ The default settings are optimized for most use cases:
 
 | Feature | Substate | Redux | Zustand | Valtio | MobX |
 |---------|----------|-------|---------|--------|------|
-| **Bundle Size** | ~5KB | ~13KB | ~8KB | ~14KB | ~167KB |
-| **TypeScript** | ✅ Built-in | ✅ Good | ✅ Good | ✅ Good | ✅ Good |
+| **Bundle Size** | ~9KB | ~13KB | ~8KB | ~14KB | ~167KB |
+| **TypeScript** | ✅ Excellent | ✅ Excellent | ✅ Excellent | ✅ Excellent | ✅ Excellent |
 | **Learning Curve** | 🟢 Low | 🔴 High | 🟡 Medium | 🟡 Medium | 🔴 High |
 | **Boilerplate** | 🟢 Minimal | 🔴 Heavy | 🟡 Some | 🟢 Minimal | 🟡 Some |
 | **Time Travel** | ✅ Built-in | ⚡ DevTools | ❌ No | ❌ No | ❌ No |

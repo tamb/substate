@@ -3,21 +3,30 @@
   "version": "10.0.0-alpha.0",
   "description": "Pub/Sub pattern with State Management",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/index.umd.js",
+  "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.umd.js",
       "types": "./dist/index.d.ts"
     }
   },
   "files": [
     "LICENSE",
     "README.md",
-    "dist"
+    "dist/index.esm.js",
+    "dist/index.umd.js",
+    "dist/index.d.ts",
+    "dist/index.esm.js.map",
+    "dist/index.umd.js.map",
+    "dist/index.d.ts.map",
+    "dist/core"
   ],
   "scripts": {
-    "build": "rollup -c",
+    "build": "npm run clean && rollup -c",
+    "clean": "rimraf dist",
     "check": "biome check src/",
     "check:fix": "biome check --write src/",
     "format": "biome format src/",
@@ -27,7 +36,11 @@
     "pre": "npm test && npm run build && npm publish --tag next",
     "safe-publish": "npm test && npm run build && npm publish",
     "test": "vitest --run",
+    "test:all": "npm run test && npm run test:builds",
+    "test:builds": "npm run test:esm && npm run test:umd",
     "test:coverage": "vitest --coverage",
+    "test:esm": "node build-tests/test-esm.mjs",
+    "test:umd": "node build-tests/test-umd.cjs",
     "test.watch": "vitest"
   },
   "repository": {
@@ -44,8 +57,14 @@
   ],
   "author": "Tamb (Tom Saporito) <tsaporito@protonmail.com>",
   "license": "MIT",
+  "dependencies": {
+    "clone-deep": "^4.0.1",
+    "object-bystring": "^6.0.2"
+  },
   "devDependencies": {
     "@biomejs/biome": "^2.2.0",
+    "@rollup/plugin-commonjs": "^28.0.6",
+    "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.1.1",
     "@types/clone-deep": "^4.0.4",
@@ -56,9 +75,5 @@
     "tslib": "^2.6.2",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"
-  },
-  "peerDependencies": {
-    "clone-deep": "^4.0.1",
-    "object-bystring": "^6.0.2"
   }
 }

@@ -1,28 +1,9 @@
-import terser from "@rollup/plugin-terser";
-import typescript from "@rollup/plugin-typescript";
+import esm from "./rollup.esm.config.js";
+import umd from "./rollup.umd.config.js";
 
 export default [
-  {
-    input: "./src/index.ts",
-    external: ["clone-deep", "object-bystring"],
-    output: {
-      file: "dist/index.js",
-      format: "umd",
-      name: "substate",
-      globals: {
-        "object-bystring": "byString",
-        "clone-deep": "cloneDeep",
-        rfdc: "rfdc",
-      },
-    },
-    plugins: [
-      typescript(),
-      terser({
-        compress: {
-          drop_console: true,
-        },
-        ecma: 2020,
-      }),
-    ],
-  },
+  // ESM build
+  esm,
+  // UMD build (for browsers and legacy compatibility)
+  umd,  
 ];
