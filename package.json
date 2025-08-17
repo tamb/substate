@@ -17,17 +17,18 @@
     "dist"
   ],
   "scripts": {
-    "test": "vitest --run",
     "build": "rollup -c",
-    "test.watch": "vitest",
-    "pre": "npm test && npm run build && npm publish --tag next",
-    "safe-publish": "npm test && npm run build && npm publish",
-    "lint": "biome lint src/",
-    "lint:fix": "biome lint --write src/",
+    "check": "biome check src/",
+    "check:fix": "biome check --write src/",
     "format": "biome format src/",
     "format:fix": "biome format --write src/",
-    "check": "biome check src/",
-    "check:fix": "biome check --write src/"
+    "lint": "biome lint src/",
+    "lint:fix": "biome lint --write src/",
+    "pre": "npm test && npm run build && npm publish --tag next",
+    "safe-publish": "npm test && npm run build && npm publish",
+    "test": "vitest --run",
+    "test:coverage": "vitest --coverage",
+    "test.watch": "vitest"
   },
   "repository": {
     "type": "git",
@@ -48,6 +49,7 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.1.1",
     "@types/clone-deep": "^4.0.4",
+    "@vitest/coverage-v8": "^3.2.4",
     "rimraf": "^6.0.1",
     "rollup": "^4.46.2",
     "stacktrace-js": "^2.0.2",
