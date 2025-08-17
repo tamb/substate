@@ -109,89 +109,89 @@
 <a name='L44'></a><a href='#L44'>44</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-yes">112x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">34x</span>
-<span class="cline-any cline-yes">34x</span>
-<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-yes">112x</span>
+<span class="cline-any cline-yes">112x</span>
+<span class="cline-any cline-yes">112x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">34x</span>
-<span class="cline-any cline-yes">55x</span>
-<span class="cline-any cline-yes">55x</span>
-<span class="cline-any cline-yes">55x</span>
+<span class="cline-any cline-yes">112x</span>
+<span class="cline-any cline-yes">143x</span>
+<span class="cline-any cline-yes">143x</span>
+<span class="cline-any cline-yes">143x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">34x</span>
-<span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-yes">15x</span>
-<span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-yes">15x</span>
-<span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-yes">112x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">17x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">17x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-yes">112x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-yes">112x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">34x</span>
-<span class="cline-any cline-yes">29x</span>
-<span class="cline-any cline-yes">19x</span>
-<span class="cline-any cline-yes">23x</span>
-<span class="cline-any cline-yes">19x</span>
-<span class="cline-any cline-yes">19x</span>
-<span class="cline-any cline-yes">29x</span>
-<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-yes">112x</span>
+<span class="cline-any cline-yes">202x</span>
+<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-yes">202x</span>
+<span class="cline-any cline-yes">112x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import type { EventHandler, IEvents, IPubSub } from './PubSub.interface'
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import type { EventHandler, IEvents, IPubSub } from './PubSub.interface';
 &nbsp;
 class PubSub implements IPubSub {
-  events: IEvents
+  events: IEvents;
 &nbsp;
   constructor() {
-    this.events = {}
+    this.events = {};
   }
 &nbsp;
   on(eventName: string, fn: EventHandler) {
-    this.events[eventName] = this.events[eventName] || []
-    this.events[eventName].push(fn)
+    this.events[eventName] = this.events[eventName] || [];
+    this.events[eventName].push(fn);
   }
 &nbsp;
   off(eventName: string, fn: EventHandler) {
     if (this.events[eventName]) {
       for (let i = 0; i &lt; this.events[eventName].length; i++) {
         if (this.events[eventName][i] === fn) {
-          this.events[eventName].splice(i, 1)
-          break
+          this.events[eventName].splice(i, 1);
+          break;
         }
       }
     }
   }
 &nbsp;
   removeAll() {
-    this.events = {}
+    this.events = {};
   }
 &nbsp;
   removeAllOf(eventName: string) {
-    this.events[eventName] = []
+    this.events[eventName] = [];
   }
 &nbsp;
   emit(eventName: string, data: object = {}) {
     if (this.events[eventName]) {
       this.events[eventName].forEach((fn) =&gt; {
-        fn(data)
-      })
+        fn(data);
+      });
     }
   }
 }
 &nbsp;
-export { type EventHandler, type IPubSub, PubSub }
+export { type EventHandler, type IPubSub, PubSub };
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -199,7 +199,7 @@ export { type EventHandler, type IPubSub, PubSub }
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-08-16T23:58:53.613Z
+                at 2025-08-17T06:10:30.019Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

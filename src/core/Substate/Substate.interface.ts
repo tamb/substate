@@ -130,7 +130,7 @@ interface ISubstate extends IPubSub {
   limitHistory(maxSize: number): void;
 
   /** Returns estimated memory usage information for the store */
-  getMemoryUsage(): { stateCount: number; taggedCount: number; estimatedSizeKB: number };
+  getMemoryUsage(): { stateCount: number; taggedCount: number; estimatedSizeKB: number | null };
 
   /** Retrieves a tagged state by its tag name */
   getTaggedState(tag: string): IState | undefined;

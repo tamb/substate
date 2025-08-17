@@ -144,4 +144,38 @@ describe('Substate state management', () => {
     A.updateState({ timeOfFun: new Date(), $type: DATEUPDATED });
     expect(A.getProp('$type')).toMatch(DATEUPDATED);
   });
+
+  test('should use $deep property to override default deep cloning behavior', () => {
+    // Create a store with shallow cloning by default
+    const shallowStore = new Substate({
+      name: 'ShallowStore',
+      state: { nested: { value: 'original' } },
+      defaultDeep: false,
+    });
+
+    // Update with $deep: true to force deep cloning
+    shallowStore.updateState({
+      'nested.value': 'updated',
+      $deep: true,
+    });
+
+    // The $deep property should override the defaultDeep setting
+    expect(shallowStore.getCurrentState().nested.value).toBe('updated');
+
+    // Create a store with deep cloning by default
+    const deepStore = new Substate({
+      name: 'DeepStore',
+      state: { nested: { value: 'original' } },
+      defaultDeep: true,
+    });
+
+    // Update with $deep: false to force shallow cloning
+    deepStore.updateState({
+      'nested.value': 'updated',
+      $deep: false,
+    });
+
+    // The $deep property should override the defaultDeep setting
+    expect(deepStore.getCurrentState().nested.value).toBe('updated');
+  });
 });

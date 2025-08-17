@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { Substate } from './Substate';
 import { createStore } from '../createStore/createStore';
+import type { IState } from './Substate.interface';
 
 describe('Memory Management Features', () => {
   let store: Substate;
@@ -256,7 +257,7 @@ describe('Memory Management Features', () => {
 
       const finalUsage = store.getMemoryUsage();
       expect(finalUsage.stateCount).toBeGreaterThan(initialUsage.stateCount);
-      expect(finalUsage.estimatedSizeKB).toBeGreaterThan(initialUsage.estimatedSizeKB);
+      expect(finalUsage.estimatedSizeKB).toBeGreaterThan(initialUsage.estimatedSizeKB!);
     });
 
     test('should handle empty state storage gracefully', () => {
@@ -296,6 +297,64 @@ describe('Memory Management Features', () => {
 
       expect(usage.stateCount).toBe(2);
       expect(usage.estimatedSizeKB).toBeGreaterThan(0);
+    });
+
+    test('should handle JSON.stringify errors gracefully', () => {
+      // Mock console.error to verify it's called
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      // Create a state with circular reference that will cause JSON.stringify to throw
+      const circularState: IState = { data: 'test' };
+      circularState.self = circularState; // Circular reference
+
+      store.updateState(circularState);
+      const usage = store.getMemoryUsage();
+
+      // Should return fallback values when JSON.stringify fails
+      expect(usage.stateCount).toBe(store.stateStorage.length);
+      expect(usage.taggedCount).toBe(store.taggedStates.size);
+      expect(usage.estimatedSizeKB).toBeNull();
+
+      // Should log the error
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Error estimating memory usage:',
+        expect.any(Error)
+      );
+
+      // Clean up
+      consoleErrorSpy.mockRestore();
+    });
+
+    test('should handle edge case with zero sample size in memory estimation', () => {
+      const store = new Substate({
+        name: 'EdgeCaseStore',
+        state: { data: 'test' },
+      });
+
+      // Mock Math.min to return 0, forcing the sampleSize to be 0
+      // This tests the defensive `: 0` fallback in line 525
+      const originalMathMin = Math.min;
+      const mathMinSpy = vi.spyOn(Math, 'min').mockImplementation((a: number, b: number) => {
+        // For the specific call in getMemoryUsage, return 0 to force the edge case
+        if (a === 3) {
+          return 0;
+        }
+        return originalMathMin(a, b);
+      });
+
+      try {
+        const usage = store.getMemoryUsage();
+
+        // Should still return valid results with defensive programming
+        expect(usage.stateCount).toBe(1);
+        expect(usage.estimatedSizeKB).toBeGreaterThanOrEqual(1);
+
+        // The sampleSize would be 0, triggering the `: 0` part of the ternary
+        // which should result in estimatedBytes = 0 * stateCount = 0
+        // But the final result is Math.max(1, ...) so it should be at least 1
+      } finally {
+        mathMinSpy.mockRestore();
+      }
     });
   });
 

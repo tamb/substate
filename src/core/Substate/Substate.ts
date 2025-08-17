@@ -86,7 +86,7 @@ class Substate extends PubSub implements ISubstate {
   stateStorage: IState[];
   defaultDeep: boolean;
   maxHistorySize: number;
-  private taggedStates: Map<string, { stateIndex: number; state: IState }>;
+  taggedStates: Map<string, { stateIndex: number; state: IState }>;
 
   constructor(obj: IConfig = {}) {
     super();
@@ -490,7 +490,11 @@ class Substate extends PubSub implements ISubstate {
    *
    * @since 10.0.0
    */
-  public getMemoryUsage(): { stateCount: number; taggedCount: number; estimatedSizeKB: number } {
+  public getMemoryUsage(): {
+    stateCount: number;
+    taggedCount: number;
+    estimatedSizeKB: number | null;
+  } {
     const stateCount = this.stateStorage.length;
 
     // Handle empty state storage
@@ -521,8 +525,12 @@ class Substate extends PubSub implements ISubstate {
       const averageStateSize = sampleSize > 0 ? totalSampleSize / sampleSize : 0;
       estimatedBytes = averageStateSize * stateCount;
     } catch (_error) {
-      // Fallback estimation if JSON.stringify fails
-      estimatedBytes = stateCount * 1024; // Assume 1KB per state as fallback
+      console.error('Error estimating memory usage:', _error);
+      return {
+        stateCount: this.stateStorage.length,
+        taggedCount: this.taggedStates.size,
+        estimatedSizeKB: null,
+      };
     }
 
     const estimatedSizeKB = Math.max(1, Math.round(estimatedBytes / 1024));
