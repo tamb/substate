@@ -81,7 +81,7 @@ for (const projectPath of testProjects) {
   console.log(`  ✅ node_modules directory exists`);
   
   // Check for framework-specific dependencies
-  if (projectPath.includes('react')) {
+  if (projectPath === 'integration-tests/react-vite') {
     const reactPath = path.join(nodeModulesPath, 'react');
     if (fs.existsSync(reactPath)) {
       console.log(`  ✅ React locally installed (isolated)`);
@@ -89,15 +89,27 @@ for (const projectPath of testProjects) {
       console.log(`  ❌ React not found in local node_modules`);
       allPassed = false;
     }
-  }
-  
-  if (projectPath.includes('preact')) {
+    
+    // React projects should NOT have Preact
+    const preactPath = path.join(nodeModulesPath, 'preact');
+    if (fs.existsSync(preactPath)) {
+      console.log(`  ⚠️  Preact unexpectedly found in React project`);
+    }
+  } else if (projectPath === 'integration-tests/preact-vite') {
     const preactPath = path.join(nodeModulesPath, 'preact');
     if (fs.existsSync(preactPath)) {
       console.log(`  ✅ Preact locally installed (isolated)`);
     } else {
       console.log(`  ❌ Preact not found in local node_modules`);
       allPassed = false;
+    }
+    
+    // Preact projects should NOT have React
+    const reactPath = path.join(nodeModulesPath, 'react');
+    if (fs.existsSync(reactPath)) {
+      console.log(`  ⚠️  React unexpectedly found in Preact project`);
+    } else {
+      console.log(`  ✅ React correctly absent from Preact project`);
     }
   }
   
@@ -127,19 +139,34 @@ const rootNodeModules = path.join(rootDir, 'node_modules');
 if (fs.existsSync(rootNodeModules)) {
   console.log('🔍 Checking root node_modules for pollution:');
   
+  // Read root package.json to check legitimate devDependencies
+  const rootPackageJsonPath = path.join(rootDir, 'package.json');
+  let rootDevDeps = {};
+  
+  try {
+    const rootPackageJson = JSON.parse(fs.readFileSync(rootPackageJsonPath, 'utf8'));
+    rootDevDeps = rootPackageJson.devDependencies || {};
+  } catch (error) {
+    console.log(`  ⚠️  Could not read root package.json: ${error.message}`);
+  }
+  
   const pollutionChecks = ['react', 'preact', '@types/react'];
-  let foundPollution = false;
+  let foundActualPollution = false;
   
   for (const dep of pollutionChecks) {
     const depPath = path.join(rootNodeModules, dep);
     if (fs.existsSync(depPath)) {
-      console.log(`  ⚠️  Found ${dep} in root node_modules (possible hoisting)`);
-      foundPollution = true;
+      if (rootDevDeps[dep]) {
+        console.log(`  ✅ Found ${dep} in root node_modules (legitimate devDependency)`);
+      } else {
+        console.log(`  ⚠️  Found ${dep} in root node_modules (possible hoisting - not in devDependencies)`);
+        foundActualPollution = true;
+      }
     }
   }
   
-  if (!foundPollution) {
-    console.log(`  ✅ No framework dependencies found in root (good isolation)`);
+  if (!foundActualPollution) {
+    console.log(`  ✅ No unexpected framework dependencies found in root (good isolation)`);
   }
   console.log('');
 }

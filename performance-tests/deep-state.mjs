@@ -17,6 +17,41 @@ const TEST_CONFIGS = {
   deep: { depth: 5, breadth: 5 }          // 5 levels, 5 props each (~4K nodes)
 };
 
+// Performance thresholds (in milliseconds) - Strict standards accounting for deep operation complexity
+// Memory thresholds account for 50-state history + tagged states + deep structure overhead
+const PERFORMANCE_THRESHOLDS = {
+  shallow: {
+    creation: 25,          // Deep store creation with cloning overhead
+    singleUpdate: 10,      // Single deep updates with cloning
+    avgUpdate: 5,          // Average deep update should be reasonable
+    avgDeepAccess: 1,      // Deep property access should be fast
+    avgArrayAccess: 2,     // Array access with deep structures
+    avgHistory: 20,        // State history operations
+    avgCloning: 50,        // Deep cloning operations
+    memoryKB: 12000        // ~10.5MB observed, allow 15% headroom for ~5K nodes * 50 states
+  },
+  medium: {
+    creation: 50,          // More complex state creation
+    singleUpdate: 25,      // Deep updates for medium complexity
+    avgUpdate: 15,         // Average updates with more complexity
+    avgDeepAccess: 3,      // Deep access time scales with complexity
+    avgArrayAccess: 5,     // Array operations in complex structures
+    avgHistory: 50,        // History operations with larger states
+    avgCloning: 100,       // Deep cloning for medium structures
+    memoryKB: 50000        // ~46MB observed, allow 10% headroom for ~22K nodes * 50 states
+  },
+  deep: {
+    creation: 100,         // Very deep structures take longer to create
+    singleUpdate: 50,      // Deep updates for very complex structures
+    avgUpdate: 30,         // Updates with maximum complexity
+    avgDeepAccess: 5,      // Access time for very deep structures
+    avgArrayAccess: 10,    // Array operations in very deep structures
+    avgHistory: 100,       // History with very complex states
+    avgCloning: 200,       // Deep cloning for very complex structures
+    memoryKB: 48000        // ~43MB observed, allow 11% headroom for ~21K nodes * 50 states
+  }
+};
+
 // Utility functions
 function createDeepState(depth, breadth, currentDepth = 0) {
   if (currentDepth >= depth) {
@@ -56,6 +91,20 @@ function formatTime(ms) {
   if (ms < 1) return `${(ms * 1000).toFixed(2)}μs`;
   if (ms < 1000) return `${ms.toFixed(2)}ms`;
   return `${(ms / 1000).toFixed(2)}s`;
+}
+
+function checkThreshold(actual, threshold, metric, testType, isMemory = false) {
+  const passed = actual <= threshold;
+  const status = passed ? '✅' : '❌';
+  const percentage = ((actual / threshold) * 100).toFixed(1);
+  
+  if (isMemory) {
+    console.log(`  ${status} ${metric}: ${actual.toFixed(0)}KB (threshold: ${threshold}KB, ${percentage}% of limit)`);
+  } else {
+    console.log(`  ${status} ${metric}: ${formatTime(actual)} (threshold: ${formatTime(threshold)}, ${percentage}% of limit)`);
+  }
+  
+  return passed;
 }
 
 function calculateStateComplexity(state, depth = 0) {
@@ -196,11 +245,34 @@ function runDeepBenchmark(testName, config, iterations) {
   const finalMemUsage = store.getMemoryUsage();
   console.log(`Final Memory Usage: ${finalMemUsage.estimatedSizeKB}KB (${finalMemUsage.stateCount} states, ${finalMemUsage.taggedCount} tagged)`);
   
+  // Performance validation
+  console.log('\n🎯 Performance Validation:');
+  const testType = testName.includes('Shallow') ? 'shallow' : 
+                  testName.includes('Medium') ? 'medium' : 'deep';
+  const thresholds = PERFORMANCE_THRESHOLDS[testType];
+  
+  const validationResults = {
+    creation: checkThreshold(createResult.duration, thresholds.creation, 'Store Creation', testType),
+    singleUpdate: checkThreshold(singleUpdateResult.duration, thresholds.singleUpdate, 'Single Deep Update', testType),
+    avgUpdate: checkThreshold(batchUpdateResult.duration / iterations, thresholds.avgUpdate, 'Avg Deep Update', testType),
+    avgDeepAccess: checkThreshold(deepAccessResult.duration / (iterations * 2), thresholds.avgDeepAccess, 'Avg Deep Access', testType),
+    avgArrayAccess: checkThreshold(arrayAccessResult.duration / iterations, thresholds.avgArrayAccess, 'Avg Array Access', testType),
+    avgHistory: checkThreshold(historyResult.duration / Math.min(iterations, 20), thresholds.avgHistory, 'Avg History Operation', testType),
+    avgCloning: checkThreshold(cloneResult.duration / Math.min(iterations, 10), thresholds.avgCloning, 'Avg Deep Clone', testType),
+    memory: checkThreshold(finalMemUsage.estimatedSizeKB, thresholds.memoryKB, 'Memory Usage', testType, true)
+  };
+
+  const allPassed = Object.values(validationResults).every(passed => passed);
+  console.log(`\n${allPassed ? '🎉' : '💥'} Overall Performance: ${allPassed ? 'PASSED' : 'FAILED'}`);
+
   return {
     testName,
     config,
     iterations,
     complexity,
+    thresholds,
+    validationResults,
+    allPassed,
     results: {
       creation: createResult.duration,
       singleUpdate: singleUpdateResult.duration,
@@ -232,14 +304,25 @@ results.push(runDeepBenchmark('Very Deep', TEST_CONFIGS.deep, ITERATIONS.large))
 // Summary
 console.log('\n🎯 DEEP STATE PERFORMANCE SUMMARY');
 console.log('==================================');
+
+let overallSuccess = true;
 results.forEach(result => {
-  console.log(`\n${result.testName} (${result.complexity.nodeCount.toLocaleString()} nodes):`);
+  const status = result.allPassed ? '✅' : '❌';
+  console.log(`\n${status} ${result.testName} (${result.complexity.nodeCount.toLocaleString()} nodes) - ${result.allPassed ? 'PASSED' : 'FAILED'}:`);
   console.log(`  Store Creation: ${formatTime(result.results.creation)}`);
   console.log(`  Single Deep Update: ${formatTime(result.results.singleUpdate)}`);
   console.log(`  Avg Deep Update: ${formatTime(result.results.batchUpdate / result.iterations)}`);
   console.log(`  Avg Deep Access: ${formatTime(result.results.deepAccess / (result.iterations * 2))}`);
   console.log(`  Avg Deep Clone: ${formatTime(result.results.cloning / Math.min(result.iterations, 10))}`);
   console.log(`  Final Memory: ${result.results.memoryKB}KB`);
+  
+  if (!result.allPassed) {
+    overallSuccess = false;
+    console.log(`  💡 Failed metrics: ${Object.entries(result.validationResults)
+      .filter(([_, passed]) => !passed)
+      .map(([metric]) => metric)
+      .join(', ')}`);
+  }
 });
 
 // Performance comparison
@@ -251,4 +334,14 @@ console.log('• Nested property access has minimal overhead with dot notation')
 console.log('• Tagged states provide efficient checkpoints for complex states');
 console.log('• Automatic memory management prevents unbounded growth');
 
-console.log('\n✅ Deep state benchmarks completed!');
+console.log('\n' + '='.repeat(50));
+if (overallSuccess) {
+  console.log('🎉 ALL DEEP STATE PERFORMANCE TESTS PASSED!');
+  console.log('✅ Substate meets high performance standards for deep operations');
+  process.exit(0);
+} else {
+  console.log('💥 SOME DEEP STATE PERFORMANCE TESTS FAILED!');
+  console.log('❌ Performance optimization needed to meet deep operation standards');
+  console.log('💡 Consider optimizing failing operations or adjusting thresholds if justified');
+  process.exit(1);
+}

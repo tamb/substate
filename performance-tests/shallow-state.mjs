@@ -17,6 +17,38 @@ const TEST_SIZES = {
   large: 1000     // 1000 properties
 };
 
+// Performance thresholds (in milliseconds) - High standards for production-ready performance
+// Memory thresholds account for 50-state history (default maxHistorySize) with realistic overhead
+const PERFORMANCE_THRESHOLDS = {
+  small: {
+    creation: 5,           // Store creation should be nearly instantaneous
+    singleUpdate: 1,       // Single updates should be sub-millisecond
+    avgUpdate: 0.1,        // Average update should be extremely fast
+    avgAccess: 0.01,       // Property access should be ultra-fast
+    avgNestedAccess: 0.05, // Nested access with minimal overhead
+    avgEvent: 0.1,         // Event firing should be very fast
+    memoryKB: 150          // ~127KB observed, allow 20% headroom for 10 props * 50 states
+  },
+  medium: {
+    creation: 15,          // Still very fast creation for medium state
+    singleUpdate: 2,       // Single updates remain fast
+    avgUpdate: 0.2,        // Slightly higher but still very fast
+    avgAccess: 0.02,       // Access time scales linearly but stays low
+    avgNestedAccess: 0.1,  // Nested access remains efficient
+    avgEvent: 0.2,         // Events should scale well
+    memoryKB: 1500         // ~1257KB observed, allow 20% headroom for 100 props * 50 states
+  },
+  large: {
+    creation: 50,          // Acceptable creation time for large state
+    singleUpdate: 5,       // Updates should still be fast even for large state
+    avgUpdate: 0.5,        // Individual updates remain quick
+    avgAccess: 0.05,       // Access time should scale well
+    avgNestedAccess: 0.2,  // Nested access with good performance
+    avgEvent: 0.5,         // Events should remain responsive
+    memoryKB: 15000        // ~12.8MB observed, allow 17% headroom for 1000 props * 50 states
+  }
+};
+
 // Utility functions
 function createInitialState(size) {
   const state = {};
@@ -45,6 +77,20 @@ function formatTime(ms) {
   if (ms < 1) return `${(ms * 1000).toFixed(2)}μs`;
   if (ms < 1000) return `${ms.toFixed(2)}ms`;
   return `${(ms / 1000).toFixed(2)}s`;
+}
+
+function checkThreshold(actual, threshold, metric, testSize, isMemory = false) {
+  const passed = actual <= threshold;
+  const status = passed ? '✅' : '❌';
+  const percentage = ((actual / threshold) * 100).toFixed(1);
+  
+  if (isMemory) {
+    console.log(`  ${status} ${metric}: ${actual.toFixed(0)}KB (threshold: ${threshold}KB, ${percentage}% of limit)`);
+  } else {
+    console.log(`  ${status} ${metric}: ${formatTime(actual)} (threshold: ${formatTime(threshold)}, ${percentage}% of limit)`);
+  }
+  
+  return passed;
 }
 
 function runBenchmark(testName, stateSize, iterations) {
@@ -132,10 +178,32 @@ function runBenchmark(testName, stateSize, iterations) {
   
   store.off('STATE_UPDATED', listener);
   
+  // Performance validation
+  console.log('\n🎯 Performance Validation:');
+  const testSizeKey = stateSize === TEST_SIZES.small ? 'small' : 
+                     stateSize === TEST_SIZES.medium ? 'medium' : 'large';
+  const thresholds = PERFORMANCE_THRESHOLDS[testSizeKey];
+  
+  const validationResults = {
+    creation: checkThreshold(createResult.duration, thresholds.creation, 'Store Creation', testSizeKey),
+    singleUpdate: checkThreshold(singleUpdateResult.duration, thresholds.singleUpdate, 'Single Update', testSizeKey),
+    avgUpdate: checkThreshold(batchUpdateResult.duration / Math.min(iterations, 1000), thresholds.avgUpdate, 'Avg Update', testSizeKey),
+    avgAccess: checkThreshold(accessResult.duration / iterations, thresholds.avgAccess, 'Avg Property Access', testSizeKey),
+    avgNestedAccess: checkThreshold(nestedAccessResult.duration / iterations, thresholds.avgNestedAccess, 'Avg Nested Access', testSizeKey),
+    avgEvent: checkThreshold(eventResult.duration / Math.min(iterations, 100), thresholds.avgEvent, 'Avg Event', testSizeKey),
+    memory: checkThreshold(memUsage.estimatedSizeKB, thresholds.memoryKB, 'Memory Usage', testSizeKey, true)
+  };
+
+  const allPassed = Object.values(validationResults).every(passed => passed);
+  console.log(`\n${allPassed ? '🎉' : '💥'} Overall Performance: ${allPassed ? 'PASSED' : 'FAILED'}`);
+
   return {
     testName,
     stateSize,
     iterations,
+    thresholds,
+    validationResults,
+    allPassed,
     results: {
       creation: createResult.duration,
       singleUpdate: singleUpdateResult.duration,
@@ -165,13 +233,34 @@ results.push(runBenchmark('Large State', TEST_SIZES.large, ITERATIONS.small));
 // Summary
 console.log('\n🎯 SHALLOW STATE PERFORMANCE SUMMARY');
 console.log('=====================================');
+
+let overallSuccess = true;
 results.forEach(result => {
-  console.log(`\n${result.testName}:`);
+  const status = result.allPassed ? '✅' : '❌';
+  console.log(`\n${status} ${result.testName} - ${result.allPassed ? 'PASSED' : 'FAILED'}:`);
   console.log(`  Store Creation: ${formatTime(result.results.creation)}`);
   console.log(`  Single Update: ${formatTime(result.results.singleUpdate)}`);
   console.log(`  Avg Update: ${formatTime(result.results.batchUpdate / Math.min(result.iterations, 1000))}`);
   console.log(`  Avg Property Access: ${formatTime(result.results.propertyAccess / result.iterations)}`);
   console.log(`  Memory Usage: ${result.results.memoryKB}KB`);
+  
+  if (!result.allPassed) {
+    overallSuccess = false;
+    console.log(`  💡 Failed metrics: ${Object.entries(result.validationResults)
+      .filter(([_, passed]) => !passed)
+      .map(([metric]) => metric)
+      .join(', ')}`);
+  }
 });
 
-console.log('\n✅ Shallow state benchmarks completed!');
+console.log('\n' + '='.repeat(50));
+if (overallSuccess) {
+  console.log('🎉 ALL SHALLOW STATE PERFORMANCE TESTS PASSED!');
+  console.log('✅ Substate meets high performance standards for shallow operations');
+  process.exit(0);
+} else {
+  console.log('💥 SOME PERFORMANCE TESTS FAILED!');
+  console.log('❌ Performance optimization needed to meet standards');
+  console.log('💡 Consider optimizing failing operations or adjusting thresholds if justified');
+  process.exit(1);
+}
