@@ -11,6 +11,14 @@
       "import": "./dist/index.esm.js",
       "require": "./dist/index.umd.js",
       "types": "./dist/index.d.ts"
+    },
+    "./react": {
+      "import": "./dist/react/index.js",
+      "types": "./dist/react/index.d.ts"
+    },
+    "./preact": {
+      "import": "./dist/preact/index.js",
+      "types": "./dist/preact/index.d.ts"
     }
   },
   "files": [
@@ -23,7 +31,9 @@
     "dist/index.esm.js.map",
     "dist/index.umd.js.map",
     "dist/index.d.ts.map",
-    "dist/core"
+    "dist/core",
+    "dist/react",
+    "dist/preact"
   ],
   "scripts": {
     "build": "npm run clean && rollup -c",
@@ -37,8 +47,8 @@
     "pre": "npm test && npm run build && npm publish --tag next",
     "safe-publish": "npm test && npm run build && npm publish",
     "test": "vitest --run",
-    "test:all": "npm run test && npm run test:builds && npm run test:performance",
-    "test:ci": "npm run check && npm run test && npm run test:builds",
+    "test:all": "npm run test && npm run test:builds && npm run test:performance && npm run test:integrations",
+    "test:ci": "npm run check && npm run test && npm run test:builds && npm run test:integrations",
     "test:builds": "npm run test:esm && npm run test:umd",
     "test:coverage": "vitest --coverage",
     "test:esm": "node build-tests/test-esm.mjs",
@@ -46,7 +56,13 @@
     "test.watch": "vitest",
     "test:performance": "npm run test:perf:shallow && npm run test:perf:deep",
     "test:perf:shallow": "node performance-tests/shallow-state.mjs",
-    "test:perf:deep": "node performance-tests/deep-state.mjs"
+    "test:perf:deep": "node performance-tests/deep-state.mjs",
+    "test:isolation": "node scripts/check-isolation.js",
+    "test:integrations": "npm run build && npm run test:integration:react && npm run test:integration:preact",
+    "test:integration:react": "cd integration-tests/react-vite && npm install && npm test",
+    "test:integration:preact": "cd integration-tests/preact-vite && npm install && npm test",
+    "dev:react": "cd integration-tests/react-vite && npm install && npm run dev",
+    "dev:preact": "cd integration-tests/preact-vite && npm install && npm run dev"
   },
   "repository": {
     "type": "git",
@@ -73,7 +89,20 @@
   "license": "MIT",
   "dependencies": {
     "clone-deep": "^4.0.1",
-    "object-bystring": "^6.0.2"
+    "object-bystring": "^6.0.2",
+    "rfdc": "^1.4.1"
+  },
+  "peerDependencies": {
+    "preact": ">=10.0.0",
+    "react": ">=16.8.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "preact": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.0",
@@ -82,8 +111,11 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.1.1",
     "@types/clone-deep": "^4.0.4",
+    "@types/react": "^19.1.10",
     "@vitest/coverage-v8": "^3.2.4",
     "audit-ci": "^7.1.0",
+    "preact": "^10.27.1",
+    "react": "^19.1.1",
     "rimraf": "^6.0.1",
     "rollup": "^4.46.2",
     "stacktrace-js": "^2.0.2",

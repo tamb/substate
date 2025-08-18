@@ -1,0 +1,22 @@
+{
+  "name": "substate-preact-integration-test",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Integration test for Substate Preact hooks",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "echo \"Integration test for Preact\" && npm run build"
+  },
+  "dependencies": {
+    "substate": "file:../../",
+    "preact": "^10.19.6"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.8.2",
+    "typescript": "^5.2.2",
+    "vite": "^5.2.0"
+  }
+}

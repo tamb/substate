@@ -1,5 +1,5 @@
-import cloneDeep from 'clone-deep';
 import byString from 'object-bystring';
+import rfdc from 'rfdc';
 
 import { PubSub } from '../PubSub/PubSub';
 import type {
@@ -12,6 +12,7 @@ import type {
 } from './Substate.interface';
 
 const S: string = 'UPDATE_STATE';
+const cloneDeep = rfdc();
 
 /**
  * Substate - A lightweight, pub/sub-based state management library
