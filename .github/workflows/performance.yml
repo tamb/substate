@@ -10,17 +10,21 @@ on:
 
 jobs:
   performance:
-    name: Performance Benchmarks
+    name: Performance Benchmarks on Node ${{ matrix.node-version }}
     runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [20.x, 22.x]  # LTS versions only
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         
-      - name: Setup Node.js
+      - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: ${{ matrix.node-version }}
           cache: 'npm'
           
       - name: Install dependencies
@@ -45,7 +49,7 @@ jobs:
       - name: Upload performance results
         uses: actions/upload-artifact@v4
         with:
-          name: performance-results-${{ github.sha }}
+          name: performance-results-node-${{ matrix.node-version }}-${{ github.sha }}
           path: performance-results.txt
           retention-days: 30
           

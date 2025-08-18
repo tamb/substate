@@ -9,7 +9,7 @@ This directory contains the automated workflows for Substate's continuous integr
 
 **Features**:
 - **Multi-platform testing**: Ubuntu, Windows, macOS
-- **Multi-Node.js versions**: 18.x, 20.x, 22.x
+- **Multi-Node.js versions**: 20.x, 22.x, 24.x
 - **Comprehensive testing**: Unit tests, build tests, linting
 - **Coverage reporting**: Automatic Codecov integration
 - **Security auditing**: Dependency vulnerability scanning
@@ -18,6 +18,7 @@ This directory contains the automated workflows for Substate's continuous integr
 **Triggers**: Push, PR, Manual dispatch
 
 **Features**:
+- **Multi-Node testing**: Node.js 20.x and 22.x (LTS versions)
 - **Automated benchmarks**: Shallow and deep state performance
 - **Performance regression detection**: Threshold-based alerts
 - **PR comments**: Performance results automatically posted
@@ -28,16 +29,19 @@ This directory contains the automated workflows for Substate's continuous integr
 **Triggers**: Git tags matching `v*` pattern
 
 **Features**:
+- **Multi-stage pipeline**: Validate → Prepare → Publish → Release
+- **Job dependencies**: Publishing only happens after all checks pass
 - **Full test suite**: All tests must pass before release
-- **Automated publishing**: NPM with provenance
+- **Automated publishing**: NPM with provenance (currently disabled)
 - **GitHub releases**: Automatic release notes generation
 - **Artifact preservation**: 90-day retention
 - **Prerelease detection**: Automatic alpha/beta/rc handling
+- **Failure isolation**: Each stage can fail independently
 
-### 4. **Alpha Publishing** (`publish-alpha.yml`)
-**Triggers**: Push to v10 branch, Manual dispatch
+### 4. **Alpha Publishing** (`publish-alpha.yml.disabled`)
+**Status**: Currently disabled - workflow renamed to `.disabled` extension
 
-**Features**:
+**Features** (when enabled):
 - **Alpha releases**: Automatic alpha versioning
 - **NPM alpha tag**: Separate distribution channel
 - **Testing gate**: Must pass all tests
@@ -71,16 +75,22 @@ The performance workflow provides:
 
 ## 🚦 Release Process
 
-### Alpha Releases (Automated)
-1. Push to `v10` branch
-2. Alpha workflow publishes `substate@alpha`
-3. Available for testing immediately
+### Alpha Releases (Currently Disabled)
+1. ~~Push to `v10` branch~~
+2. ~~Alpha workflow publishes `substate@alpha`~~
+3. ~~Available for testing immediately~~
 
-### Stable Releases (Tag-based)
-1. Create and push version tag: `git tag v10.0.0 && git push origin v10.0.0`
-2. Release workflow runs automatically
-3. Publishes to NPM as `substate@latest`
-4. Creates GitHub release with notes
+**To re-enable**: `mv publish-alpha.yml.disabled publish-alpha.yml`
+
+### Stable Releases (Tag-based from main)
+1. Merge `v10` → `main` when ready for release
+2. Create and push version tag: `git tag v10.0.0 && git push origin v10.0.0`
+3. **Validate**: All tests, builds, and performance checks run
+4. **Prepare**: Version extraction and changelog generation
+5. **Publish**: NPM publishing (currently disabled)
+6. **Release**: GitHub release creation with notes
+
+**Note**: Release workflow only runs on version tags, not on `v10` branch pushes
 
 ## 📈 Monitoring & Alerts
 

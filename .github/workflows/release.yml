@@ -4,14 +4,16 @@ on:
   push:
     tags:
       - 'v*'
+    # Only run on version tags from main branch
 
 permissions:
   contents: write
   id-token: write
 
 jobs:
-  release:
-    name: Create Release
+  # Step 1: Run all validation checks
+  validate:
+    name: Validate Release
     runs-on: ubuntu-latest
     
     steps:
@@ -25,7 +27,6 @@ jobs:
         with:
           node-version: '20.x'
           cache: 'npm'
-          registry-url: 'https://registry.npmjs.org'
           
       - name: Install dependencies
         run: npm ci
@@ -47,6 +48,44 @@ jobs:
           test -f dist/index.d.ts
           echo "✅ All build outputs verified"
           
+      - name: Upload build artifacts for publishing
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-build
+          path: |
+            dist/
+            package.json
+            README.md
+            LICENSE
+          retention-days: 1
+  
+  # Step 2: Prepare release (only if validation passes)
+  prepare:
+    name: Prepare Release
+    runs-on: ubuntu-latest
+    needs: validate
+    outputs:
+      version: ${{ steps.version.outputs.VERSION }}
+      changelog: ${{ steps.changelog.outputs.CHANGELOG }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-build
+          
       - name: Extract version from tag
         id: version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
@@ -56,11 +95,6 @@ jobs:
         
       - name: Verify package integrity
         run: npm pack --dry-run
-        
-      - name: Publish to npm
-        run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           
       - name: Generate changelog
         id: changelog
@@ -72,37 +106,87 @@ jobs:
           else
             echo "CHANGELOG=No changelog available" >> $GITHUB_OUTPUT
           fi
+
+  # Step 3: Publish to NPM (only if validation and prepare succeed)
+  publish:
+    name: Publish to NPM
+    runs-on: ubuntu-latest
+    needs: [validate, prepare]
+    if: ${{ !cancelled() && needs.validate.result == 'success' && needs.prepare.result == 'success' }}
+    env:
+      ENABLE_NPM_PUBLISH: false  # Set to true when ready to publish releases
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
           
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-build
+          
+      - name: Update package.json version
+        run: npm version ${{ needs.prepare.outputs.version }} --no-git-tag-version
+        
+      - name: Check if publishing is enabled
+        run: |
+          if [ "$ENABLE_NPM_PUBLISH" != "true" ]; then
+            echo "❌ NPM publishing is disabled (ENABLE_NPM_PUBLISH=$ENABLE_NPM_PUBLISH)"
+            echo "To enable: Set ENABLE_NPM_PUBLISH=true in the workflow"
+            exit 1
+          fi
+          echo "✅ NPM publishing is enabled"
+        
+      - name: Publish to npm
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  # Step 4: Create GitHub Release (only if NPM publishing succeeds)
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [validate, prepare, publish]
+    if: ${{ !cancelled() && needs.validate.result == 'success' && needs.prepare.result == 'success' && needs.publish.result == 'success' }}
+    
+    steps:
       - name: Create GitHub Release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: Release ${{ steps.version.outputs.VERSION }}
+          release_name: Release ${{ needs.prepare.outputs.version }}
           body: |
-            ## 🎉 Substate v${{ steps.version.outputs.VERSION }}
+            ## 🎉 Substate v${{ needs.prepare.outputs.version }}
             
             ### 📦 Installation
             ```bash
-            npm install substate@${{ steps.version.outputs.VERSION }}
+            npm install substate@${{ needs.prepare.outputs.version }}
             ```
             
             ### 📋 Changes
-            ${{ steps.changelog.outputs.CHANGELOG }}
+            ${{ needs.prepare.outputs.changelog }}
             
             ### 🔗 Links
-            - [NPM Package](https://www.npmjs.com/package/substate/v/${{ steps.version.outputs.VERSION }})
+            - [NPM Package](https://www.npmjs.com/package/substate/v/${{ needs.prepare.outputs.version }})
             - [Documentation](https://github.com/tamb/substate#readme)
             - [Performance Benchmarks](https://github.com/tamb/substate/actions/runs/${{ github.run_id }})
             
           draft: false
-          prerelease: ${{ contains(steps.version.outputs.VERSION, 'alpha') || contains(steps.version.outputs.VERSION, 'beta') || contains(steps.version.outputs.VERSION, 'rc') }}
+          prerelease: ${{ contains(needs.prepare.outputs.version, 'alpha') || contains(needs.prepare.outputs.version, 'beta') || contains(needs.prepare.outputs.version, 'rc') }}
           
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: release-artifacts-${{ steps.version.outputs.VERSION }}
+          name: release-artifacts-${{ needs.prepare.outputs.version }}
           path: |
             dist/
             package.json
