@@ -31,6 +31,7 @@ jobs:
         
       - name: Run linting
         run: npm run check
+        shell: bash
         
       - name: Run tests
         run: npm test
