@@ -2,7 +2,6 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { createStore, type IState } from 'substate'
 import { useSubstate, useSubstateActions } from 'substate/react'
-import React from 'react'
 
 // Test state interfaces
 interface CounterState extends IState {
@@ -15,6 +14,12 @@ interface TodoState extends IState {
   filter: 'all' | 'active' | 'completed'
 }
 
+interface Todo {
+  id: string
+  text: string
+  completed: boolean
+}
+
 // Test Components
 function CounterComponent({ store }: { store: any }) {
   const count = useSubstate(store, (state) => state.count)
@@ -22,10 +27,10 @@ function CounterComponent({ store }: { store: any }) {
 
   return (
     <div>
-      <span data-testid="count">{count}</span>
+      <span data-testid="count">{count as number}</span>
       <button 
         data-testid="increment" 
-        onClick={() => updateState({ count: count + 1, lastUpdated: Date.now() })}
+        onClick={() => updateState({ count: (count as number) + 1, lastUpdated: Date.now() })}
       >
         Increment
       </button>
@@ -47,10 +52,10 @@ function TodoComponent({ store }: { store: any }) {
       text: 'Test Todo', 
       completed: false 
     }
-    updateState({ todos: [...todos, newTodo] })
+    updateState({ todos: [...(todos as any[]), newTodo] })
   }
 
-  const filteredTodos = todos.filter(todo => {
+  const filteredTodos = (todos as any[]).filter((todo: Todo) => {
     if (filter === 'completed') return todo.completed
     if (filter === 'active') return !todo.completed
     return true

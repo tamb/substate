@@ -14,17 +14,23 @@ interface TodoState extends IState {
   filter: 'all' | 'active' | 'completed'
 }
 
+interface Todo {
+  id: string
+  text: string
+  completed: boolean
+}
+
 // Test Components
 function CounterComponent({ store }: { store: any }) {
-  const count = useSubstate(store, (state) => state.count)
+  const count = useSubstate<CounterState>(store, (state) => state.count)
   const { updateState, resetState } = useSubstateActions(store)
 
   return (
     <div>
-      <span data-testid="count">{count}</span>
+      <span data-testid="count">{count as number}</span>
       <button 
         data-testid="increment" 
-        onClick={() => updateState({ count: count + 1, lastUpdated: Date.now() })}
+        onClick={() => updateState({ count: (count as number) + 1, lastUpdated: Date.now() })}
       >
         Increment
       </button>
@@ -36,8 +42,8 @@ function CounterComponent({ store }: { store: any }) {
 }
 
 function TodoComponent({ store }: { store: any }) {
-  const todos = useSubstate(store, (state) => state.todos)
-  const filter = useSubstate(store, (state) => state.filter)
+  const todos = useSubstate<TodoState>(store, (state) => state.todos)
+  const filter = useSubstate<TodoState>(store, (state) => state.filter)
   const { updateState } = useSubstateActions(store)
 
   const addTodo = () => {
@@ -46,10 +52,10 @@ function TodoComponent({ store }: { store: any }) {
       text: 'Test Todo', 
       completed: false 
     }
-    updateState({ todos: [...todos, newTodo] })
+    updateState({ todos: [...(todos as Todo[]), newTodo] })
   }
 
-  const filteredTodos = todos.filter(todo => {
+  const filteredTodos = (todos as Todo[]).filter((todo: Todo) => {
     if (filter === 'completed') return todo.completed
     if (filter === 'active') return !todo.completed
     return true
