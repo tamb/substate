@@ -11,6 +11,8 @@
     "test": "echo \"Running React integration tests...\" && npm run build && vitest run"
   },
   "dependencies": {
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
     "substate": "file:../../"
   },
   "devDependencies": {

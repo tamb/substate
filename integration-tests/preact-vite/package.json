@@ -11,6 +11,8 @@
     "test": "echo \"Running Preact integration tests...\" && npm run build && vitest run"
   },
   "dependencies": {
+    "preact": "^10.25.3",
+    "preact-render-to-string": "^6.4.3",
     "substate": "file:../../"
   },
   "devDependencies": {

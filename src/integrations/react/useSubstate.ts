@@ -108,12 +108,14 @@ function useSubstate<TState extends IState = IState, TReturn = unknown>(
       }
     };
 
-    // Subscribe to store updates
+    // Subscribe to store updates and resets
     store.on('STATE_UPDATED', handleStateUpdate);
+    store.on('STATE_RESET', handleStateUpdate);
 
     // Cleanup subscription on unmount or dependency change
     return () => {
       store.off('STATE_UPDATED', handleStateUpdate);
+      store.off('STATE_RESET', handleStateUpdate);
     };
   }, [store, memoizedSelector]);
 

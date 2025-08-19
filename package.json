@@ -58,7 +58,8 @@
     "test:perf:shallow": "node performance-tests/shallow-state.mjs",
     "test:perf:deep": "node performance-tests/deep-state.mjs",
     "test:isolation": "node scripts/check-isolation.js",
-    "test:integrations": "npm run test:integration:react && npm run test:integration:preact",
+    "test:integrations:check": "node scripts/check-dependency-match.js",
+    "test:integrations": "npm run test:integrations:check && npm run test:integration:react && npm run test:integration:preact",
     "test:integration:react": "cd integration-tests/react-vite && npm install && npm test",
     "test:integration:preact": "cd integration-tests/preact-vite && npm install && npm test",
     "dev:react": "cd integration-tests/react-vite && npm install && npm run dev",
@@ -94,8 +95,8 @@
   },
   "peerDependencies": {
     "preact": ">=10.0.0",
-    "react": ">=18.2.0",
-    "react-dom": ">=18.2.0"
+    "react": ">=19.0.0",
+    "react-dom": ">=19.0.0"
   },
   "peerDependenciesMeta": {
     "react": {
