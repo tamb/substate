@@ -8,7 +8,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "test": "echo \"Integration test for Preact\" && npm run build"
+    "test": "echo \"Running Preact integration tests...\" && npm run build && vitest run"
   },
   "dependencies": {
     "preact": "^10.19.6",
@@ -16,7 +16,12 @@
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.8.2",
+    "@testing-library/preact": "^3.2.3",
+    "@testing-library/jest-dom": "^6.4.2",
+    "@testing-library/user-event": "^14.5.2",
+    "jsdom": "^24.0.0",
     "typescript": "^5.2.2",
-    "vite": "^7.1.2"
+    "vite": "^7.1.2",
+    "vitest": "^1.3.1"
   }
 }
