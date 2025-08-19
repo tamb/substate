@@ -147,7 +147,7 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
    * Also updates tagged state indices when history is trimmed
    * @param newState - The new state object
    */
-  private pushState(newState: IState): void {
+  private pushState(newState: TState): void {
     this.stateStorage.push(newState);
 
     // Trim history if it exceeds the maximum size
@@ -226,8 +226,8 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
       //update cloned state
     }
 
-    if (!this.defaultDeep) newState.$deep = false; // reset $deep keyword
-    newState.$type = action.$type || S; // set $type if not already set
+    if (!this.defaultDeep) (newState as IState).$deep = false; // reset $deep keyword
+    (newState as IState).$type = action.$type || S; // set $type if not already set
 
     //pushes new state
     this.pushState(newState);
@@ -632,10 +632,10 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
     const restoredState = cloneDeep(taggedEntry.state);
 
     // Remove the $tag metadata to avoid re-tagging
-    delete (restoredState as any).$tag;
+    delete (restoredState as IState).$tag;
 
     // Add it as a new state in history
-    this.pushState(restoredState as IState);
+    this.pushState(restoredState);
 
     // Emit state change event
     this.emit('TAG_JUMPED', { tag, state: this.getCurrentState() });

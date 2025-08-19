@@ -20,6 +20,7 @@ export default {
     commonjs(),
     typescript({
       declaration: false, // Only generate declarations once (in ESM build)
+      declarationMap: false,
       rootDir: 'src',
       exclude: ['**/*.test.ts', '**/*.test.js', 'dist/**/*'],
     }),

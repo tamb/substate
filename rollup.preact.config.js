@@ -14,6 +14,7 @@ export default {
   plugins: [
     typescript({
       declaration: false,
+      declarationMap: false,
       exclude: ["**/*.test.ts", "**/*.test.js", "dist/**/*", "integration-tests/**/*", "build-tests/**/*", "performance-tests/**/*"],
     }),
     resolve({
