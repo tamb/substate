@@ -1,10 +1,16 @@
 import { useState } from 'preact/hooks'
-import { createStore } from 'substate'
+import { createStore, type IState } from 'substate'
 import { useSubstate, useSubstateActions } from 'substate/preact'
 import './app.css'
 
-// Create stores - same as React version to test compatibility
-const counterStore = createStore({
+// Define state interface that extends IState
+interface CounterState extends IState {
+  count: number
+  lastUpdated: number
+}
+
+// Create stores - with full type safety
+const counterStore = createStore<CounterState>({
   name: 'PreactCounterStore', 
   state: { count: 0, lastUpdated: Date.now() }
 })
@@ -40,8 +46,8 @@ export function App() {
 }
 
 function CounterDemo() {
-  const count = useSubstate(counterStore, state => state.count as number)
-  const lastUpdated = useSubstate(counterStore, state => state.lastUpdated as number)
+  const count = useSubstate(counterStore, state => state.count)
+  const lastUpdated = useSubstate(counterStore, state => state.lastUpdated)
   const { updateState, resetState, getMemoryUsage } = useSubstateActions(counterStore)
   
   const increment = () => {

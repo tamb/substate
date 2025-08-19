@@ -1,15 +1,19 @@
-import React from 'react'
-import type { ISubstate } from 'substate'
+import type { IState, ISubstate } from 'substate'
 import { useSubstate, useSubstateActions } from 'substate/react'
 
+interface CounterState extends IState {
+  count: number
+  lastUpdated: number
+}
+
 interface CounterProps {
-  store: ISubstate
+  store: ISubstate<CounterState>
 }
 
 export default function Counter({ store }: CounterProps) {
   // Test selector optimization - only re-renders when count changes
-  const count = useSubstate(store, state => state.count as number)
-  const lastUpdated = useSubstate(store, state => state.lastUpdated as number)
+  const count = useSubstate(store, (state) => state.count)
+  const lastUpdated = useSubstate(store, (state) => state.lastUpdated)
   
   // Test comprehensive actions hook
   const { 
@@ -64,7 +68,7 @@ export default function Counter({ store }: CounterProps) {
         <div style={{ marginBottom: '1rem' }}>
           <h4>Tagged States (Click to jump):</h4>
           <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
-            {availableTags.slice(-5).map(tag => (
+            {availableTags.slice(-5).map((tag : string) => (
               <button
                 key={tag}
                 onClick={() => jumpToTag(tag)}

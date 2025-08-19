@@ -4,11 +4,14 @@ import type { ICreateStoreConfig } from './createStore.interface';
 
 /**
  * Factory function to create a new Substate store
+ * @template TState - The type of the state object
  * @param config - Configuration object for the store
- * @returns A new Substate instance
+ * @returns A new Substate instance with typed state
  */
-function createStore(config: ICreateStoreConfig): Substate {
-  const substateConfig: IConfig = {
+function createStore<TState extends Record<string, unknown> = Record<string, unknown>>(
+  config: ICreateStoreConfig<TState>
+): Substate<TState> {
+  const substateConfig: IConfig<TState> = {
     name: config.name,
     state: config.state,
     defaultDeep: config.defaultDeep ?? false,
@@ -17,7 +20,7 @@ function createStore(config: ICreateStoreConfig): Substate {
     maxHistorySize: config.maxHistorySize ?? 50,
   };
 
-  return new Substate(substateConfig);
+  return new Substate<TState>(substateConfig);
 }
 
 export { createStore };

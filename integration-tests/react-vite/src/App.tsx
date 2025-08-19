@@ -1,21 +1,39 @@
-import React, { useState } from 'react'
-import { createStore } from 'substate'
-import { useSubstate, useSubstateActions } from 'substate/react'
+import { useState } from 'react'
+import { createStore, type IState } from 'substate'
 import Counter from './components/Counter'
 import TodoApp from './components/TodoApp'
 import './App.css'
 
-// Create stores outside React - demonstrates framework-agnostic nature
-const counterStore = createStore({
+// Define state interfaces that extend IState
+interface CounterState extends IState {
+  count: number
+  lastUpdated: number
+}
+
+interface Todo {
+  id: string
+  text: string
+  completed: boolean
+  createdAt: number
+}
+
+interface TodoState extends IState {
+  todos: Todo[]
+  filter: 'all' | 'active' | 'completed'
+  newTodoText: string
+}
+
+// Create stores outside React - demonstrates framework-agnostic nature with full type safety
+const counterStore = createStore<CounterState>({
   name: 'CounterStore',
   state: { count: 0, lastUpdated: Date.now() }
 })
 
-const todoStore = createStore({
+const todoStore = createStore<TodoState>({
   name: 'TodoStore',
   state: {
     todos: [],
-    filter: 'all' as 'all' | 'active' | 'completed',
+    filter: 'all',
     newTodoText: ''
   },
   defaultDeep: true

@@ -57,16 +57,22 @@ function shallowEqual(a: unknown, b: unknown): boolean {
  * // Get nested property with string selector
  * const userName = useSubstate(store, 'user.profile.name');
  */
-function useSubstate(store: ISubstate): IState;
-function useSubstate<T>(store: ISubstate, selector: StateSelector<T>): T;
-function useSubstate(store: ISubstate, selector: StringSelector): unknown;
-function useSubstate<T>(
-  store: ISubstate,
-  selector?: StateSelector<T> | StringSelector
-): T | IState | unknown {
+function useSubstate<TState extends IState = IState>(store: ISubstate<TState>): TState;
+function useSubstate<TState extends IState = IState, TReturn = unknown>(
+  store: ISubstate<TState>,
+  selector: StateSelector<TState, TReturn>
+): TReturn;
+function useSubstate<TState extends IState = IState>(
+  store: ISubstate<TState>,
+  selector: StringSelector
+): unknown;
+function useSubstate<TState extends IState = IState, TReturn = unknown>(
+  store: ISubstate<TState>,
+  selector?: StateSelector<TState, TReturn> | StringSelector
+): TReturn | TState | unknown {
   // Memoize the selector function to prevent unnecessary re-subscriptions
   const memoizedSelector = useCallback(
-    (state: IState) => {
+    (state: TState) => {
       if (!selector) {
         return state;
       }
@@ -92,7 +98,7 @@ function useSubstate<T>(
 
   useEffect(() => {
     // Update handler that only triggers re-render if selected value actually changed
-    const handleStateUpdate = (newState: IState) => {
+    const handleStateUpdate = (newState: TState) => {
       const newSelectedValue = memoizedSelector(newState);
 
       // Only update if the selected value has actually changed (shallow equality)

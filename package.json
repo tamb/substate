@@ -8,17 +8,17 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.esm.js",
-      "require": "./dist/index.umd.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.umd.js"
     },
     "./react": {
-      "import": "./dist/react/index.js",
-      "types": "./dist/react/index.d.ts"
+      "types": "./dist/react/index.d.ts",
+      "import": "./dist/react/index.js"
     },
     "./preact": {
-      "import": "./dist/preact/index.js",
-      "types": "./dist/preact/index.d.ts"
+      "types": "./dist/preact/index.d.ts",
+      "import": "./dist/preact/index.js"
     }
   },
   "files": [
@@ -36,7 +36,7 @@
     "dist/preact"
   ],
   "scripts": {
-    "build": "npm run clean && rollup -c",
+    "build": "npm run clean && rollup -c && node scripts/copy-declarations.js",
     "clean": "rimraf dist",
     "check": "biome check src/",
     "check:fix": "biome check --write src/",

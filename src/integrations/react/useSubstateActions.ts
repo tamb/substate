@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import type { ISubstate } from '../../core/Substate/Substate.interface';
+import type { IState, ISubstate } from '../../core/Substate/Substate.interface';
 import type { SubstateActions } from './types';
 
 /**
@@ -21,7 +21,9 @@ import type { SubstateActions } from './types';
  * updateState({ count: count + 1 });
  * jumpToTag('checkpoint-1');
  */
-export function useSubstateActions(store: ISubstate): SubstateActions {
+export function useSubstateActions<TState extends IState = IState>(
+  store: ISubstate<TState>
+): SubstateActions<TState> {
   return useMemo(
     () => ({
       // Core state methods

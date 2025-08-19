@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react'
-import type { ISubstate } from 'substate'
+import type { IState, ISubstate } from 'substate'
 import { useSubstate, useSubstateActions } from 'substate/react'
 
 interface Todo {
@@ -9,17 +9,23 @@ interface Todo {
   createdAt: number
 }
 
+interface TodoState extends IState {
+  todos: Todo[]
+  filter: 'all' | 'active' | 'completed'
+  newTodoText: string
+}
+
 interface TodoProps {
-  store: ISubstate
+  store: ISubstate<TodoState>
 }
 
 export default function TodoApp({ store }: TodoProps) {
   const formRef = useRef<HTMLFormElement>(null)
   
   // Test multiple selectors for performance optimization
-  const todos = useSubstate(store, state => state.todos as Todo[])
-  const filter = useSubstate(store, state => state.filter as 'all' | 'active' | 'completed')
-  const newTodoText = useSubstate(store, state => state.newTodoText as string)
+  const todos = useSubstate(store, (state) => state.todos)
+  const filter = useSubstate(store, (state) => state.filter)
+  const newTodoText = useSubstate(store, (state) => state.newTodoText)
   
   const { 
     updateState, 
@@ -37,7 +43,7 @@ export default function TodoApp({ store }: TodoProps) {
     if (!inputElement) return
     
     const unsync = sync({
-      readerObj: inputElement,
+      readerObj: inputElement as unknown as Record<string, unknown>,
       stateField: 'newTodoText',
       readField: 'value'
     })
@@ -65,7 +71,7 @@ export default function TodoApp({ store }: TodoProps) {
   
   const toggleTodo = (id: string) => {
     updateState({
-      todos: todos.map(todo =>
+      todos: todos.map((todo : Todo) =>
         todo.id === id ? { ...todo, completed: !todo.completed } : todo
       ),
       $tag: `toggled-${id.slice(0, 8)}`
@@ -73,14 +79,14 @@ export default function TodoApp({ store }: TodoProps) {
   }
   
   const deleteTodo = (id: string) => {
-    const todoText = todos.find(t => t.id === id)?.text || 'todo'
+    const todoText = todos.find((t : Todo) => t.id === id)?.text || 'todo'
     updateState({
-      todos: todos.filter(todo => todo.id !== id),
+      todos: todos.filter((todo : Todo) => todo.id !== id),
       $tag: `deleted-${todoText.slice(0, 10)}`
     })
   }
   
-  const filteredTodos = todos.filter(todo => {
+  const filteredTodos = todos.filter((todo : Todo) => {
     switch (filter) {
       case 'active': return !todo.completed
       case 'completed': return todo.completed
@@ -90,8 +96,8 @@ export default function TodoApp({ store }: TodoProps) {
   
   const stats = {
     total: todos.length,
-    active: todos.filter(t => !t.completed).length,
-    completed: todos.filter(t => t.completed).length
+    active: todos.filter((t : Todo) => !t.completed).length,
+    completed: todos.filter((t : Todo) => t.completed).length
   }
   
   const availableTags = getAvailableTags()
@@ -157,7 +163,7 @@ export default function TodoApp({ store }: TodoProps) {
             {filter === 'all' ? 'No todos yet' : `No ${filter} todos`}
           </p>
         ) : (
-          filteredTodos.map(todo => (
+          filteredTodos.map((todo : Todo) => (
             <div 
               key={todo.id}
               style={{
@@ -205,7 +211,7 @@ export default function TodoApp({ store }: TodoProps) {
         <div style={{ marginBottom: '1rem' }}>
           <h4>Recent Actions (Click to undo):</h4>
           <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
-            {availableTags.slice(-5).map(tag => (
+            {availableTags.slice(-5).map((tag : string) => (
               <button
                 key={tag}
                 onClick={() => jumpToTag(tag)}
