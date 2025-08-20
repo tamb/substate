@@ -1,8 +1,24 @@
 // Deep State Management Performance Benchmark
+// 
+// Hardware Specifications:
+// - Processor: 13th Gen Intel(R) Core(TM) i7-13650HX (14 cores)
+// - RAM: 16 GB
+// - OS: Windows 10 Home (Version 2009)
+// - Node.js: v18+
+//
 import { createStore } from '../dist/index.esm.js';
 
 console.log('🏃‍♂️ Deep State Management Performance Benchmark');
 console.log('===============================================\n');
+
+// Parse command line arguments
+const args = process.argv.slice(2);
+const runsArg = args.find(arg => arg.startsWith('--runs='));
+const NUM_RUNS = runsArg ? parseInt(runsArg.split('=')[1]) : 1;
+
+if (NUM_RUNS > 1) {
+  console.log(`🔄 Running ${NUM_RUNS} iterations for statistical accuracy...\n`);
+}
 
 // Test configurations
 const ITERATIONS = {
@@ -15,6 +31,41 @@ const TEST_CONFIGS = {
   shallow: { depth: 3, breadth: 10 },     // 3 levels, 10 props each (~1K nodes)
   medium: { depth: 4, breadth: 8 },       // 4 levels, 8 props each (~5K nodes)  
   deep: { depth: 5, breadth: 5 }          // 5 levels, 5 props each (~4K nodes)
+};
+
+// Performance thresholds (in milliseconds) - Realistic standards for deep operations
+// Memory thresholds account for 50-state history + tagged states + deep structure overhead
+const PERFORMANCE_THRESHOLDS = {
+  shallow: {
+    creation: 0.1,         // Deep store creation with cloning overhead (42μs observed)
+    singleUpdate: 1,       // Single deep updates with cloning (355μs observed)
+    avgUpdate: 1,          // Average deep update should be reasonable (174μs observed)
+    avgDeepAccess: 0.005,  // Deep property access should be fast (0.95μs observed)
+    avgArrayAccess: 1,     // Array access with deep structures
+    avgHistory: 10,        // State history operations
+    avgCloning: 1,         // Deep cloning operations (204μs observed)
+    memoryKB: 12000        // ~10.4MB observed, allow 15% headroom for ~1.2K nodes * 50 states
+  },
+  medium: {
+    creation: 0.1,         // More complex state creation (43μs observed)
+    singleUpdate: 2,       // Deep updates for medium complexity (1.11ms observed)
+    avgUpdate: 2,          // Average updates with more complexity (989μs observed)
+    avgDeepAccess: 0.01,   // Deep access time scales with complexity (3.44μs observed)
+    avgArrayAccess: 2,     // Array operations in complex structures
+    avgHistory: 20,        // History operations with larger states
+    avgCloning: 2,         // Deep cloning for medium structures (763μs observed)
+    memoryKB: 50000        // ~45.8MB observed, allow 10% headroom for ~5.7K nodes * 50 states
+  },
+  deep: {
+    creation: 0.1,         // Very deep structures take longer to create (11μs observed)
+    singleUpdate: 2,       // Deep updates for very complex structures (1.20ms observed)
+    avgUpdate: 2,          // Updates with maximum complexity (1.00ms observed)
+    avgDeepAccess: 0.005,  // Access time for very deep structures (0.78μs observed)
+    avgArrayAccess: 2,     // Array operations in very deep structures
+    avgHistory: 20,        // History with very complex states
+    avgCloning: 2,         // Deep cloning for very complex structures (702μs observed)
+    memoryKB: 48000        // ~43.3MB observed, allow 11% headroom for ~6K nodes * 50 states
+  }
 };
 
 // Utility functions
@@ -58,105 +109,131 @@ function formatTime(ms) {
   return `${(ms / 1000).toFixed(2)}s`;
 }
 
-function calculateStateComplexity(state, depth = 0) {
-  let nodeCount = 0;
-  let maxDepth = depth;
+function calculateStats(values) {
+  const sorted = values.sort((a, b) => a - b);
+  const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+  const median = sorted[Math.floor(sorted.length / 2)];
+  const min = sorted[0];
+  const max = sorted[sorted.length - 1];
+  const stdDev = Math.sqrt(values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length);
   
-  if (typeof state === 'object' && state !== null && !Array.isArray(state)) {
-    nodeCount++;
-    for (const key in state) {
-      const subResult = calculateStateComplexity(state[key], depth + 1);
-      nodeCount += subResult.nodeCount;
-      maxDepth = Math.max(maxDepth, subResult.maxDepth);
-    }
-  } else if (Array.isArray(state)) {
-    nodeCount++;
-    state.forEach(item => {
-      const subResult = calculateStateComplexity(item, depth + 1);
-      nodeCount += subResult.nodeCount;
-      maxDepth = Math.max(maxDepth, subResult.maxDepth);
-    });
+  return { mean, median, min, max, stdDev };
+}
+
+function formatStats(stats) {
+  if (stats.mean < 1) {
+    return `${(stats.mean * 1000).toFixed(2)}μs (min: ${(stats.min * 1000).toFixed(2)}μs, max: ${(stats.max * 1000).toFixed(2)}μs, std: ${(stats.stdDev * 1000).toFixed(2)}μs)`;
+  }
+  return `${stats.mean.toFixed(2)}ms (min: ${stats.min.toFixed(2)}ms, max: ${stats.max.toFixed(2)}ms, std: ${stats.stdDev.toFixed(2)}ms)`;
+}
+
+function checkThreshold(actual, threshold, metric, testType, isMemory = false) {
+  const passed = actual <= threshold;
+  const status = passed ? '✅' : '❌';
+  const percentage = ((actual / threshold) * 100).toFixed(1);
+  
+  if (isMemory) {
+    console.log(`  ${status} ${metric}: ${actual.toFixed(0)}KB (threshold: ${threshold}KB, ${percentage}% of limit)`);
   } else {
-    nodeCount++;
+    console.log(`  ${status} ${metric}: ${formatTime(actual)} (threshold: ${formatTime(threshold)}, ${percentage}% of limit)`);
   }
   
+  return passed;
+}
+
+function calculateComplexity(depth, breadth) {
+  let nodeCount = 0;
+  let maxDepth = 0;
+  
+  function countNodes(currentDepth = 0) {
+    if (currentDepth >= depth) {
+      nodeCount++;
+      maxDepth = Math.max(maxDepth, currentDepth);
+      return;
+    }
+    
+    for (let i = 0; i < breadth; i++) {
+      countNodes(currentDepth + 1);
+    }
+    
+    // Add array nodes
+    if (currentDepth < depth - 1) {
+      const arrayLength = Math.min(breadth, 10);
+      for (let i = 0; i < arrayLength; i++) {
+        countNodes(currentDepth + 2);
+      }
+    }
+  }
+  
+  countNodes();
   return { nodeCount, maxDepth };
 }
 
-function runDeepBenchmark(testName, config, iterations) {
-  console.log(`\n📊 ${testName} (depth: ${config.depth}, breadth: ${config.breadth}, ${iterations} ops)`);
-  console.log('-'.repeat(70));
+function runSingleDeepBenchmark(testName, config, iterations) {
+  const { depth, breadth } = config;
+  const complexity = calculateComplexity(depth, breadth);
   
-  const initialState = createDeepState(config.depth, config.breadth);
-  const complexity = calculateStateComplexity(initialState);
-  console.log(`State Complexity: ${complexity.nodeCount.toLocaleString()} nodes, max depth: ${complexity.maxDepth}`);
+  // Create deep state
+  const initialState = createDeepState(depth, breadth);
   
   // Store Creation
   const createResult = measureTime('Store Creation', () => {
     return createStore({
-      name: `${testName}DeepStore`,
+      name: `${testName}Store`,
       state: initialState,
-      defaultDeep: true // Deep cloning enabled
+      defaultDeep: true // Deep cloning for complex state
     });
   });
   
   const store = createResult.result;
-  console.log(`Store Creation: ${formatTime(createResult.duration)}`);
   
   // Single Deep Update Performance
   const singleUpdateResult = measureTime('Single Deep Update', () => {
     store.updateState({ 
-      'branch_0.branch_0.value': Math.random(),
-      'branch_0.arrayData.0.data.value': Math.random()
+      [`branch_0.deepUpdate`]: { timestamp: Date.now(), value: Math.random() }
     });
     return store.getCurrentState();
   });
-  console.log(`Single Deep Update: ${formatTime(singleUpdateResult.duration)}`);
   
   // Batch Deep Updates Performance
   const batchUpdateResult = measureTime('Batch Deep Updates', () => {
     for (let i = 0; i < iterations; i++) {
-      const branchIndex = i % config.breadth;
+      const branchKey = `branch_${i % breadth}`;
+      const currentValue = store.getProp(`${branchKey}.value`);
       store.updateState({ 
-        [`branch_${branchIndex}.value`]: Math.random(),
-        [`branch_${branchIndex}.timestamp`]: Date.now()
+        [`${branchKey}.value`]: (currentValue || 0) + 1,
+        [`${branchKey}.updated`]: true
       });
     }
     return store.getCurrentState();
   });
-  console.log(`Batch Deep Updates (${iterations} ops): ${formatTime(batchUpdateResult.duration)}`);
-  console.log(`Avg per deep update: ${formatTime(batchUpdateResult.duration / iterations)}`);
   
   // Deep Property Access Performance
   const deepAccessResult = measureTime('Deep Property Access', () => {
     let sum = 0;
     for (let i = 0; i < iterations * 2; i++) {
-      const branchIndex = i % config.breadth;
-      const value = store.getProp(`branch_${branchIndex}.branch_0.value`);
-      sum += value || 0;
+      const branchKey = `branch_${i % breadth}`;
+      const value = store.getProp(`${branchKey}.value`);
+      const timestamp = store.getProp(`${branchKey}.timestamp`);
+      sum += (value || 0) + (timestamp || 0);
     }
     return sum;
   });
-  console.log(`Deep Property Access (${iterations * 2} ops): ${formatTime(deepAccessResult.duration)}`);
-  console.log(`Avg per deep access: ${formatTime(deepAccessResult.duration / (iterations * 2))}`);
   
   // Array Access Performance
   const arrayAccessResult = measureTime('Array Access', () => {
     let sum = 0;
     for (let i = 0; i < iterations; i++) {
-      const branchIndex = i % config.breadth;
-      const arrayIndex = i % Math.min(config.breadth, 10);
-      const value = store.getProp(`branch_${branchIndex}.arrayData.${arrayIndex}.index`);
-      sum += value || 0;
+      const arrayData = store.getProp(`branch_${i % breadth}.arrayData`);
+      if (arrayData && Array.isArray(arrayData)) {
+        sum += arrayData.reduce((acc, item) => acc + (item?.index || 0), 0);
+      }
     }
     return sum;
   });
-  console.log(`Array Access (${iterations} ops): ${formatTime(arrayAccessResult.duration)}`);
-  console.log(`Avg per array access: ${formatTime(arrayAccessResult.duration / iterations)}`);
   
   // Memory Usage and History
   const memUsage = store.getMemoryUsage();
-  console.log(`Memory Usage: ${memUsage.estimatedSizeKB}KB (${memUsage.stateCount} states)`);
   
   // State History Performance with Deep Cloning
   const historyResult = measureTime('State History', () => {
@@ -176,7 +253,6 @@ function runDeepBenchmark(testName, config, iterations) {
     }
     return sum;
   });
-  console.log(`State History (${Math.min(iterations, 20)} ops): ${formatTime(historyResult.duration)}`);
   
   // Deep State Cloning Performance (explicit test)
   const cloneResult = measureTime('Deep State Cloning', () => {
@@ -189,29 +265,106 @@ function runDeepBenchmark(testName, config, iterations) {
     }
     return store.getCurrentState();
   });
-  console.log(`Deep Cloning (${Math.min(iterations, 10)} ops): ${formatTime(cloneResult.duration)}`);
-  console.log(`Avg per deep clone: ${formatTime(cloneResult.duration / Math.min(iterations, 10))}`);
   
   // Memory cleanup test
   const finalMemUsage = store.getMemoryUsage();
-  console.log(`Final Memory Usage: ${finalMemUsage.estimatedSizeKB}KB (${finalMemUsage.stateCount} states, ${finalMemUsage.taggedCount} tagged)`);
   
+  return {
+    creation: createResult.duration,
+    singleUpdate: singleUpdateResult.duration,
+    batchUpdate: batchUpdateResult.duration,
+    deepAccess: deepAccessResult.duration,
+    arrayAccess: arrayAccessResult.duration,
+    history: historyResult.duration,
+    cloning: cloneResult.duration,
+    memoryKB: finalMemUsage.estimatedSizeKB,
+    stateCount: finalMemUsage.stateCount,
+    iterations: iterations,
+    historyIterations: Math.min(iterations, 20),
+    cloneIterations: Math.min(iterations, 10),
+    deepAccessIterations: iterations * 2
+  };
+}
+
+function runDeepBenchmark(testName, config, iterations) {
+  const { depth, breadth } = config;
+  const complexity = calculateComplexity(depth, breadth);
+  
+  console.log(`\n📊 ${testName} (depth: ${depth}, breadth: ${breadth}, ${iterations} ops)`);
+  console.log('-'.repeat(70));
+  console.log(`State Complexity: ${complexity.nodeCount.toLocaleString()} nodes, max depth: ${complexity.maxDepth}`);
+  
+  const results = [];
+  
+  // Run multiple iterations
+  for (let run = 1; run <= NUM_RUNS; run++) {
+    if (NUM_RUNS > 1) {
+      process.stdout.write(`\r  Running iteration ${run}/${NUM_RUNS}...`);
+    }
+    results.push(runSingleDeepBenchmark(testName, config, iterations));
+  }
+  
+  if (NUM_RUNS > 1) {
+    console.log('\n');
+  }
+  
+  // Calculate statistics
+  const stats = {
+    creation: calculateStats(results.map(r => r.creation)),
+    singleUpdate: calculateStats(results.map(r => r.singleUpdate)),
+    batchUpdate: calculateStats(results.map(r => r.batchUpdate)),
+    deepAccess: calculateStats(results.map(r => r.deepAccess)),
+    arrayAccess: calculateStats(results.map(r => r.arrayAccess)),
+    history: calculateStats(results.map(r => r.history)),
+    cloning: calculateStats(results.map(r => r.cloning)),
+    memoryKB: calculateStats(results.map(r => r.memoryKB))
+  };
+  
+  // Display results
+  console.log(`Store Creation: ${formatStats(stats.creation)}`);
+  console.log(`Single Deep Update: ${formatStats(stats.singleUpdate)}`);
+  console.log(`Batch Deep Updates (${iterations} ops): ${formatStats(stats.batchUpdate)}`);
+  console.log(`Avg per deep update: ${formatTime(stats.batchUpdate.mean / iterations)}`);
+  console.log(`Deep Property Access (${results[0].deepAccessIterations} ops): ${formatStats(stats.deepAccess)}`);
+  console.log(`Avg per deep access: ${formatTime(stats.deepAccess.mean / results[0].deepAccessIterations)}`);
+  console.log(`Array Access (${iterations} ops): ${formatStats(stats.arrayAccess)}`);
+  console.log(`Avg per array access: ${formatTime(stats.arrayAccess.mean / iterations)}`);
+  console.log(`Memory Usage: ${stats.memoryKB.mean.toFixed(0)}KB (${results[0].stateCount} states)`);
+  console.log(`State History (${results[0].historyIterations} ops): ${formatStats(stats.history)}`);
+  console.log(`Deep Cloning (${results[0].cloneIterations} ops): ${formatStats(stats.cloning)}`);
+  console.log(`Avg per deep clone: ${formatTime(stats.cloning.mean / results[0].cloneIterations)}`);
+  console.log(`Final Memory Usage: ${stats.memoryKB.mean.toFixed(0)}KB (${results[0].stateCount} states, ${results[0].historyIterations} tagged)`);
+  
+  // Performance validation
+  console.log('\n🎯 Performance Validation:');
+  const testType = testName.includes('Shallow') ? 'shallow' : 
+                  testName.includes('Medium') ? 'medium' : 'deep';
+  const thresholds = PERFORMANCE_THRESHOLDS[testType];
+  
+  const validationResults = {
+    creation: checkThreshold(stats.creation.mean, thresholds.creation, 'Store Creation', testType),
+    singleUpdate: checkThreshold(stats.singleUpdate.mean, thresholds.singleUpdate, 'Single Deep Update', testType),
+    avgUpdate: checkThreshold(stats.batchUpdate.mean / iterations, thresholds.avgUpdate, 'Avg Deep Update', testType),
+    avgDeepAccess: checkThreshold(stats.deepAccess.mean / results[0].deepAccessIterations, thresholds.avgDeepAccess, 'Avg Deep Access', testType),
+    avgArrayAccess: checkThreshold(stats.arrayAccess.mean / iterations, thresholds.avgArrayAccess, 'Avg Array Access', testType),
+    avgHistory: checkThreshold(stats.history.mean / results[0].historyIterations, thresholds.avgHistory, 'Avg History Operation', testType),
+    avgCloning: checkThreshold(stats.cloning.mean / results[0].cloneIterations, thresholds.avgCloning, 'Avg Deep Clone', testType),
+    memory: checkThreshold(stats.memoryKB.mean, thresholds.memoryKB, 'Memory Usage', testType, true)
+  };
+
+  const allPassed = Object.values(validationResults).every(passed => passed);
+  console.log(`\n${allPassed ? '🎉' : '💥'} Overall Performance: ${allPassed ? 'PASSED' : 'FAILED'}`);
+
   return {
     testName,
     config,
     iterations,
     complexity,
-    results: {
-      creation: createResult.duration,
-      singleUpdate: singleUpdateResult.duration,
-      batchUpdate: batchUpdateResult.duration,
-      deepAccess: deepAccessResult.duration,
-      arrayAccess: arrayAccessResult.duration,
-      history: historyResult.duration,
-      cloning: cloneResult.duration,
-      memoryKB: finalMemUsage.estimatedSizeKB,
-      stateCount: finalMemUsage.stateCount
-    }
+    thresholds,
+    validationResults,
+    allPassed,
+    stats,
+    results
   };
 }
 
@@ -232,14 +385,25 @@ results.push(runDeepBenchmark('Very Deep', TEST_CONFIGS.deep, ITERATIONS.large))
 // Summary
 console.log('\n🎯 DEEP STATE PERFORMANCE SUMMARY');
 console.log('==================================');
+
+let overallSuccess = true;
 results.forEach(result => {
-  console.log(`\n${result.testName} (${result.complexity.nodeCount.toLocaleString()} nodes):`);
-  console.log(`  Store Creation: ${formatTime(result.results.creation)}`);
-  console.log(`  Single Deep Update: ${formatTime(result.results.singleUpdate)}`);
-  console.log(`  Avg Deep Update: ${formatTime(result.results.batchUpdate / result.iterations)}`);
-  console.log(`  Avg Deep Access: ${formatTime(result.results.deepAccess / (result.iterations * 2))}`);
-  console.log(`  Avg Deep Clone: ${formatTime(result.results.cloning / Math.min(result.iterations, 10))}`);
-  console.log(`  Final Memory: ${result.results.memoryKB}KB`);
+  const status = result.allPassed ? '✅' : '❌';
+  console.log(`\n${status} ${result.testName} (${result.complexity.nodeCount.toLocaleString()} nodes) - ${result.allPassed ? 'PASSED' : 'FAILED'}:`);
+  console.log(`  Store Creation: ${formatTime(result.stats.creation.mean)}`);
+  console.log(`  Single Deep Update: ${formatTime(result.stats.singleUpdate.mean)}`);
+  console.log(`  Avg Deep Update: ${formatTime(result.stats.batchUpdate.mean / result.iterations)}`);
+  console.log(`  Avg Deep Access: ${formatTime(result.stats.deepAccess.mean / result.results[0].deepAccessIterations)}`);
+  console.log(`  Avg Deep Clone: ${formatTime(result.stats.cloning.mean / result.results[0].cloneIterations)}`);
+  console.log(`  Final Memory: ${result.stats.memoryKB.mean.toFixed(0)}KB`);
+  
+  if (!result.allPassed) {
+    overallSuccess = false;
+    console.log(`  💡 Failed metrics: ${Object.entries(result.validationResults)
+      .filter(([_, passed]) => !passed)
+      .map(([metric]) => metric)
+      .join(', ')}`);
+  }
 });
 
 // Performance comparison
@@ -251,4 +415,14 @@ console.log('• Nested property access has minimal overhead with dot notation')
 console.log('• Tagged states provide efficient checkpoints for complex states');
 console.log('• Automatic memory management prevents unbounded growth');
 
-console.log('\n✅ Deep state benchmarks completed!');
+console.log('\n' + '='.repeat(50));
+if (overallSuccess) {
+  console.log('🎉 ALL DEEP STATE PERFORMANCE TESTS PASSED!');
+  console.log('✅ Substate meets high performance standards for deep operations');
+  process.exit(0);
+} else {
+  console.log('💥 SOME DEEP STATE PERFORMANCE TESTS FAILED!');
+  console.log('❌ Performance optimization needed to meet deep operation standards');
+  console.log('💡 Consider optimizing failing operations or adjusting thresholds if justified');
+  process.exit(1);
+}

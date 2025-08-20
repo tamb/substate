@@ -1,5 +1,5 @@
-import cloneDeep from 'clone-deep';
 import byString from 'object-bystring';
+import rfdc from 'rfdc';
 
 import { PubSub } from '../PubSub/PubSub';
 import type {
@@ -12,6 +12,7 @@ import type {
 } from './Substate.interface';
 
 const S: string = 'UPDATE_STATE';
+const cloneDeep = rfdc();
 
 /**
  * Substate - A lightweight, pub/sub-based state management library
@@ -19,6 +20,7 @@ const S: string = 'UPDATE_STATE';
  * Substate provides immutable state management with middleware support, state history,
  * and a powerful sync feature for unidirectional data binding to external objects.
  *
+ * @template TState - The type of the state object stored in this Substate instance
  * @class Substate
  * @extends PubSub
  * @implements ISubstate
@@ -78,17 +80,17 @@ const S: string = 'UPDATE_STATE';
  *
  * @since 1.0.0
  */
-class Substate extends PubSub implements ISubstate {
+class Substate<TState extends IState = IState> extends PubSub implements ISubstate<TState> {
   name: string;
-  afterUpdate: UpdateMiddleware[] | [];
-  beforeUpdate: UpdateMiddleware[] | [];
+  afterUpdate: UpdateMiddleware<TState>[] | [];
+  beforeUpdate: UpdateMiddleware<TState>[] | [];
   currentState: number;
-  stateStorage: IState[];
+  stateStorage: TState[];
   defaultDeep: boolean;
   maxHistorySize: number;
-  taggedStates: Map<string, { stateIndex: number; state: IState }>;
+  taggedStates: Map<string, { stateIndex: number; state: TState }>;
 
-  constructor(obj: IConfig = {}) {
+  constructor(obj: IConfig<TState> = {} as IConfig<TState>) {
     super();
 
     this.name = obj.name || 'SubStateInstance';
@@ -100,7 +102,7 @@ class Substate extends PubSub implements ISubstate {
     this.maxHistorySize = obj.maxHistorySize || 50;
     this.taggedStates = new Map();
 
-    if (obj.state) this.stateStorage.push(obj.state as unknown as IState);
+    if (obj.state) this.stateStorage.push(obj.state);
     this.on(S, this.updateState.bind(this));
   }
 
@@ -109,7 +111,7 @@ class Substate extends PubSub implements ISubstate {
    * @param index - The index of the state to get
    * @returns The state
    */
-  public getState(index: number): IState {
+  public getState(index: number): TState {
     return this.stateStorage[index];
   }
 
@@ -117,8 +119,8 @@ class Substate extends PubSub implements ISubstate {
    * Gets the current state
    * @returns The current state
    */
-  public getCurrentState(): IState {
-    return this.getState(this.currentState) as IState;
+  public getCurrentState(): TState {
+    return this.getState(this.currentState);
   }
 
   /**
@@ -145,7 +147,7 @@ class Substate extends PubSub implements ISubstate {
    * Also updates tagged state indices when history is trimmed
    * @param newState - The new state object
    */
-  private pushState(newState: IState): void {
+  private pushState(newState: TState): void {
     this.stateStorage.push(newState);
 
     // Trim history if it exceeds the maximum size
@@ -178,8 +180,10 @@ class Substate extends PubSub implements ISubstate {
    * @param deep - Whether to clone the state deeply
    * @returns The cloned state
    */
-  private cloneState(deep: boolean): IState {
-    return deep ? cloneDeep(this.getCurrentState()) : Object.assign({}, this.getCurrentState());
+  private cloneState(deep: boolean): TState {
+    return deep
+      ? cloneDeep(this.getCurrentState())
+      : Object.assign({} as TState, this.getCurrentState());
   }
 
   /**
@@ -210,7 +214,7 @@ class Substate extends PubSub implements ISubstate {
    * Updates the state with a new state object
    * @param action - The new state object
    */
-  public updateState(action: IState): void {
+  public updateState(action: Partial<TState> & IState): void {
     this.fireBeforeMiddleware(action);
     let deep: boolean = this.defaultDeep;
     if (action.$deep !== undefined) deep = action.$deep;
@@ -222,8 +226,8 @@ class Substate extends PubSub implements ISubstate {
       //update cloned state
     }
 
-    if (!this.defaultDeep) newState.$deep = false; // reset $deep keyword
-    newState.$type = action.$type || S; // set $type if not already set
+    if (!this.defaultDeep) (newState as IState).$deep = false; // reset $deep keyword
+    (newState as IState).$type = action.$type || S; // set $type if not already set
 
     //pushes new state
     this.pushState(newState);
@@ -232,7 +236,7 @@ class Substate extends PubSub implements ISubstate {
     if (action.$tag !== undefined) {
       this.taggedStates.set(action.$tag, {
         stateIndex: this.currentState,
-        state: cloneDeep(newState), // Store a deep copy to prevent mutations
+        state: cloneDeep(newState) as TState, // Store a deep copy to prevent mutations
       });
     }
 
@@ -563,7 +567,7 @@ class Substate extends PubSub implements ISubstate {
    *
    * @since 10.0.0
    */
-  public getTaggedState(tag: string): IState | undefined {
+  public getTaggedState(tag: string): TState | undefined {
     const taggedEntry = this.taggedStates.get(tag);
     return taggedEntry ? cloneDeep(taggedEntry.state) : undefined;
   }
@@ -628,7 +632,7 @@ class Substate extends PubSub implements ISubstate {
     const restoredState = cloneDeep(taggedEntry.state);
 
     // Remove the $tag metadata to avoid re-tagging
-    delete restoredState.$tag;
+    delete (restoredState as IState).$tag;
 
     // Add it as a new state in history
     this.pushState(restoredState);

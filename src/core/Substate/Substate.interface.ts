@@ -3,7 +3,10 @@ import type { IPubSub } from '../PubSub/PubSub.interface';
 // Type definitions for middleware functions
 type BeforeMiddleware = (value: unknown, context: SyncContext) => unknown;
 type AfterMiddleware = (value: unknown, context: SyncContext) => void;
-type UpdateMiddleware = (store: ISubstate, action: IState) => void;
+type UpdateMiddleware<TState extends IState = IState> = (
+  store: ISubstate<TState>,
+  action: IState
+) => void;
 
 interface SyncContext {
   source: string;
@@ -78,22 +81,23 @@ interface ISyncConfig {
 /**
  * Interface defining the public API of the Substate class
  * Extends IPubSub to inherit event management capabilities
+ * @template TState - The type of the state object stored in this Substate instance
  */
-interface ISubstate extends IPubSub {
+interface ISubstate<TState extends IState = IState> extends IPubSub {
   /** Name identifier for this Substate instance */
   name: string;
 
   /** Array of functions called after each state update */
-  afterUpdate: UpdateMiddleware[] | [];
+  afterUpdate: UpdateMiddleware<TState>[] | [];
 
   /** Array of functions called before each state update */
-  beforeUpdate: UpdateMiddleware[] | [];
+  beforeUpdate: UpdateMiddleware<TState>[] | [];
 
   /** Index pointing to the current state in the state history */
   currentState: number;
 
   /** Array storing the complete state history */
-  stateStorage: IState[];
+  stateStorage: TState[];
 
   /** Default setting for deep cloning during state updates */
   defaultDeep: boolean;
@@ -102,10 +106,10 @@ interface ISubstate extends IPubSub {
   maxHistorySize: number;
 
   /** Retrieves a specific state from history by index */
-  getState(index: number): IState;
+  getState(index: number): TState;
 
   /** Gets the current active state object */
-  getCurrentState(): IState;
+  getCurrentState(): TState;
 
   /** Extracts a property value from current state using dot notation */
   getProp(prop: string): unknown;
@@ -114,7 +118,7 @@ interface ISubstate extends IPubSub {
   resetState(): void;
 
   /** Updates the current state with new values and emits change events */
-  updateState(action: IState): void;
+  updateState(action: Partial<TState> & IState): void;
 
   /**
    * Establishes unidirectional sync between state property and target object
@@ -133,7 +137,7 @@ interface ISubstate extends IPubSub {
   getMemoryUsage(): { stateCount: number; taggedCount: number; estimatedSizeKB: number | null };
 
   /** Retrieves a tagged state by its tag name */
-  getTaggedState(tag: string): IState | undefined;
+  getTaggedState(tag: string): TState | undefined;
 
   /** Returns an array of all available tag names */
   getAvailableTags(): string[];
@@ -148,14 +152,14 @@ interface ISubstate extends IPubSub {
   clearTags(): void;
 }
 
-interface IConfig {
+interface IConfig<TState extends IState = IState> {
   name?: string;
-  afterUpdate?: UpdateMiddleware[] | [];
-  beforeUpdate?: UpdateMiddleware[] | [];
+  afterUpdate?: UpdateMiddleware<TState>[] | [];
+  beforeUpdate?: UpdateMiddleware<TState>[] | [];
   currentState?: number;
-  stateStorage?: IState[];
+  stateStorage?: TState[];
   defaultDeep?: boolean;
-  state?: object;
+  state?: TState;
   maxHistorySize?: number;
 }
 

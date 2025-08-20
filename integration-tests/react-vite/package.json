@@ -1,0 +1,31 @@
+{
+  "name": "substate-react-integration-test",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Integration test for Substate React hooks",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "echo \"Running React integration tests...\" && npm run build && vitest run"
+  },
+  "dependencies": {
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "substate": "file:../../"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.4.2",
+    "@testing-library/react": "^16.0.1",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/node": "^24.3.0",
+    "@types/react": "19.1.10",
+    "@types/react-dom": "19.0.1",
+    "@vitejs/plugin-react": "^4.2.1",
+    "jsdom": "^24.0.0",
+    "typescript": "^5.2.2",
+    "vite": "^7.1.2",
+    "vitest": "^3.2.4"
+  }
+}

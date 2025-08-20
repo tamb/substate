@@ -1,0 +1,50 @@
+.app {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.demo-selector {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.demo-selector button {
+  padding: 0.75rem 1.5rem;
+  border: 2px solid #646cff;
+  background: transparent;
+  color: #646cff;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.demo-selector button:hover {
+  background: #646cff;
+  color: white;
+}
+
+.demo-selector button.active {
+  background: #646cff;
+  color: white;
+}
+
+.demo-container {
+  min-height: 400px;
+  padding: 2rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.5rem;
+  background: #fafafa;
+  color: #333;
+}
+
+@media (prefers-color-scheme: dark) {
+  .demo-container {
+    background: #1a1a1a;
+    border-color: #333;
+    color: #fff;
+  }
+}

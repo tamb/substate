@@ -1,11 +1,11 @@
 import type { UpdateMiddleware } from '../Substate/Substate.interface';
 
-interface ICreateStoreConfig {
+interface ICreateStoreConfig<TState extends Record<string, unknown> = Record<string, unknown>> {
   name: string;
-  state?: object;
+  state?: TState;
   defaultDeep?: boolean;
-  beforeUpdate?: UpdateMiddleware[];
-  afterUpdate?: UpdateMiddleware[];
+  beforeUpdate?: UpdateMiddleware<TState>[];
+  afterUpdate?: UpdateMiddleware<TState>[];
   maxHistorySize?: number;
 }
 
