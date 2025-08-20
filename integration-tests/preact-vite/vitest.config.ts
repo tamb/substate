@@ -8,7 +8,7 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
-    isolate: false,
+    isolate: true,
     pool: 'threads',
     environmentOptions: {
       jsdom: {
@@ -17,4 +17,12 @@ export default defineConfig({
       }
     }
   },
+  resolve: {
+    alias: {
+      // Map React testing imports to work with Preact
+      'react': 'preact/compat',
+      'react-dom': 'preact/compat',
+      'react-dom/test-utils': 'preact/test-utils'
+    }
+  }
 })

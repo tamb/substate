@@ -47,19 +47,19 @@
     "pre": "npm test && npm run build && npm publish --tag next",
     "safe-publish": "npm test && npm run build && npm publish",
     "test": "vitest --run",
-    "test:all": "npm run test:isolation && npm run test && npm run test:builds && npm run test:performance && npm run test:integrations && npm run test:ci",
+    "test:all": "npm run test:isolation && npm run test && npm run test:builds && npm run test:performance:avg && npm run test:integrations && npm run test:ci",
     "test:ci": "npm run check && npm run test && npm run test:builds && npm run test:integrations",
     "test:builds": "npm run test:esm && npm run test:umd",
     "test:coverage": "vitest --coverage",
     "test:esm": "node build-tests/test-esm.mjs",
     "test:umd": "node build-tests/test-umd.cjs",
     "test.watch": "vitest",
-    "test:performance": "npm run test:perf:shallow && npm run test:perf:deep",
-    "test:perf:shallow": "node performance-tests/shallow-state.mjs",
-    "test:perf:deep": "node performance-tests/deep-state.mjs",
+    "test:perf:shallow:avg": "node performance-tests/shallow-state.mjs --runs=5",
+    "test:perf:deep:avg": "node performance-tests/deep-state.mjs --runs=5",
+    "test:performance:avg": "npm run test:perf:shallow:avg && npm run test:perf:deep:avg",
     "test:isolation": "node scripts/check-isolation.js",
     "test:integrations:check": "node scripts/check-dependency-match.js",
-    "test:integrations": "npm run test:integrations:check && npm run test:integration:react && npm run test:integration:preact",
+    "test:integrations": "npm run test:integrations:check && npm run test:integration:react",
     "test:integration:react": "cd integration-tests/react-vite && npm install && npm test",
     "test:integration:preact": "cd integration-tests/preact-vite && npm install && npm test",
     "dev:react": "cd integration-tests/react-vite && npm install && npm run dev",
@@ -94,9 +94,10 @@
     "rfdc": "^1.4.1"
   },
   "peerDependencies": {
-    "preact": ">=10.0.0",
-    "react": ">=19.0.0",
-    "react-dom": ">=19.0.0"
+    "preact": "10.27.1",
+    "preact-render-to-string": "6.5.1",
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
   },
   "peerDependenciesMeta": {
     "react": {

@@ -1,8 +1,24 @@
 // Shallow State Management Performance Benchmark
+// 
+// Hardware Specifications:
+// - Processor: 13th Gen Intel(R) Core(TM) i7-13650HX (14 cores)
+// - RAM: 16 GB
+// - OS: Windows 10 Home (Version 2009)
+// - Node.js: v18+
+//
 import { createStore } from '../dist/index.esm.js';
 
 console.log('🏃‍♂️ Shallow State Management Performance Benchmark');
 console.log('================================================\n');
+
+// Parse command line arguments
+const args = process.argv.slice(2);
+const runsArg = args.find(arg => arg.startsWith('--runs='));
+const NUM_RUNS = runsArg ? parseInt(runsArg.split('=')[1]) : 1;
+
+if (NUM_RUNS > 1) {
+  console.log(`🔄 Running ${NUM_RUNS} iterations for statistical accuracy...\n`);
+}
 
 // Test configurations
 const ITERATIONS = {
@@ -17,33 +33,33 @@ const TEST_SIZES = {
   large: 1000     // 1000 properties
 };
 
-// Performance thresholds (in milliseconds) - High standards for production-ready performance
+// Performance thresholds (in milliseconds) - Updated for improved performance
 // Memory thresholds account for 50-state history (default maxHistorySize) with realistic overhead
 const PERFORMANCE_THRESHOLDS = {
   small: {
-    creation: 5,           // Store creation should be nearly instantaneous
-    singleUpdate: 1,       // Single updates should be sub-millisecond
-    avgUpdate: 0.1,        // Average update should be extremely fast
-    avgAccess: 0.01,       // Property access should be ultra-fast
-    avgNestedAccess: 0.05, // Nested access with minimal overhead
+    creation: 0.1,         // Store creation should be extremely fast (41μs observed)
+    singleUpdate: 0.1,     // Single updates should be sub-millisecond (61μs observed)
+    avgUpdate: 0.005,      // Average update should be ultra-fast (1.41μs observed)
+    avgAccess: 0.001,      // Property access should be ultra-fast (0.15μs observed)
+    avgNestedAccess: 0.01, // Nested access with minimal overhead
     avgEvent: 0.1,         // Event firing should be very fast
     memoryKB: 150          // ~127KB observed, allow 20% headroom for 10 props * 50 states
   },
   medium: {
-    creation: 15,          // Still very fast creation for medium state
-    singleUpdate: 2,       // Single updates remain fast
-    avgUpdate: 0.2,        // Slightly higher but still very fast
-    avgAccess: 0.02,       // Access time scales linearly but stays low
-    avgNestedAccess: 0.1,  // Nested access remains efficient
+    creation: 0.1,         // Very fast creation for medium state (29μs observed)
+    singleUpdate: 0.1,     // Single updates remain fast (63μs observed)
+    avgUpdate: 0.05,       // Slightly higher but still very fast (25.93μs observed)
+    avgAccess: 0.001,      // Access time scales linearly but stays low (0.15μs observed)
+    avgNestedAccess: 0.02, // Nested access remains efficient
     avgEvent: 0.2,         // Events should scale well
-    memoryKB: 1500         // ~1257KB observed, allow 20% headroom for 100 props * 50 states
+    memoryKB: 1500         // ~1.3MB observed, allow 20% headroom for 100 props * 50 states
   },
   large: {
-    creation: 50,          // Acceptable creation time for large state
-    singleUpdate: 5,       // Updates should still be fast even for large state
-    avgUpdate: 0.5,        // Individual updates remain quick
-    avgAccess: 0.05,       // Access time should scale well
-    avgNestedAccess: 0.2,  // Nested access with good performance
+    creation: 0.1,         // Very fast creation time for large state (15μs observed)
+    singleUpdate: 1,       // Updates should still be fast even for large state (598μs observed)
+    avgUpdate: 0.5,        // Individual updates remain quick (254μs observed)
+    avgAccess: 0.001,      // Access time should scale well (0.32μs observed)
+    avgNestedAccess: 0.05, // Nested access with good performance
     avgEvent: 0.5,         // Events should remain responsive
     memoryKB: 15000        // ~12.8MB observed, allow 17% headroom for 1000 props * 50 states
   }
@@ -79,6 +95,24 @@ function formatTime(ms) {
   return `${(ms / 1000).toFixed(2)}s`;
 }
 
+function calculateStats(values) {
+  const sorted = values.sort((a, b) => a - b);
+  const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+  const median = sorted[Math.floor(sorted.length / 2)];
+  const min = sorted[0];
+  const max = sorted[sorted.length - 1];
+  const stdDev = Math.sqrt(values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length);
+  
+  return { mean, median, min, max, stdDev };
+}
+
+function formatStats(stats) {
+  if (stats.mean < 1) {
+    return `${(stats.mean * 1000).toFixed(2)}μs (min: ${(stats.min * 1000).toFixed(2)}μs, max: ${(stats.max * 1000).toFixed(2)}μs, std: ${(stats.stdDev * 1000).toFixed(2)}μs)`;
+  }
+  return `${stats.mean.toFixed(2)}ms (min: ${stats.min.toFixed(2)}ms, max: ${stats.max.toFixed(2)}ms, std: ${stats.stdDev.toFixed(2)}ms)`;
+}
+
 function checkThreshold(actual, threshold, metric, testSize, isMemory = false) {
   const passed = actual <= threshold;
   const status = passed ? '✅' : '❌';
@@ -93,10 +127,7 @@ function checkThreshold(actual, threshold, metric, testSize, isMemory = false) {
   return passed;
 }
 
-function runBenchmark(testName, stateSize, iterations) {
-  console.log(`\n📊 ${testName} (${stateSize} props, ${iterations.toLocaleString()} ops)`);
-  console.log('-'.repeat(60));
-  
+function runSingleBenchmark(testName, stateSize, iterations) {
   const initialState = createInitialState(stateSize);
   
   // Store Creation
@@ -109,14 +140,12 @@ function runBenchmark(testName, stateSize, iterations) {
   });
   
   const store = createResult.result;
-  console.log(`Store Creation: ${formatTime(createResult.duration)}`);
   
   // Single Update Performance
   const singleUpdateResult = measureTime('Single Update', () => {
     store.updateState({ prop0: { ...store.getProp('prop0'), updated: true } });
     return store.getCurrentState();
   });
-  console.log(`Single Update: ${formatTime(singleUpdateResult.duration)}`);
   
   // Batch Updates Performance
   const batchUpdateResult = measureTime('Batch Updates', () => {
@@ -129,8 +158,6 @@ function runBenchmark(testName, stateSize, iterations) {
     }
     return store.getCurrentState();
   });
-  console.log(`Batch Updates (${Math.min(iterations, 1000)} ops): ${formatTime(batchUpdateResult.duration)}`);
-  console.log(`Avg per update: ${formatTime(batchUpdateResult.duration / Math.min(iterations, 1000))}`);
   
   // Property Access Performance
   const accessResult = measureTime('Property Access', () => {
@@ -142,8 +169,6 @@ function runBenchmark(testName, stateSize, iterations) {
     }
     return sum;
   });
-  console.log(`Property Access (${iterations.toLocaleString()} ops): ${formatTime(accessResult.duration)}`);
-  console.log(`Avg per access: ${formatTime(accessResult.duration / iterations)}`);
   
   // Nested Property Access Performance  
   const nestedAccessResult = measureTime('Nested Property Access', () => {
@@ -155,12 +180,9 @@ function runBenchmark(testName, stateSize, iterations) {
     }
     return sum;
   });
-  console.log(`Nested Access (${iterations.toLocaleString()} ops): ${formatTime(nestedAccessResult.duration)}`);
-  console.log(`Avg per nested access: ${formatTime(nestedAccessResult.duration / iterations)}`);
   
   // Memory Usage
   const memUsage = store.getMemoryUsage();
-  console.log(`Memory Usage: ${memUsage.estimatedSizeKB}KB (${memUsage.stateCount} states)`);
   
   // Event System Performance
   let eventCount = 0;
@@ -173,10 +195,64 @@ function runBenchmark(testName, stateSize, iterations) {
     }
     return eventCount;
   });
-  console.log(`Event System (${Math.min(iterations, 100)} events): ${formatTime(eventResult.duration)}`);
-  console.log(`Avg per event: ${formatTime(eventResult.duration / Math.min(iterations, 100))}`);
   
   store.off('STATE_UPDATED', listener);
+  
+  return {
+    creation: createResult.duration,
+    singleUpdate: singleUpdateResult.duration,
+    batchUpdate: batchUpdateResult.duration,
+    propertyAccess: accessResult.duration,
+    nestedAccess: nestedAccessResult.duration,
+    eventSystem: eventResult.duration,
+    memoryKB: memUsage.estimatedSizeKB,
+    iterations: iterations,
+    batchIterations: Math.min(iterations, 1000),
+    eventIterations: Math.min(iterations, 100)
+  };
+}
+
+function runBenchmark(testName, stateSize, iterations) {
+  console.log(`\n📊 ${testName} (${stateSize} props, ${iterations.toLocaleString()} ops)`);
+  console.log('-'.repeat(60));
+  
+  const results = [];
+  
+  // Run multiple iterations
+  for (let run = 1; run <= NUM_RUNS; run++) {
+    if (NUM_RUNS > 1) {
+      process.stdout.write(`\r  Running iteration ${run}/${NUM_RUNS}...`);
+    }
+    results.push(runSingleBenchmark(testName, stateSize, iterations));
+  }
+  
+  if (NUM_RUNS > 1) {
+    console.log('\n');
+  }
+  
+  // Calculate statistics
+  const stats = {
+    creation: calculateStats(results.map(r => r.creation)),
+    singleUpdate: calculateStats(results.map(r => r.singleUpdate)),
+    batchUpdate: calculateStats(results.map(r => r.batchUpdate)),
+    propertyAccess: calculateStats(results.map(r => r.propertyAccess)),
+    nestedAccess: calculateStats(results.map(r => r.nestedAccess)),
+    eventSystem: calculateStats(results.map(r => r.eventSystem)),
+    memoryKB: calculateStats(results.map(r => r.memoryKB))
+  };
+  
+  // Display results
+  console.log(`Store Creation: ${formatStats(stats.creation)}`);
+  console.log(`Single Update: ${formatStats(stats.singleUpdate)}`);
+  console.log(`Batch Updates (${results[0].batchIterations} ops): ${formatStats(stats.batchUpdate)}`);
+  console.log(`Avg per update: ${formatTime(stats.batchUpdate.mean / results[0].batchIterations)}`);
+  console.log(`Property Access (${iterations.toLocaleString()} ops): ${formatStats(stats.propertyAccess)}`);
+  console.log(`Avg per access: ${formatTime(stats.propertyAccess.mean / iterations)}`);
+  console.log(`Nested Access (${iterations.toLocaleString()} ops): ${formatStats(stats.nestedAccess)}`);
+  console.log(`Avg per nested access: ${formatTime(stats.nestedAccess.mean / iterations)}`);
+  console.log(`Memory Usage: ${stats.memoryKB.mean.toFixed(0)}KB (${results[0].iterations} states)`);
+  console.log(`Event System (${results[0].eventIterations} events): ${formatStats(stats.eventSystem)}`);
+  console.log(`Avg per event: ${formatTime(stats.eventSystem.mean / results[0].eventIterations)}`);
   
   // Performance validation
   console.log('\n🎯 Performance Validation:');
@@ -185,13 +261,13 @@ function runBenchmark(testName, stateSize, iterations) {
   const thresholds = PERFORMANCE_THRESHOLDS[testSizeKey];
   
   const validationResults = {
-    creation: checkThreshold(createResult.duration, thresholds.creation, 'Store Creation', testSizeKey),
-    singleUpdate: checkThreshold(singleUpdateResult.duration, thresholds.singleUpdate, 'Single Update', testSizeKey),
-    avgUpdate: checkThreshold(batchUpdateResult.duration / Math.min(iterations, 1000), thresholds.avgUpdate, 'Avg Update', testSizeKey),
-    avgAccess: checkThreshold(accessResult.duration / iterations, thresholds.avgAccess, 'Avg Property Access', testSizeKey),
-    avgNestedAccess: checkThreshold(nestedAccessResult.duration / iterations, thresholds.avgNestedAccess, 'Avg Nested Access', testSizeKey),
-    avgEvent: checkThreshold(eventResult.duration / Math.min(iterations, 100), thresholds.avgEvent, 'Avg Event', testSizeKey),
-    memory: checkThreshold(memUsage.estimatedSizeKB, thresholds.memoryKB, 'Memory Usage', testSizeKey, true)
+    creation: checkThreshold(stats.creation.mean, thresholds.creation, 'Store Creation', testSizeKey),
+    singleUpdate: checkThreshold(stats.singleUpdate.mean, thresholds.singleUpdate, 'Single Update', testSizeKey),
+    avgUpdate: checkThreshold(stats.batchUpdate.mean / results[0].batchIterations, thresholds.avgUpdate, 'Avg Update', testSizeKey),
+    avgAccess: checkThreshold(stats.propertyAccess.mean / iterations, thresholds.avgAccess, 'Avg Property Access', testSizeKey),
+    avgNestedAccess: checkThreshold(stats.nestedAccess.mean / iterations, thresholds.avgNestedAccess, 'Avg Nested Access', testSizeKey),
+    avgEvent: checkThreshold(stats.eventSystem.mean / results[0].eventIterations, thresholds.avgEvent, 'Avg Event', testSizeKey),
+    memory: checkThreshold(stats.memoryKB.mean, thresholds.memoryKB, 'Memory Usage', testSizeKey, true)
   };
 
   const allPassed = Object.values(validationResults).every(passed => passed);
@@ -204,15 +280,8 @@ function runBenchmark(testName, stateSize, iterations) {
     thresholds,
     validationResults,
     allPassed,
-    results: {
-      creation: createResult.duration,
-      singleUpdate: singleUpdateResult.duration,
-      batchUpdate: batchUpdateResult.duration,
-      propertyAccess: accessResult.duration,
-      nestedAccess: nestedAccessResult.duration,
-      eventSystem: eventResult.duration,
-      memoryKB: memUsage.estimatedSizeKB
-    }
+    stats,
+    results
   };
 }
 
@@ -238,11 +307,11 @@ let overallSuccess = true;
 results.forEach(result => {
   const status = result.allPassed ? '✅' : '❌';
   console.log(`\n${status} ${result.testName} - ${result.allPassed ? 'PASSED' : 'FAILED'}:`);
-  console.log(`  Store Creation: ${formatTime(result.results.creation)}`);
-  console.log(`  Single Update: ${formatTime(result.results.singleUpdate)}`);
-  console.log(`  Avg Update: ${formatTime(result.results.batchUpdate / Math.min(result.iterations, 1000))}`);
-  console.log(`  Avg Property Access: ${formatTime(result.results.propertyAccess / result.iterations)}`);
-  console.log(`  Memory Usage: ${result.results.memoryKB}KB`);
+  console.log(`  Store Creation: ${formatTime(result.stats.creation.mean)}`);
+  console.log(`  Single Update: ${formatTime(result.stats.singleUpdate.mean)}`);
+  console.log(`  Avg Update: ${formatTime(result.stats.batchUpdate.mean / result.results[0].batchIterations)}`);
+  console.log(`  Avg Property Access: ${formatTime(result.stats.propertyAccess.mean / result.iterations)}`);
+  console.log(`  Memory Usage: ${result.stats.memoryKB.mean.toFixed(0)}KB`);
   
   if (!result.allPassed) {
     overallSuccess = false;

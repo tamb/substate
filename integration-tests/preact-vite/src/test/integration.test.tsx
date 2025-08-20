@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/preact'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { renderHook, act } from '@testing-library/react-hooks'
 import { createStore, type IState } from 'substate'
 import { useSubstate, useSubstateActions } from 'substate/preact'
 
@@ -115,14 +116,12 @@ describe('Preact Integration Tests', () => {
     })
 
     it('should return current state without selector', () => {
-      function TestComponent() {
-        const state = useSubstate(counterStore)
-        return <span data-testid="full-state">{JSON.stringify(state)}</span>
-      }
-
-      render(<TestComponent />)
-      const element = screen.getByTestId('full-state')
-      expect(element.textContent).toContain('"count":0')
+      const { result } = renderHook(() => useSubstate(counterStore))
+      
+      expect(result.current).toMatchObject({
+        count: 0,
+        lastUpdated: expect.any(Number)
+      })
     })
 
     it('should return selected value with function selector', () => {
@@ -150,13 +149,9 @@ describe('Preact Integration Tests', () => {
     })
 
     it('should handle string selectors', () => {
-      function TestComponent() {
-        const count = useSubstate(counterStore, 'count')
-        return <span data-testid="string-selector">{String(count)}</span>
-      }
-
-      render(<TestComponent />)
-      expect(screen.getByTestId('string-selector')).toHaveTextContent('0')
+      const { result } = renderHook(() => useSubstate(counterStore, 'count'))
+      
+      expect(result.current).toBe(0)
     })
   })
 
@@ -168,6 +163,28 @@ describe('Preact Integration Tests', () => {
         name: 'TestCounter',
         state: { count: 5, lastUpdated: Date.now() }
       })
+    })
+
+    it('should provide actions with renderHook', () => {
+      const { result } = renderHook(() => useSubstateActions(counterStore))
+      
+      expect(result.current).toHaveProperty('updateState')
+      expect(result.current).toHaveProperty('resetState')
+      expect(typeof result.current.updateState).toBe('function')
+      expect(typeof result.current.resetState).toBe('function')
+    })
+
+    it('should update state with actions from renderHook', () => {
+      const { result: actionsResult } = renderHook(() => useSubstateActions(counterStore))
+      const { result: stateResult } = renderHook(() => useSubstate(counterStore, (state) => state.count))
+      
+      expect(stateResult.current).toBe(5)
+      
+      act(() => {
+        actionsResult.current.updateState({ count: 10, lastUpdated: Date.now() })
+      })
+      
+      expect(stateResult.current).toBe(10)
     })
 
     it('should provide updateState action', async () => {

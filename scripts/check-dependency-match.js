@@ -10,29 +10,29 @@ function checkThatIntegrationDependenciesMatch(integrationDependency, rootDepend
     const integrationDependencies = integrationPackageJson.dependencies;
     const rootDependencies = rootPackageJson.peerDependencies;
 
-    const majorIntegrationVersionNum = Number(integrationDependencies[integrationDependency].substring(1).split('.')[0]);
-    const majorRootVersionNum = Number(rootDependencies[rootDependency].substring(2).split('.')[0]);
+    const integrationVersion = integrationDependencies[integrationDependency];
+    const rootVersion = rootDependencies[rootDependency];
 
-    if (majorIntegrationVersionNum === majorRootVersionNum) {
-            const output = {
-        matches: true,
-        sign: '✅',
+    if (integrationVersion === rootVersion) {
+        const output = {
+            matches: true,
+            sign: '✅',
+            integrationDependency,
+            integrationVersion: integrationVersion.toString(),
+            rootDependency,
+            rootVersion: rootVersion.toString()
+        };
+        return output;
+    }
+
+    const output = {
+        matches: false,
+        sign: '❌',
         integrationDependency,
-        integrationVersion: majorIntegrationVersionNum.toString(),
+        integrationVersion: integrationVersion.toString(),
         rootDependency,
-        rootVersion: majorRootVersionNum.toString()
+        rootVersion: rootVersion.toString()
     };
-    return output;
-}
-
-const output = {
-    matches: false,
-    sign: '❌',
-    integrationDependency,
-    integrationVersion: majorIntegrationVersionNum.toString(),
-    rootDependency,
-    rootVersion: majorRootVersionNum.toString()
-};
     return output;
 }
 console.log('🔍 Checking dependency match...\n');
