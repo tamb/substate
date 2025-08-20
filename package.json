@@ -38,6 +38,7 @@
   "scripts": {
     "build": "npm run clean && rollup -c && node scripts/copy-declarations.js",
     "clean": "rimraf dist",
+    "clean:all": "node scripts/clear-all-dependencies.js",
     "check": "biome check src/",
     "check:fix": "biome check --write src/",
     "format": "biome format src/",
