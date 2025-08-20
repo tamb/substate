@@ -19,6 +19,13 @@ const directoriesToRemove = [
   'coverage'
 ];
 
+// Files to clean up - specify exact paths relative to project root
+const filesToRemove = [
+  'package-lock.json',
+  'integration-tests/react-vite/package-lock.json',
+  'integration-tests/preact-vite/package-lock.json'
+];
+
 // Function to remove directory recursively
 function removeDirectory(dirPath) {
   const fullPath = path.resolve(projectRoot, dirPath);
@@ -31,6 +38,18 @@ function removeDirectory(dirPath) {
   }
 }
 
+// Function to remove file
+function removeFile(filePath) {
+  const fullPath = path.resolve(projectRoot, filePath);
+  
+  if (fs.existsSync(fullPath)) {
+    console.log(`🗑️  Removing file: ${filePath}`);
+    fs.unlinkSync(fullPath);
+  } else {
+    console.log(`⚠️  File not found: ${filePath}`);
+  }
+}
+
 console.log('🧹 Starting cleanup...\n');
 
 // Remove specified directories
@@ -38,6 +57,13 @@ console.log(`📁 Removing ${directoriesToRemove.length} directories:\n`);
 
 for (const dirPath of directoriesToRemove) {
   removeDirectory(dirPath);
+}
+
+// Remove specified files
+console.log(`\n📄 Removing ${filesToRemove.length} files:\n`);
+
+for (const filePath of filesToRemove) {
+  removeFile(filePath);
 }
 
 console.log('\n✅ Cleanup completed!');
