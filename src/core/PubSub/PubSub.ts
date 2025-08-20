@@ -4,11 +4,13 @@ class PubSub implements IPubSub {
   events: IEvents;
 
   constructor() {
-    this.events = {};
+    this.events = Object.create(null); // Slightly faster than {}
   }
 
   on(eventName: string, fn: EventHandler) {
-    this.events[eventName] = this.events[eventName] || [];
+    if (!this.events[eventName]) {
+      this.events[eventName] = [];
+    }
     this.events[eventName].push(fn);
   }
 
@@ -32,10 +34,11 @@ class PubSub implements IPubSub {
   }
 
   emit(eventName: string, data: object = {}) {
-    if (this.events[eventName]) {
-      this.events[eventName].forEach((fn) => {
-        fn(data);
-      });
+    const handlers = this.events[eventName];
+    if (handlers) {
+      for (let i = 0; i < handlers.length; i++) {
+        handlers[i](data);
+      }
     }
   }
 }

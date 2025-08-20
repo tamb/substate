@@ -89,6 +89,8 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
   defaultDeep: boolean;
   maxHistorySize: number;
   taggedStates: Map<string, { stateIndex: number; state: TState }>;
+  private _hasMiddleware: boolean;
+  private _hasTaggedStates: boolean;
 
   constructor(obj: IConfig<TState> = {} as IConfig<TState>) {
     super();
@@ -102,8 +104,14 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
     this.maxHistorySize = obj.maxHistorySize || 50;
     this.taggedStates = new Map();
 
+    // Pre-compute middleware flags for performance
+    this._hasMiddleware = this.beforeUpdate.length > 0 || this.afterUpdate.length > 0;
+    this._hasTaggedStates = false;
+
     if (obj.state) this.stateStorage.push(obj.state);
-    this.on(S, this.updateState.bind(this));
+
+    // Optimize event binding by using arrow function to avoid bind overhead
+    this.on(S, (action: Partial<TState> & IState) => this.updateState(action));
   }
 
   /**
@@ -129,6 +137,10 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
    * @returns The property value
    */
   public getProp(prop: string): unknown {
+    // Fast path for direct property access
+    if (!prop.includes('.')) {
+      return this.getCurrentState()[prop as keyof TState];
+    }
     return byString(this.getCurrentState(), prop);
   }
 
@@ -191,11 +203,11 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
    * @param action - The new state object
    */
   private fireBeforeMiddleware(action: IState): void {
-    this.beforeUpdate.length > 0
-      ? this.beforeUpdate.forEach((func) => {
-          func(this, action);
-        })
-      : null;
+    if (this.beforeUpdate.length > 0) {
+      this.beforeUpdate.forEach((func) => {
+        func(this, action);
+      });
+    }
   }
 
   /**
@@ -203,11 +215,30 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
    * @param action - The new state object
    */
   private fireAfterMiddleware(action: IState): void {
-    this.afterUpdate.length > 0
-      ? this.afterUpdate.forEach((func) => {
-          func(this, action);
-        })
-      : null;
+    if (this.afterUpdate.length > 0) {
+      this.afterUpdate.forEach((func) => {
+        func(this, action);
+      });
+    }
+  }
+
+  /**
+   * Fast path for simple property updates without middleware or special features
+   * @param action - The new state object
+   */
+  private fastUpdateState(action: Partial<TState> & IState): void {
+    const newState = Object.assign({} as TState, this.getCurrentState());
+
+    // Fast property assignment for direct properties
+    for (const key in action) {
+      if (key !== '$deep' && key !== '$type' && key !== '$tag') {
+        (newState as unknown as IState)[key] = action[key];
+      }
+    }
+
+    (newState as IState).$type = S;
+    this.pushState(newState);
+    this.emit('STATE_UPDATED', newState);
   }
 
   /**
@@ -215,32 +246,65 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
    * @param action - The new state object
    */
   public updateState(action: Partial<TState> & IState): void {
-    this.fireBeforeMiddleware(action);
+    // Fast path for simple updates without middleware, deep cloning, or tagging
+    if (
+      !this._hasMiddleware &&
+      !action.$deep &&
+      action.$tag === undefined &&
+      !this._hasTaggedStates
+    ) {
+      // Check if all keys are direct properties (no dot notation)
+      let canUseFastPath = true;
+      for (const key in action) {
+        if (key.includes('.') || key === '$deep' || key === '$type' || key === '$tag') {
+          canUseFastPath = false;
+          break;
+        }
+      }
+
+      if (canUseFastPath) {
+        this.fastUpdateState(action);
+        return;
+      }
+    }
+
+    // Standard path with full feature support
+    if (this._hasMiddleware) {
+      this.fireBeforeMiddleware(action);
+    }
+
     let deep: boolean = this.defaultDeep;
     if (action.$deep !== undefined) deep = action.$deep;
     const newState = this.cloneState(deep);
 
     //update temp new state
     for (const key in action) {
-      byString(newState, key, action[key]);
+      if (!key.includes('.')) {
+        (newState as unknown as IState)[key] = action[key];
+      } else {
+        byString(newState, key, action[key]);
+      }
       //update cloned state
     }
 
     if (!this.defaultDeep) (newState as IState).$deep = false; // reset $deep keyword
     (newState as IState).$type = action.$type || S; // set $type if not already set
 
-    //pushes new state
+    // pushes new state
     this.pushState(newState);
 
     // Handle tagging if $tag is provided (including empty strings)
     if (action.$tag !== undefined) {
+      this._hasTaggedStates = true;
       this.taggedStates.set(action.$tag, {
         stateIndex: this.currentState,
         state: cloneDeep(newState) as TState, // Store a deep copy to prevent mutations
       });
     }
 
-    this.fireAfterMiddleware(action);
+    if (this._hasMiddleware) {
+      this.fireAfterMiddleware(action);
+    }
     this.emit(action.$type || 'STATE_UPDATED', this.getCurrentState()); //emit with latest data
   }
 

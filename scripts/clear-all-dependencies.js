@@ -70,3 +70,4 @@ console.log('\n✅ Cleanup completed!');
 console.log('\n💡 Next steps:');
 console.log('   1. Run "npm install" to reinstall dependencies');
 console.log('   2. Run "npm run build" to rebuild the project');
+console.log('\n🔧 Cross-platform cleanup script ready!');
