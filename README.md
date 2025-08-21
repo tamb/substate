@@ -30,7 +30,7 @@ Substate provides a simple yet powerful way to manage application state with bui
 
 ## ✨ Features
 
-- 🚀 **Lightweight** - Minimal bundle size with zero dependencies
+- 🚀 **Lightweight** - Tiny bundle size at 10kb
 - 🔒 **Type-safe** - Full TypeScript support with comprehensive type definitions
 - 🔄 **Reactive** - Built-in Pub/Sub pattern for reactive state updates
 - 🕰️ **Time Travel** - Complete state history with ability to navigate between states
