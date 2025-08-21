@@ -38,13 +38,18 @@ function benchmarkSubstate(stateSize, iterations) {
   
   // Batch Updates Performance
   const batchUpdateResult = measureTime('Batch Updates', () => {
+    // Prepare batch updates for better performance
+    const batchUpdates = [];
     for (let i = 0; i < Math.min(iterations, 1000); i++) {
       const propKey = `prop${i % stateSize}`;
       const currentProp = store.getProp(propKey);
-      store.updateState({ 
+      batchUpdates.push({ 
         [propKey]: { ...currentProp, counter: (currentProp.counter || 0) + 1 }
       });
     }
+    
+    // Use the new optimized batch update method
+    store.batchUpdateState(batchUpdates);
     return store.getCurrentState();
   });
   

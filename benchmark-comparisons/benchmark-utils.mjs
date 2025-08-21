@@ -7,6 +7,7 @@ import path from 'path';
 // Environment detection
 const isCI = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
 
+export const NUM_RUNS = 100;
 // Test configurations
 export const TEST_CONFIGS = {
   iterations: {
@@ -80,7 +81,6 @@ export function runBenchmark(testName, stateSize, iterations, benchmarkFn) {
   console.log('-'.repeat(60));
   
   const results = [];
-  const NUM_RUNS = 15; // Run 15 times for statistical accuracy
   
   // Run multiple iterations
   for (let run = 1; run <= NUM_RUNS; run++) {

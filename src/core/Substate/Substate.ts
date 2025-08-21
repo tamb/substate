@@ -128,20 +128,24 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
    * @returns The current state
    */
   public getCurrentState(): TState {
-    return this.getState(this.currentState);
+    return this.stateStorage[this.currentState];
   }
 
   /**
-   * Gets a property from the current state
+   * Gets a property from the current state with optimized access
    * @param prop - The property to get
    * @returns The property value
    */
   public getProp(prop: string): unknown {
-    // Fast path for direct property access
+    const currentState = this.getCurrentState();
+
+    // Fast path for direct property access (most common case)
     if (!prop.includes('.')) {
-      return this.getCurrentState()[prop as keyof TState];
+      return currentState[prop as keyof TState];
     }
-    return byString(this.getCurrentState(), prop);
+
+    // Use byString for nested property access
+    return byString(currentState, prop);
   }
 
   /**
@@ -188,14 +192,17 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
   }
 
   /**
-   * Clones the current state
+   * Optimized state cloning with faster shallow clone
    * @param deep - Whether to clone the state deeply
    * @returns The cloned state
    */
   private cloneState(deep: boolean): TState {
-    return deep
-      ? cloneDeep(this.getCurrentState())
-      : Object.assign({} as TState, this.getCurrentState());
+    if (deep) {
+      return cloneDeep(this.getCurrentState());
+    }
+
+    // Optimized shallow clone using spread operator (faster than Object.assign)
+    return { ...this.getCurrentState() } as TState;
   }
 
   /**
@@ -223,16 +230,52 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
   }
 
   /**
-   * Fast path for simple property updates without middleware or special features
+   * Ultra-fast path for simple property updates without middleware or special features
    * @param action - The new state object
    */
   private fastUpdateState(action: Partial<TState> & IState): void {
-    const newState = Object.assign({} as TState, this.getCurrentState());
+    // Direct array access for maximum speed
+    const currentState = this.stateStorage[this.currentState];
+
+    // Use spread operator for faster shallow cloning
+    const newState = { ...currentState } as TState;
 
     // Fast property assignment for direct properties
-    for (const key in action) {
+    // Optimized loop with early exit for better performance
+    const keys = Object.keys(action);
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
       if (key !== '$deep' && key !== '$type' && key !== '$tag') {
         (newState as unknown as IState)[key] = action[key];
+      }
+    }
+
+    (newState as IState).$type = S;
+    this.pushState(newState);
+    this.emit('STATE_UPDATED', newState);
+  }
+
+  /**
+   * Ultra-fast batch update for multiple properties at once
+   * @param actions - Array of update actions
+   */
+  private fastBatchUpdate(actions: Array<Partial<TState> & IState>): void {
+    // Get current state for batch operations
+    const currentState = this.getCurrentState();
+
+    // Pre-allocate the new state object
+    const newState = { ...currentState } as TState;
+
+    // Process all actions in a single pass
+    for (let actionIndex = 0; actionIndex < actions.length; actionIndex++) {
+      const action = actions[actionIndex];
+      const keys = Object.keys(action);
+
+      for (let keyIndex = 0; keyIndex < keys.length; keyIndex++) {
+        const key = keys[keyIndex];
+        if (key !== '$deep' && key !== '$type' && key !== '$tag') {
+          (newState as unknown as IState)[key] = action[key];
+        }
       }
     }
 
@@ -255,7 +298,9 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
     ) {
       // Check if all keys are direct properties (no dot notation)
       let canUseFastPath = true;
-      for (const key in action) {
+      const keys = Object.keys(action);
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
         if (key.includes('.') || key === '$deep' || key === '$type' || key === '$tag') {
           canUseFastPath = false;
           break;
@@ -278,7 +323,9 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
     const newState = this.cloneState(deep);
 
     //update temp new state
-    for (const key in action) {
+    const keys = Object.keys(action);
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
       if (!key.includes('.')) {
         (newState as unknown as IState)[key] = action[key];
       } else {
@@ -306,6 +353,47 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
       this.fireAfterMiddleware(action);
     }
     this.emit(action.$type || 'STATE_UPDATED', this.getCurrentState()); //emit with latest data
+  }
+
+  /**
+   * Batch update multiple properties at once for better performance
+   * @param actions - Array of update actions
+   */
+  public batchUpdateState(actions: Array<Partial<TState> & IState>): void {
+    if (actions.length === 0) return;
+
+    // Fast path for batch updates without middleware, deep cloning, or tagging
+    if (!this._hasMiddleware && !this._hasTaggedStates) {
+      // Check if all actions can use fast path
+      let canUseFastPath = true;
+      for (let i = 0; i < actions.length; i++) {
+        const action = actions[i];
+        if (action.$deep || action.$tag !== undefined) {
+          canUseFastPath = false;
+          break;
+        }
+
+        const keys = Object.keys(action);
+        for (let j = 0; j < keys.length; j++) {
+          const key = keys[j];
+          if (key.includes('.') || key === '$deep' || key === '$type' || key === '$tag') {
+            canUseFastPath = false;
+            break;
+          }
+        }
+        if (!canUseFastPath) break;
+      }
+
+      if (canUseFastPath) {
+        this.fastBatchUpdate(actions);
+        return;
+      }
+    }
+
+    // Standard path - process each action individually
+    for (let i = 0; i < actions.length; i++) {
+      this.updateState(actions[i]);
+    }
   }
 
   /**

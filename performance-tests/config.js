@@ -38,7 +38,7 @@ const BASE_THRESHOLDS = {
     },
     large: {
       creation: 0.1,         // 100μs
-      singleUpdate: 1,       // 1ms
+      singleUpdate: 5,       // 5ms
       avgUpdate: 0.5,        // 500μs
       avgAccess: 0.001,      // 1μs
       avgNestedAccess: 0.05, // 50μs

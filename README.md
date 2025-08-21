@@ -663,6 +663,91 @@ store.updateState({
 
 ---
 
+#### `batchUpdateState(actions: Array<Partial<TState> & IState>): void`
+
+Updates multiple properties at once for better performance. This method is optimized for bulk operations and provides significant performance improvements over multiple individual `updateState()` calls.
+
+```typescript
+// Instead of multiple individual updates (slower)
+store.updateState({ counter: 1 });
+store.updateState({ user: { name: "John" } });
+store.updateState({ theme: "dark" });
+
+// Use batch update for better performance
+store.batchUpdateState([
+  { counter: 1 },
+  { user: { name: "John" } },
+  { theme: "dark" }
+]);
+
+// Batch updates with complex operations
+store.batchUpdateState([
+  { 'user.profile.name': 'Jane' },
+  { 'user.profile.email': 'jane@example.com' },
+  { 'settings.theme': 'light' },
+  { 'settings.notifications': true }
+]);
+
+// Batch updates with metadata
+store.batchUpdateState([
+  { data: newData, $type: 'DATA_IMPORT' },
+  { lastUpdated: Date.now() },
+  { version: '2.0.0' }
+]);
+```
+
+**Performance Benefits:**
+- **Single state clone** instead of multiple clones
+- **One event emission** instead of multiple events
+- **Reduced middleware calls** (if using middleware)
+- **Better memory efficiency**
+
+**When to Use:**
+- **Multiple related updates** that should happen together
+- **Performance-critical code** with frequent state changes
+- **Bulk operations** like form submissions or data imports
+- **Reducing re-renders** in React/Preact components
+
+**Parameters:**
+- `actions` - Array of update action objects (same format as `updateState`)
+
+**Smart Optimization:**
+The method automatically detects if it can use the fast path (no middleware, no deep cloning, no tagging) and processes all updates in a single optimized operation. If any action requires the full feature set, it falls back to processing each action individually.
+
+**Example Use Cases:**
+```typescript
+// Form submission with multiple fields
+function submitForm(formData) {
+  store.batchUpdateState([
+    { 'form.isSubmitting': true },
+    { 'form.data': formData },
+    { 'form.errors': [] },
+    { 'form.lastSubmitted': Date.now() }
+  ]);
+}
+
+// Bulk data import
+function importData(items) {
+  store.batchUpdateState([
+    { 'data.items': items },
+    { 'data.totalCount': items.length },
+    { 'data.lastImport': Date.now() },
+    { 'ui.showImportSuccess': true }
+  ]);
+}
+
+// User profile update
+function updateProfile(profileData) {
+  store.batchUpdateState([
+    { 'user.profile': profileData },
+    { 'user.lastUpdated': Date.now() },
+    { 'ui.profileUpdated': true }
+  ]);
+}
+```
+
+---
+
 #### `getCurrentState(): IState`
 
 Returns the current active state object.
@@ -1331,7 +1416,7 @@ The report generator creates multiple output formats:
 
 | Feature | Substate | Redux | Zustand | Valtio | MobX |
 |---------|----------|-------|---------|--------|------|
-| **Bundle Size** | ~8KB | ~13KB | ~8KB | ~14KB | ~167KB |
+| **Bundle Size** | ~10KB | ~13KB | ~8KB | ~14KB | ~167KB |
 | **TypeScript** | ✅ Excellent | ✅ Excellent | ✅ Excellent | ✅ Excellent | ✅ Excellent |
 | **Learning Curve** | 🟢 Low | 🔴 High | 🟡 Medium | 🟡 Medium | 🔴 High |
 | **Boilerplate** | 🟢 Minimal | 🔴 Heavy | 🟡 Some | 🟢 Minimal | 🟡 Some |
@@ -1343,6 +1428,8 @@ The report generator creates multiple output formats:
 | **Middleware** | ✅ Simple | ✅ Complex | ✅ Simple | ❌ No | ✅ Yes |
 | **Nested Updates** | ✅ Dot notation + Object spread | ⚡ Reducers | ⚡ Manual | ✅ Direct | ✅ Direct |
 | **Tagged States** | ✅ Built-in | ❌ No | ❌ No | ❌ No | ❌ No |
+
+**NOTE:** Clone our repo and run the benchmarks to see how we stack up!
 
 ### When to Use Substate
 

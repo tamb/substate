@@ -120,6 +120,9 @@ interface ISubstate<TState extends IState = IState> extends IPubSub {
   /** Updates the current state with new values and emits change events */
   updateState(action: Partial<TState> & IState): void;
 
+  /** Batch updates multiple properties at once for better performance */
+  batchUpdateState(actions: Array<Partial<TState> & IState>): void;
+
   /**
    * Establishes unidirectional sync between state property and target object
    * @param config - Sync configuration including target object and middleware

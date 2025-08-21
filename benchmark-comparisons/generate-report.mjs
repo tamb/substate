@@ -3,6 +3,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import { NUM_RUNS } from './benchmark-utils.mjs';
 
 console.log('📊 Performance Comparison Report Generator');
 console.log('==========================================\n');
@@ -98,7 +99,7 @@ function generateMarkdownTables(results) {
   
   let markdown = `# Performance Comparison Results\n\n`;
   markdown += `**🖥️ Test Environment**: ${process.platform}, Node.js ${process.version}\n`;
-  markdown += `**📊 Method**: Averaged over 5 runs for statistical accuracy\n`;
+  markdown += `**📊 Method**: Averaged over ${NUM_RUNS} runs for statistical accuracy\n`;
   markdown += `**📅 Generated**: ${new Date().toLocaleString()}\n\n`;
   
   // Property Access Comparison
@@ -344,7 +345,7 @@ function generateMarkdownTables(results) {
   markdown += `- **Zustand**: Lightweight alternative with minimal boilerplate\n\n`;
   
   markdown += `> **💡 Note**: Performance varies by use case. Choose based on your specific requirements, not just raw speed.\n`;
-  markdown += `> **📊 Data**: Results are averaged over 5 runs with statistical analysis.\n`;
+  markdown += `> **📊 Data**: Results are averaged over ${NUM_RUNS} runs with statistical analysis.\n`;
   
   return markdown;
 }
@@ -360,7 +361,7 @@ function generateComparisonTable(results) {
   // Environment info
   const firstResult = Object.values(results)[0];
   console.log(`**🖥️ Test Environment**: ${firstResult.environment.platform}, Node.js ${firstResult.environment.nodeVersion}`);
-  console.log(`**📊 Method**: Averaged over 5 runs for statistical accuracy`);
+  console.log(`**📊 Method**: Averaged over ${NUM_RUNS} runs for statistical accuracy`);
   console.log(`**📅 Generated**: ${new Date().toLocaleString()}`);
   console.log();
   
@@ -493,7 +494,7 @@ function generateComparisonTable(results) {
   console.log();
   
   console.log('> **💡 Note**: Performance varies by use case. Choose based on your specific requirements, not just raw speed.');
-  console.log('> **📊 Data**: Results are averaged over 5 runs with statistical analysis.');
+  console.log(`> **📊 Data**: Results are averaged over ${NUM_RUNS} runs with statistical analysis.`);
 }
 
 // Function to generate detailed breakdown
