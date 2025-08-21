@@ -1200,23 +1200,6 @@ const complexStore = createStore({
 const value = store.getProp('deeply.nested.property'); // ~1μs
 ```
 
-### 🆚 Performance Comparison
-
-| Operation | Substate | Native Object | Redux | Zustand |
-|-----------|----------|---------------|-------|---------|
-| Property Access | **0.15μs** | ~0.1μs | ~2-5μs | ~1-3μs |
-| Shallow Update | **1.41μs** | ~1μs | ~50-100μs | ~20-50μs |
-| Memory Management | **Automatic** | Manual | Manual | Manual |
-| History/Time Travel | **Built-in** | None | DevTools | None |
-
-> **🔬 Benchmark Environment**: 
-> - **Hardware**: 13th Gen Intel(R) Core(TM) i7-13650HX (14 cores), 16 GB RAM
-> - **OS**: Windows 10 Home (Version 2009)
-> - **Runtime**: Node.js v18+
-> - **Method**: Averaged over 5 runs for statistical accuracy
-> 
-> Your results may vary based on hardware and usage patterns.
-
 ## 🔄 Why Choose Substate?
 
 ### Comparison with Other State Management Solutions
