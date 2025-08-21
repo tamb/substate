@@ -7,6 +7,7 @@
 // - Node.js: v18+
 //
 import { createStore } from '../dist/index.esm.js';
+import { PERFORMANCE_THRESHOLDS, TEST_CONFIGS, logEnvironmentInfo } from './config.js';
 
 console.log('🏃‍♂️ Shallow State Management Performance Benchmark');
 console.log('================================================\n');
@@ -20,50 +21,15 @@ if (NUM_RUNS > 1) {
   console.log(`🔄 Running ${NUM_RUNS} iterations for statistical accuracy...\n`);
 }
 
+// Log environment information
+logEnvironmentInfo();
+
 // Test configurations
-const ITERATIONS = {
-  small: 1000,
-  medium: 10000,
-  large: 100000
-};
+const ITERATIONS = TEST_CONFIGS.iterations;
+const TEST_SIZES = TEST_CONFIGS.testSizes;
 
-const TEST_SIZES = {
-  small: 10,      // 10 properties
-  medium: 100,    // 100 properties  
-  large: 1000     // 1000 properties
-};
-
-// Performance thresholds (in milliseconds) - Updated for improved performance
-// Memory thresholds account for 50-state history (default maxHistorySize) with realistic overhead
-const PERFORMANCE_THRESHOLDS = {
-  small: {
-    creation: 0.15,        // Store creation should be very fast (121μs observed, allowing 25% headroom)
-    singleUpdate: 0.2,     // Single updates should be fast (163μs observed, allowing 20% headroom)
-    avgUpdate: 0.005,      // Average update should be ultra-fast (1.58μs observed)
-    avgAccess: 0.001,      // Property access should be ultra-fast (0.07μs observed)
-    avgNestedAccess: 0.01, // Nested access with minimal overhead
-    avgEvent: 0.1,         // Event firing should be very fast
-    memoryKB: 150          // ~126KB observed, allow 20% headroom for 10 props * 50 states
-  },
-  medium: {
-    creation: 0.1,         // Very fast creation for medium state (29μs observed)
-    singleUpdate: 0.1,     // Single updates remain fast (63μs observed)
-    avgUpdate: 0.05,       // Slightly higher but still very fast (25.93μs observed)
-    avgAccess: 0.001,      // Access time scales linearly but stays low (0.15μs observed)
-    avgNestedAccess: 0.02, // Nested access remains efficient
-    avgEvent: 0.2,         // Events should scale well
-    memoryKB: 1500         // ~1.3MB observed, allow 20% headroom for 100 props * 50 states
-  },
-  large: {
-    creation: 0.1,         // Very fast creation time for large state (15μs observed)
-    singleUpdate: 1,       // Updates should still be fast even for large state (598μs observed)
-    avgUpdate: 0.5,        // Individual updates remain quick (254μs observed)
-    avgAccess: 0.001,      // Access time should scale well (0.32μs observed)
-    avgNestedAccess: 0.05, // Nested access with good performance
-    avgEvent: 0.5,         // Events should remain responsive
-    memoryKB: 15000        // ~12.8MB observed, allow 17% headroom for 1000 props * 50 states
-  }
-};
+// Performance thresholds from centralized config
+const THRESHOLDS = PERFORMANCE_THRESHOLDS.shallow;
 
 // Utility functions
 function createInitialState(size) {
@@ -258,7 +224,7 @@ function runBenchmark(testName, stateSize, iterations) {
   console.log('\n🎯 Performance Validation (Averages Only):');
   const testSizeKey = stateSize === TEST_SIZES.small ? 'small' : 
                      stateSize === TEST_SIZES.medium ? 'medium' : 'large';
-  const thresholds = PERFORMANCE_THRESHOLDS[testSizeKey];
+  const thresholds = THRESHOLDS[testSizeKey];
   
   // Only check average (mean) values
   const avgUpdateTime = stats.batchUpdate.mean / results[0].batchIterations;

@@ -7,6 +7,7 @@
 // - Node.js: v18+
 //
 import { createStore } from '../dist/index.esm.js';
+import { PERFORMANCE_THRESHOLDS, TEST_CONFIGS, logEnvironmentInfo } from './config.js';
 
 console.log('🏃‍♂️ Deep State Management Performance Benchmark');
 console.log('===============================================\n');
@@ -20,53 +21,15 @@ if (NUM_RUNS > 1) {
   console.log(`🔄 Running ${NUM_RUNS} iterations for statistical accuracy...\n`);
 }
 
+// Log environment information
+logEnvironmentInfo();
+
 // Test configurations
-const ITERATIONS = {
-  small: 500,     // Fewer iterations for deep cloning (more expensive)
-  medium: 100,    // Much fewer for complex deep structures
-  large: 50       // Very few for large deep structures
-};
+const ITERATIONS = TEST_CONFIGS.deepIterations;
+const TEST_CONFIGS_DEEP = TEST_CONFIGS.deepConfigs;
 
-const TEST_CONFIGS = {
-  shallow: { depth: 3, breadth: 10 },     // 3 levels, 10 props each (~1K nodes)
-  medium: { depth: 4, breadth: 8 },       // 4 levels, 8 props each (~5K nodes)  
-  deep: { depth: 5, breadth: 5 }          // 5 levels, 5 props each (~4K nodes)
-};
-
-// Performance thresholds (in milliseconds) - Realistic standards for deep operations
-// Memory thresholds account for 50-state history + tagged states + deep structure overhead
-const PERFORMANCE_THRESHOLDS = {
-  shallow: {
-    creation: 0.16,        // Deep store creation with cloning overhead (157μs observed, allowing 2% headroom)
-    singleUpdate: 1.15,    // Single deep updates with cloning (1.13ms observed, allowing 2% headroom)
-    avgUpdate: 1,          // Average deep update should be reasonable (174μs observed)
-    avgDeepAccess: 0.005,  // Deep property access should be fast (0.95μs observed)
-    avgArrayAccess: 1,     // Array access with deep structures
-    avgHistory: 10,        // State history operations
-    avgCloning: 1,         // Deep cloning operations (204μs observed)
-    memoryKB: 12000        // ~10.4MB observed, allow 15% headroom for ~1.2K nodes * 50 states
-  },
-  medium: {
-    creation: 0.1,         // More complex state creation (43μs observed)
-    singleUpdate: 2,       // Deep updates for medium complexity (1.11ms observed)
-    avgUpdate: 2,          // Average updates with more complexity (989μs observed)
-    avgDeepAccess: 0.01,   // Deep access time scales with complexity (3.44μs observed)
-    avgArrayAccess: 2,     // Array operations in complex structures
-    avgHistory: 20,        // History operations with larger states
-    avgCloning: 2,         // Deep cloning for medium structures (763μs observed)
-    memoryKB: 50000        // ~45.8MB observed, allow 10% headroom for ~5.7K nodes * 50 states
-  },
-  deep: {
-    creation: 0.1,         // Very deep structures take longer to create (11μs observed)
-    singleUpdate: 2,       // Deep updates for very complex structures (1.20ms observed)
-    avgUpdate: 2,          // Updates with maximum complexity (1.00ms observed)
-    avgDeepAccess: 0.005,  // Access time for very deep structures (0.78μs observed)
-    avgArrayAccess: 2,     // Array operations in very deep structures
-    avgHistory: 20,        // History with very complex states
-    avgCloning: 2,         // Deep cloning for very complex structures (702μs observed)
-    memoryKB: 48000        // ~43.3MB observed, allow 11% headroom for ~6K nodes * 50 states
-  }
-};
+// Performance thresholds from centralized config
+const THRESHOLDS = PERFORMANCE_THRESHOLDS.deep;
 
 // Utility functions
 function createDeepState(depth, breadth, currentDepth = 0) {
@@ -339,7 +302,7 @@ function runDeepBenchmark(testName, config, iterations) {
   console.log('\n🎯 Performance Validation (Averages Only):');
   const testType = testName.includes('Shallow') ? 'shallow' : 
                   testName.includes('Medium') ? 'medium' : 'deep';
-  const thresholds = PERFORMANCE_THRESHOLDS[testType];
+  const thresholds = THRESHOLDS[testType];
   
   // Only check average (mean) values
   const avgUpdateTime = stats.batchUpdate.mean / iterations;
@@ -381,13 +344,13 @@ console.log('Starting deep state management benchmarks...\n');
 const results = [];
 
 // Shallow deep structure (more breadth, less depth)
-results.push(runDeepBenchmark('Shallow Deep', TEST_CONFIGS.shallow, ITERATIONS.small));
+results.push(runDeepBenchmark('Shallow Deep', TEST_CONFIGS_DEEP.shallow, ITERATIONS.small));
 
 // Medium deep structure (balanced)
-results.push(runDeepBenchmark('Medium Deep', TEST_CONFIGS.medium, ITERATIONS.medium));
+results.push(runDeepBenchmark('Medium Deep', TEST_CONFIGS_DEEP.medium, ITERATIONS.medium));
 
 // Very deep structure (more depth, less breadth)
-results.push(runDeepBenchmark('Very Deep', TEST_CONFIGS.deep, ITERATIONS.large));
+results.push(runDeepBenchmark('Very Deep', TEST_CONFIGS_DEEP.deep, ITERATIONS.large));
 
 // Summary
 console.log('\n🎯 DEEP STATE PERFORMANCE SUMMARY');
