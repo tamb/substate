@@ -1,0 +1,25 @@
+{
+  "name": "substate-performance-comparison",
+  "version": "1.0.0",
+  "description": "Performance comparison benchmarks for Substate vs other state management libraries",
+  "type": "module",
+  "scripts": {
+    "install-deps": "npm install",
+    "benchmark": "node benchmark.mjs",
+    "benchmark:substate": "node benchmark-substate.mjs",
+    "benchmark:redux": "node benchmark-redux.mjs",
+    "benchmark:zustand": "node benchmark-zustand.mjs",
+    "benchmark:native": "node benchmark-native.mjs",
+    "benchmark:all": "npm run benchmark:substate && npm run benchmark:redux && npm run benchmark:zustand && npm run benchmark:native",
+    "report": "npx rimraf results && npm run benchmark:all && node generate-report.mjs"
+  },
+  "dependencies": {
+    "redux": "^4.2.1",
+    "zustand": "^4.4.1",
+    "clone-deep": "^4.0.1",
+    "object-bystring": "^6.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
+  }
+}
