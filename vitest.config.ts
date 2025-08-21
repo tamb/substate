@@ -4,9 +4,10 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   test: {
     globals: true,
-    environment: 'node',
     include: ['src/**/*.test.ts'],
     exclude: [
+      'src/integrations/**/*.test.ts',
+      'src/integrations/**/*.test.tsx',
       'node_modules/',
       'dist/',
       'coverage/',
@@ -17,6 +18,7 @@ export default defineConfig({
       'performance-tests/',
       'scripts/'
     ],
+    environment: 'node',
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

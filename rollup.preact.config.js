@@ -15,7 +15,17 @@ export default {
     typescript({
       declaration: false,
       declarationMap: false,
-      exclude: ["**/*.test.ts", "**/*.test.js", "dist/**/*", "integration-tests/**/*", "build-tests/**/*", "performance-tests/**/*"],
+      exclude: [
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/*.example.*",
+        "**/test/**/*",
+        "**/tests/**/*",
+        "dist/**/*",
+        "integration-tests/**/*",
+        "build-tests/**/*",
+        "performance-tests/**/*",
+      ],
     }),
     resolve({
       preferBuiltins: false,

@@ -22,8 +22,11 @@ export default {
       declarationMap: true,
       rootDir: 'src',
       exclude: [
-        '**/*.test.ts',
-        '**/*.test.js',
+        '**/*.test.*',
+        '**/*.spec.*',
+        '**/*.example.*',
+        '**/test/**/*',
+        '**/tests/**/*',
         'dist/**/*',
         'integration-tests/**/*',
         'build-tests/**/*',
