@@ -1,4 +1,4 @@
-import byString from 'object-bystring';
+import { byString } from 'object-bystring';
 import rfdc from 'rfdc';
 
 import { PubSub } from '../PubSub/PubSub';
@@ -466,6 +466,9 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
       afterMiddleware = [], // Default to empty array if no middleware
     } = config;
 
+    // Check if the fields exist using byString to support dot notation
+    this.validateSyncFields(readerObj, stateField, readField);
+
     /**
      * Applies the beforeMiddleware transformation chain to a value
      * Each middleware function receives the transformed value from the previous function
@@ -542,6 +545,30 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
     return () => {
       this.off('STATE_UPDATED', syncHandler);
     };
+  }
+
+  private validateSyncFields(
+    readerObj: Record<string, unknown>,
+    stateField: string,
+    readField: string
+  ): void {
+    // Check if stateField exists in the current state
+    const currentStateValue = this.getProp(stateField);
+    if (currentStateValue === undefined) {
+      throw new Error(
+        `State field '${stateField}' not found in current state. ` +
+          `Available state properties: ${Object.keys(this.getCurrentState()).join(', ')}`
+      );
+    }
+
+    // Check if readField exists in the reader object
+    const readFieldExists = byString(readerObj, readField) !== undefined;
+    if (!readFieldExists) {
+      throw new Error(
+        `Read field '${readField}' not found in reader object. ` +
+          `Available reader properties: ${Object.keys(readerObj).join(', ')}`
+      );
+    }
   }
 
   /**
