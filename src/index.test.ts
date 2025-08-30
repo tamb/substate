@@ -1,8 +1,8 @@
-import { describe, expect, test } from 'vitest';
-import { createStore, type ICreateStoreConfig, type ISubstate } from './index';
+import { describe, expect, it } from 'vitest';
+import { createStore, Substate, type ICreateStoreConfig, type ISubstate } from './index';
 
 describe('Integration tests', () => {
-  test('createStore is exported and functional', () => {
+  it('createStore is exported and functional', () => {
     const store = createStore({
       name: 'IntegrationTest',
       state: { test: true },
@@ -12,7 +12,7 @@ describe('Integration tests', () => {
     expect(store.getProp('test')).toBe(true);
   });
 
-  test('types are properly exported', () => {
+  it('types are properly exported', () => {
     // This test ensures TypeScript compilation works
     const config: ICreateStoreConfig = {
       name: 'TypeTest',
@@ -20,5 +20,15 @@ describe('Integration tests', () => {
 
     const store: ISubstate = createStore(config);
     expect(store.name).toBe('TypeTest');
+  });
+
+  it('should return a new instance of substate', () => {
+    const store = createStore({
+      name: 'IntegrationTest',
+      state: { test: true },
+    });
+
+    expect(store instanceof Substate).toBe(true);
+    expect(store.name).toBe('IntegrationTest');
   });
 });

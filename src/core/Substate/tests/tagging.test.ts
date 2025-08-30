@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { createStore } from '../createStore/createStore';
-import { Substate } from './Substate';
-import type { IState } from './Substate.interface';
+import { createStore } from '../../createStore/createStore';
+import { Substate } from '../Substate';
+import type { IState } from '../Substate.interface';
 
 // Type definitions for test data structures
 interface TestDataState extends IState {
@@ -408,7 +408,7 @@ describe('Tagging Features', () => {
     test('should work with sync functionality', () => {
       const uiModel = { displayValue: 0 };
 
-      const unsync = store.sync({
+      const synced = store.sync({
         readerObj: uiModel,
         stateField: 'counter',
         readField: 'displayValue',
@@ -420,7 +420,7 @@ describe('Tagging Features', () => {
       store.jumpToTag('synced-state');
       expect(uiModel.displayValue).toBe(5); // Should still be synced
 
-      unsync();
+      synced.unsync();
     });
 
     test('should work with createStore factory', () => {

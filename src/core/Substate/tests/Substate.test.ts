@@ -1,16 +1,8 @@
 import { beforeEach, describe, expect, type Mock, test, vi } from 'vitest';
-import { Substate } from './Substate';
-import type { IState, ISubstate } from './Substate.interface';
+import { Substate } from '../Substate';
+import type { IState, ISubstate } from '../Substate.interface';
 
-const STATE = {
-  name: 'Thomas',
-  timeOfFun: new Date().toISOString(),
-  nested: {
-    double: {
-      reason: 'Just the start',
-    },
-  },
-};
+import { MOCK_STATE } from './mocks';
 
 let A: ISubstate;
 let func1: Mock;
@@ -28,7 +20,7 @@ describe('Substate instantiation', () => {
     A = new Substate({
       name: 'HamburgerStore',
       defaultDeep: true,
-      state: STATE,
+      state: MOCK_STATE,
       beforeUpdate: [func1, func3],
       afterUpdate: [func2, func4],
     });
@@ -56,7 +48,7 @@ describe('Substate getters', () => {
     A = new Substate({
       name: 'HamburgerStore',
       defaultDeep: true,
-      state: STATE,
+      state: MOCK_STATE,
       beforeUpdate: [func1, func3],
       afterUpdate: [func2, func4],
     });
@@ -67,7 +59,7 @@ describe('Substate getters', () => {
   });
 
   test('getCurrentState returns current state and fires middleware', () => {
-    expect(A.getCurrentState()).toMatchObject(STATE);
+    expect(A.getCurrentState()).toMatchObject(MOCK_STATE);
     A.emit('UPDATE_STATE', { timeOfFun: new Date().toISOString() });
     expect(func1).toHaveBeenCalledTimes(1);
     expect(func2).toHaveBeenCalledTimes(1);
@@ -76,7 +68,7 @@ describe('Substate getters', () => {
   });
 
   test('getState returns correct state from array', () => {
-    expect(A.getState(0)).toMatchObject(STATE);
+    expect(A.getState(0)).toMatchObject(MOCK_STATE);
   });
 });
 
@@ -90,7 +82,7 @@ describe('Substate state management', () => {
     A = new Substate({
       name: 'HamburgerStore',
       defaultDeep: true,
-      state: STATE,
+      state: MOCK_STATE,
       beforeUpdate: [func1, func3],
       afterUpdate: [func2, func4],
     });

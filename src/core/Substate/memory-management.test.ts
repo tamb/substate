@@ -413,7 +413,7 @@ describe('Memory Management Features', () => {
 
       const uiModel = { displayName: '' };
 
-      const unsync = store.sync({
+      const synced = store.sync({
         readerObj: uiModel,
         stateField: 'userName',
         readField: 'displayName',
@@ -428,7 +428,7 @@ describe('Memory Management Features', () => {
       expect(uiModel.displayName).toBe('Bob');
       expect(store.stateStorage.length).toBe(2);
 
-      unsync();
+      synced.unsync();
     });
   });
 });

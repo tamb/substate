@@ -11,39 +11,34 @@ import { store } from '../../store';
 @customElement('multiplier-el')
 export class Multiplier extends LitElement {
 
-    private unsyncFunctions: (() => void)[] = [];
+    private syncedMultiplier;
+    private syncedMultipliedCount;
+    private syncedCount;
 
     constructor() {
         super();
-
-        // Simple sync - just handle UI updates
-        this.unsyncFunctions.push(
-            store.sync({
-                readerObj: this as any,
+            this.syncedMultiplier = store.sync({
+                readerObj: this as Multiplier,
                 stateField: 'isMultiplierEven',
-            })
-        );
-
-        this.unsyncFunctions.push(
-            store.sync({
-                readerObj: this as any,
+            });
+        
+            this.syncedMultipliedCount = store.sync({
+                readerObj: this as Multiplier,
                 stateField: 'multipliedCount',
             })
-        );
+        
 
-        this.unsyncFunctions.push(
-            store.sync({
-                readerObj: this as any,
+            this.syncedCount = store.sync({
+                readerObj: this as Multiplier,
                 stateField: 'count',
-            })
-        );
+            });
     }
 
     disconnectedCallback() {
         super.disconnectedCallback();
-        // Clean up all sync subscriptions
-        this.unsyncFunctions.forEach(unsync => unsync());
-        this.unsyncFunctions = [];
+        this.syncedMultiplier();
+        this.syncedMultipliedCount();
+        this.syncedCount();
     }
 
   /**
