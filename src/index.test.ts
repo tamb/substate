@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createStore, Substate, type ICreateStoreConfig, type ISubstate } from './index';
+import { createStore, type ICreateStoreConfig, type ISubstate, Substate } from './index';
 
 describe('Integration tests', () => {
   it('createStore is exported and functional', () => {

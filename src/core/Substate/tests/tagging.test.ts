@@ -71,11 +71,11 @@ describe('Tagging Features', () => {
       expect(store.getAvailableTags()).toHaveLength(0);
     });
 
-    test('should handle empty string tags', () => {
+    test('should ignore empty string tags', () => {
       store.updateState({ counter: 1, $tag: '' });
 
-      expect(store.getAvailableTags()).toEqual(['']);
-      expect(store.getTaggedState('')).toMatchObject({ counter: 1 });
+      expect(store.getAvailableTags()).toEqual([]);
+      expect(store.getTaggedState('')).toBeUndefined();
     });
   });
 

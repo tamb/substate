@@ -6,7 +6,12 @@ function canUseFastPath(action: Partial<IState> & IState) {
   const keys = Object.keys(action);
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
-    if (requiresByString(key) || key === '$deep' || key === '$type' || key === '$tag') {
+    if (
+      requiresByString(key) ||
+      (key === '$deep' && action.deep) ||
+      key === '$type' ||
+      key === '$tag'
+    ) {
       result = false;
       break;
     }

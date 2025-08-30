@@ -1,11 +1,13 @@
 // Third party
 import { byString } from 'object-bystring';
+import rfdc from 'rfdc';
+
+import { EVENTS } from '../consts';
+import { PubSub } from '../PubSub/PubSub';
 import { canUseFastPath } from './helpers/canUseFastPath';
 import { checkForFastPathPossibility } from './helpers/checkForFastPathPossibility';
-import { EVENTS } from '../consts';
 import { isDeep } from './helpers/isDeep';
-import { PubSub } from '../PubSub/PubSub';
-import rfdc from 'rfdc';
+import { requiresByString } from './helpers/requiresByString';
 import { tempUpdate } from './helpers/tempUpdate';
 import type {
   IConfig,
@@ -147,7 +149,7 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
     const currentState = this.getCurrentState();
 
     // Fast path for direct property access (most common case)
-    if (!prop.includes('.')) {
+    if (!requiresByString(prop)) {
       return currentState[prop as keyof TState];
     }
 
@@ -195,7 +197,7 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
     this.pushState(newState);
 
     // Handle tagging if $tag is provided (including empty strings)
-    if (action.$tag !== undefined) {
+    if (action.$tag) {
       this._hasTaggedStates = true;
       this.taggedStates.set(action.$tag, {
         stateIndex: this.currentState,
@@ -322,7 +324,7 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
     } = config;
 
     // Check if the fields exist using byString to support dot notation
-    this.validateSyncFields(readerObj, stateField, readField);
+    this.validateSyncFields(stateField);
 
     /**
      * Applies the beforeMiddleware transformation chain to a value
@@ -864,11 +866,7 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
     this.emit(EVENTS.STATE_UPDATED, newState);
   }
 
-  private validateSyncFields(
-    readerObj: Record<string, unknown>,
-    stateField: string,
-    readField: string
-  ): void {
+  private validateSyncFields(stateField: string): void {
     // Check if stateField exists in the current state
     const currentStateValue = this.getProp(stateField);
     if (currentStateValue === undefined) {
@@ -878,14 +876,18 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
       );
     }
 
+    // NOTE: removed to make the code more flexible
+    // byString already adds the field in.
+
     // Check if readField exists in the reader object
-    const readFieldExists = byString(readerObj, readField) !== undefined;
-    if (!readFieldExists) {
-      throw new Error(
-        `Read field '${readField}' not found in reader object. ` +
-          `Available reader properties: ${Object.keys(readerObj).join(', ')}`
-      );
-    }
+    // const useByString = requiresByString(readField);
+    // const readFieldExists = useByString ? byString(readerObj, readField) !== undefined : readerObj[readField] !== undefined;
+    // if (!readFieldExists) {
+    //   throw new Error(
+    //     `Read field '${readField}' not found in reader object. ` +
+    //       `Available reader properties: ${Object.keys(readerObj).join(', ')}`
+    //   );
+    // }
   }
   // #endregion
 }

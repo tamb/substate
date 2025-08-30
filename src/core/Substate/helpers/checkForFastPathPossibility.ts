@@ -7,7 +7,7 @@ function checkForFastPathPossibility(
   return (
     !storeInstance.hasMiddleware &&
     !action.$deep &&
-    action.$tag === undefined &&
+    !action.$tag &&
     !storeInstance.hasTaggedStates
   );
 }

@@ -193,17 +193,14 @@ describe('Substate sync method', () => {
     expect(store.getProp('userName')).toBe('Alice');
   });
 
-  test('should handle undefined state values gracefully', () => {
-    const synced = store.sync({
-      readerObj: uiModel,
-      stateField: 'nonExistentField',
-      readField: 'name',
-    });
-
-    // Should not set the reader field if state field doesn't exist
-    expect(uiModel.name).toBe('');
-
-    synced.unsync();
+  test('should throw error for non-existent state field', () => {
+    expect(() => {
+      store.sync({
+        readerObj: uiModel,
+        stateField: 'nonExistentField',
+        readField: 'name',
+      });
+    }).toThrow("State field 'nonExistentField' not found in current state");
   });
 
   test('should work with complex middleware chain', () => {

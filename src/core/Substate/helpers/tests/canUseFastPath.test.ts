@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { canUseFastPath } from './canUseFastPath';
+import { canUseFastPath } from '../canUseFastPath';
 
 describe('canUseFastPath', () => {
   it('should return true if the fast path if object is shallow and DOES NOThave keywords', () => {
