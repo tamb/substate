@@ -129,19 +129,24 @@ export function runBenchmark(testName, stateSize, iterations, benchmarkFn) {
 
 // Function to save benchmark results to JSON file
 export function saveBenchmarkResults(libraryName, results) {
-  const outputDir = './results';
+  // Use run directory if provided via environment variable, otherwise fall back to default
+  const runDir = process.env.BENCHMARK_RUN_DIR;
+  const outputDir = runDir || './results';
   
   // Create results directory if it doesn't exist
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
   
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  // Use run ID if provided, otherwise generate timestamp
+  const runId = process.env.BENCHMARK_RUN_ID;
+  const timestamp = runId || new Date().toISOString().replace(/[:.]/g, '-');
   const filename = `${outputDir}/${libraryName}-benchmark-${timestamp}.json`;
   
   const benchmarkData = {
     library: libraryName,
     timestamp: new Date().toISOString(),
+    runId: runId || 'single-run',
     environment: {
       platform: process.platform,
       nodeVersion: process.version,

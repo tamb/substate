@@ -10,19 +10,45 @@ console.log('==========================================\n');
 
 // Function to read all benchmark JSON files
 function readBenchmarkResults() {
-  const resultsDir = './results';
+  // Use run directory if provided via environment variable, otherwise use latest results
+  const runDir = process.env.BENCHMARK_RUN_DIR;
+  let resultsDir = runDir || './results';
   
   if (!fs.existsSync(resultsDir)) {
     console.log('❌ No results directory found. Run benchmarks first:');
-    console.log('   npm run benchmark:all');
+    console.log('   node benchmark-start.mjs');
     return null;
   }
   
-  const files = fs.readdirSync(resultsDir).filter(file => file.endsWith('.json'));
+  let files;
+  if (runDir) {
+    // If specific run directory, only look in that directory
+    files = fs.readdirSync(resultsDir).filter(file => file.endsWith('.json'));
+    console.log(`📁 Reading results from run directory: ${runDir}`);
+  } else {
+    // If no specific run directory, find the latest run or use legacy results
+    const allEntries = fs.readdirSync(resultsDir, { withFileTypes: true });
+    const runDirs = allEntries
+      .filter(entry => entry.isDirectory() && entry.name.startsWith('run-'))
+      .map(entry => entry.name)
+      .sort()
+      .reverse(); // Most recent first
+    
+    if (runDirs.length > 0) {
+      const latestRunDir = path.join(resultsDir, runDirs[0]);
+      files = fs.readdirSync(latestRunDir).filter(file => file.endsWith('.json'));
+      console.log(`📁 Using latest run directory: ${latestRunDir}`);
+      resultsDir = latestRunDir;
+    } else {
+      // Fall back to legacy flat structure
+      files = fs.readdirSync(resultsDir).filter(file => file.endsWith('.json'));
+      console.log(`📁 Using legacy results directory: ${resultsDir}`);
+    }
+  }
   
   if (files.length === 0) {
     console.log('❌ No benchmark result files found. Run benchmarks first:');
-    console.log('   npm run benchmark:all');
+    console.log('   node benchmark-start.mjs');
     return null;
   }
   
@@ -43,7 +69,7 @@ function readBenchmarkResults() {
     }
   }
   
-  return results;
+  return { results, resultsDir };
 }
 
 // Function to format time values
@@ -551,70 +577,68 @@ function generateDetailedBreakdown(results) {
 }
 
 // Function to save files
-function saveReportFiles(summaryJSON, markdownTables) {
-  const outputDir = './results';
+function saveReportFiles(summaryJSON, markdownTables, resultsDir = './results') {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   
   // Save summary JSON
-  const summaryFile = `${outputDir}/performance-summary-${timestamp}.json`;
+  const summaryFile = `${resultsDir}/performance-summary-${timestamp}.json`;
   fs.writeFileSync(summaryFile, JSON.stringify(summaryJSON, null, 2));
   console.log(`💾 Summary JSON saved to: ${summaryFile}`);
   
   // Save markdown tables
-  const markdownFile = `${outputDir}/performance-tables-${timestamp}.md`;
+  const markdownFile = `${resultsDir}/performance-tables-${timestamp}.md`;
   fs.writeFileSync(markdownFile, markdownTables);
   console.log(`📄 Markdown tables saved to: ${markdownFile}`);
   
-  // Save latest versions (without timestamp)
-  const latestSummaryFile = `${outputDir}/performance-summary-latest.json`;
+  // Save latest versions (without timestamp) - only in main results directory
+  const mainResultsDir = './results';
+  const latestSummaryFile = `${mainResultsDir}/performance-summary-latest.json`;
   fs.writeFileSync(latestSummaryFile, JSON.stringify(summaryJSON, null, 2));
   
-  const latestMarkdownFile = `${outputDir}/performance-tables-latest.md`;
+  const latestMarkdownFile = `${mainResultsDir}/performance-tables-latest.md`;
   fs.writeFileSync(latestMarkdownFile, markdownTables);
   
   return { summaryFile, markdownFile, latestSummaryFile, latestMarkdownFile };
 }
 
 // Main execution
-async function main() {
-  try {
-    console.log('🔍 Reading benchmark results...\n');
-    
-    const results = readBenchmarkResults();
-    
-    if (!results) {
-      process.exit(1);
-    }
-    
-    console.log(`\n📊 Found ${Object.keys(results).length} benchmark result(s)`);
-    console.log();
-    
-    // Generate summary JSON
-    const summaryJSON = createSummaryJSON(results);
-    
-    // Generate markdown tables
-    const markdownTables = generateMarkdownTables(results);
-    
-    // Save files
-    const savedFiles = saveReportFiles(summaryJSON, markdownTables);
-    
-    // Generate console output
-    generateComparisonTable(results);
-    
-    // Generate detailed breakdown
-    generateDetailedBreakdown(results);
-    
-    console.log('\n' + '='.repeat(60));
-    console.log('🎉 Performance comparison report generated successfully!');
-    console.log('📁 Results saved in: ./results/');
-    console.log(`📊 Summary JSON: ${savedFiles.latestSummaryFile}`);
-    console.log(`📄 Markdown tables: ${savedFiles.latestMarkdownFile}`);
-    console.log('📊 Run benchmarks again to update results: npm run benchmark:all');
-    
-  } catch (error) {
-    console.error('❌ Error generating report:', error.message);
+function main() {
+  const benchmarkData = readBenchmarkResults();
+  
+  if (!benchmarkData) {
     process.exit(1);
   }
+  
+  const { results, resultsDir } = benchmarkData;
+  
+  console.log('\n📊 Generating Performance Report');
+  console.log('================================\n');
+  
+  // Create summary JSON
+  const summaryJSON = createSummaryJSON(results);
+  
+  // Create markdown tables
+  const markdownTables = generateMarkdownTables(results);
+  
+  // Save both files
+  const savedFiles = saveReportFiles(summaryJSON, markdownTables, resultsDir);
+  
+  // Generate console output
+  generateComparisonTable(results);
+  
+  // Generate detailed breakdown  
+  generateDetailedBreakdown(results);
+  
+  console.log('\n🎉 Report generation completed!');
+  console.log('\n📋 Files created:');
+  console.log(`   📊 Summary: ${savedFiles.summaryFile}`);
+  console.log(`   📄 Tables:  ${savedFiles.markdownFile}`);
+  console.log(`   📊 Latest:  ${savedFiles.latestSummaryFile}`);
+  console.log(`   📄 Latest:  ${savedFiles.latestMarkdownFile}`);
+  
+  console.log('\n💡 To view the results:');
+  console.log(`   📖 Read: ${savedFiles.latestMarkdownFile}`);
+  console.log(`   📊 JSON: ${savedFiles.latestSummaryFile}`);
 }
 
 main();

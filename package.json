@@ -36,7 +36,6 @@
     "dist/preact"
   ],
   "scripts": {
-    "benchmark:comparison": "cd benchmark-comparisons && npm run benchmark:all",
     "benchmark:comparison:report": "cd benchmark-comparisons && npm run report",
     "build": "npm run clean && rollup -c && node scripts/copy-declarations.js",
     "clean": "rimraf dist",
