@@ -74,9 +74,19 @@ counterStore.on('UPDATE_STATE', (newState) => {
 });
 ```
 
-## 🏷️ Tagged States - Named Checkpoints
+## 🏷️ Tagged States - Named State Checkpoint System
 
-Create meaningful snapshots of your state that you can easily return to:
+Tagged states is a **Named State Checkpoint System** that allows you to create semantic, named checkpoints in your application's state history. Instead of navigating by numeric indices, you can jump to meaningful moments in your app's lifecycle.
+
+### What is a Named State Checkpoint System?
+
+A Named State Checkpoint System provides:
+- **Semantic Navigation**: Jump to states by meaningful names instead of numbers
+- **State Restoration**: Restore to any named checkpoint and continue from there
+- **Debugging Support**: Tag known-good states for easy rollback
+- **User Experience**: Enable features like "save points" and "undo to specific moment"
+
+### Basic Usage
 
 ```typescript
 import { createStore } from 'substate';
@@ -86,7 +96,7 @@ const gameStore = createStore({
   state: { level: 1, score: 0, lives: 3 }
 });
 
-// Create tagged checkpoints
+// Create tagged checkpoints with meaningful names
 gameStore.updateState({ 
   level: 5, 
   score: 1250, 
@@ -100,7 +110,7 @@ gameStore.updateState({
   $tag: "boss-fight" 
 });
 
-// Jump back to any tagged state
+// Jump back to any tagged state by name
 gameStore.jumpToTag("level-5-start");
 console.log(gameStore.getCurrentState()); // { level: 5, score: 1250, lives: 3 }
 
@@ -111,6 +121,180 @@ console.log(bossState); // { level: 10, score: 5000, lives: 2 }
 // Manage your tags
 console.log(gameStore.getAvailableTags()); // ["level-5-start", "boss-fight"]
 gameStore.removeTag("level-5-start");
+```
+
+### Advanced Checkpoint Patterns
+
+#### Form Wizard with Step Restoration
+
+```typescript
+const formStore = createStore({
+  name: 'FormWizard',
+  state: {
+    currentStep: 1,
+    personalInfo: { firstName: '', lastName: '', email: '' },
+    addressInfo: { street: '', city: '', zip: '' },
+    paymentInfo: { cardNumber: '', expiry: '' }
+  }
+});
+
+// Save progress at each completed step
+function completePersonalInfo(data) {
+  formStore.updateState({
+    personalInfo: data,
+    currentStep: 2,
+    $tag: "step-1-complete"
+  });
+}
+
+function completeAddressInfo(data) {
+  formStore.updateState({
+    addressInfo: data,
+    currentStep: 3,
+    $tag: "step-2-complete"
+  });
+}
+
+// User can jump back to any completed step
+function goToStep(stepNumber) {
+  const stepTag = `step-${stepNumber}-complete`;
+  if (formStore.getAvailableTags().includes(stepTag)) {
+    formStore.jumpToTag(stepTag);
+  }
+}
+
+// Usage
+goToStep(1); // Jump back to personal info step
+goToStep(2); // Jump back to address info step
+```
+
+#### Debugging and Error Recovery
+
+```typescript
+const appStore = createStore({
+  name: 'AppStore',
+  state: {
+    userData: null,
+    settings: {},
+    lastError: null
+  }
+});
+
+// Tag known good states for debugging
+function markKnownGoodState() {
+  appStore.updateState({
+    $tag: "last-known-good"
+  });
+}
+
+// When errors occur, jump back to known good state
+function handleError(error) {
+  console.error('Error occurred:', error);
+  
+  if (appStore.getAvailableTags().includes("last-known-good")) {
+    console.log('Rolling back to last known good state...');
+    appStore.jumpToTag("last-known-good");
+  }
+}
+
+// Tag states before risky operations
+function performRiskyOperation() {
+  appStore.updateState({
+    $tag: "before-risky-operation"
+  });
+  
+  // ... perform operation that might fail
+  
+  if (operationFailed) {
+    appStore.jumpToTag("before-risky-operation");
+  }
+}
+```
+
+#### Game Save System
+
+```typescript
+const gameStore = createStore({
+  name: 'GameStore',
+  state: {
+    player: { health: 100, level: 1, inventory: [] },
+    world: { currentArea: 'town', discoveredAreas: [] },
+    quests: { active: [], completed: [] }
+  }
+});
+
+// Auto-save system
+function autoSave() {
+  const timestamp = new Date().toISOString();
+  gameStore.updateState({
+    $tag: `auto-save-${timestamp}`
+  });
+}
+
+// Manual save system
+function manualSave(saveName) {
+  gameStore.updateState({
+    $tag: `save-${saveName}`
+  });
+}
+
+// Load save system
+function loadSave(saveName) {
+  const saveTag = `save-${saveName}`;
+  if (gameStore.getAvailableTags().includes(saveTag)) {
+    gameStore.jumpToTag(saveTag);
+    return true;
+  }
+  return false;
+}
+
+// Get all available saves
+function getAvailableSaves() {
+  return gameStore.getAvailableTags()
+    .filter(tag => tag.startsWith('save-'))
+    .map(tag => tag.replace('save-', ''));
+}
+
+// Usage
+manualSave("checkpoint-1");
+manualSave("before-boss-fight");
+loadSave("checkpoint-1");
+```
+
+#### Feature Flag and A/B Testing
+
+```typescript
+const experimentStore = createStore({
+  name: 'ExperimentStore',
+  state: {
+    features: {},
+    userGroup: null,
+    experimentResults: {}
+  }
+});
+
+// Tag different experiment variants
+function setupExperimentVariant(variant) {
+  experimentStore.updateState({
+    userGroup: variant,
+    $tag: `experiment-${variant}`
+  });
+}
+
+// Jump between experiment variants
+function switchToVariant(variant) {
+  const variantTag = `experiment-${variant}`;
+  if (experimentStore.getAvailableTags().includes(variantTag)) {
+    experimentStore.jumpToTag(variantTag);
+  }
+}
+
+// Usage
+setupExperimentVariant("control");
+setupExperimentVariant("variant-a");
+setupExperimentVariant("variant-b");
+
+switchToVariant("variant-a"); // Switch to variant A
 ```
 
 ### 🎯 Common Tagging Patterns
@@ -130,6 +314,12 @@ store.updateState({ debugInfo: data, $tag: "issue-reproduction" });
 
 // Game saves
 gameStore.updateState({ saveData, $tag: `save-${Date.now()}` });
+
+// Workflow states
+workflowStore.updateState({ status: "approved", $tag: "workflow-approved" });
+
+// User session states
+sessionStore.updateState({ user: userData, $tag: "user-logged-in" });
 ```
 
 ## 📚 Usage Examples
@@ -559,6 +749,151 @@ const unsync3 = dataStore.sync({
 
 // One update triggers all syncs
 dataStore.updateState({ timestamp: Date.now() });
+```
+
+### Framework Integration Examples
+
+#### React Integration with Sync
+
+Substate's sync feature works seamlessly with React's useState and useEffect:
+
+```typescript
+import React, { useState, useEffect } from 'react';
+import { createStore } from 'substate';
+
+const userStore = createStore({
+  name: 'UserStore',
+  state: { userName: 'John', age: 25 }
+});
+
+function UserProfile() {
+  const [displayName, setDisplayName] = useState('');
+  const [formattedAge, setFormattedAge] = useState('');
+
+  useEffect(() => {
+    // Sync userName to displayName with transformation
+    const unsyncName = userStore.sync({
+      readerObj: { displayName },
+      stateField: 'userName',
+      readField: 'displayName',
+      beforeMiddleware: [
+        (name) => name.toUpperCase(),
+        (upperName) => `User: ${upperName}`
+      ],
+      afterMiddleware: [
+        (value) => setDisplayName(value as string)
+      ]
+    });
+
+    // Sync age to formattedAge with calculation
+    const unsyncAge = userStore.sync({
+      readerObj: { formattedAge },
+      stateField: 'age',
+      readField: 'formattedAge',
+      beforeMiddleware: [
+        (age) => `${age} years old`,
+        (ageText) => `Age: ${ageText}`
+      ],
+      afterMiddleware: [
+        (value) => setFormattedAge(value as string)
+      ]
+    });
+
+    // Cleanup on unmount
+    return () => {
+      unsyncName();
+      unsyncAge();
+    };
+  }, []);
+
+  return (
+    <div>
+      <h2>{displayName}</h2>
+      <p>{formattedAge}</p>
+    </div>
+  );
+}
+```
+
+#### Lit Integration with Sync
+
+Substate's sync feature integrates perfectly with Lit components using `requestUpdate()`:
+
+```typescript
+import { LitElement, html, property } from 'lit';
+import { createStore } from 'substate';
+
+const productStore = createStore({
+  name: 'ProductStore',
+  state: { 
+    price: 29.99,
+    currency: 'USD',
+    name: 'awesome widget'
+  }
+});
+
+class ProductDisplay extends LitElement {
+  @property({ type: String }) formattedPrice = '';
+  @property({ type: String }) productTitle = '';
+
+  private syncTarget: Record<string, unknown> = {};
+
+  connectedCallback() {
+    super.connectedCallback();
+    
+    // Sync price with currency formatting
+    this.unsyncPrice = productStore.sync({
+      readerObj: this.syncTarget,
+      stateField: 'price',
+      readField: 'formattedPrice',
+      beforeMiddleware: [
+        (price) => `$${price.toFixed(2)}`,
+        (formatted) => `${formatted} USD`
+      ],
+      afterMiddleware: [
+        (value) => {
+          this.formattedPrice = value as string;
+          this.requestUpdate('formattedPrice');
+        }
+      ]
+    });
+
+    // Sync product name with title case transformation
+    this.unsyncName = productStore.sync({
+      readerObj: this.syncTarget,
+      stateField: 'name',
+      readField: 'productTitle',
+      beforeMiddleware: [
+        (name) => name.split(' ').map(word => 
+          word.charAt(0).toUpperCase() + word.slice(1)
+        ).join(' ')
+      ],
+      afterMiddleware: [
+        (value) => {
+          this.productTitle = value as string;
+          this.requestUpdate('productTitle');
+        }
+      ]
+    });
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this.unsyncPrice();
+    this.unsyncName();
+  }
+
+  render() {
+    return html`
+      <div>
+        <h2>${this.productTitle}</h2>
+        <p>Price: ${this.formattedPrice}</p>
+      </div>
+    `;
+  }
+}
+
+customElements.define('product-display', ProductDisplay);
 ```
 
 ### TypeScript Support
@@ -1416,20 +1751,27 @@ The report generator creates multiple output formats:
 
 | Feature | Substate | Redux | Zustand | Valtio | MobX |
 |---------|----------|-------|---------|--------|------|
-| **Bundle Size** | ~10KB | ~13KB | ~8KB | ~14KB | ~167KB |
+| **Bundle Size** | ~11KB | ~13KB | ~8KB | ~14KB | ~20KB |
 | **TypeScript** | ✅ Excellent | ✅ Excellent | ✅ Excellent | ✅ Excellent | ✅ Excellent |
-| **Learning Curve** | 🟢 Low | 🔴 High | 🟡 Medium | 🟡 Medium | 🔴 High |
-| **Boilerplate** | 🟢 Minimal | 🔴 Heavy | 🟡 Some | 🟢 Minimal | 🟡 Some |
+| **Learning Curve** | 🟢 Low | 🔴 High | 🟢 Low | 🟡 Medium | 🔴 High |
+| **Boilerplate** | 🟢 Minimal | 🔴 Heavy | 🟢 Minimal | 🟢 Minimal | 🟡 Some |
 | **Time Travel** | ✅ Built-in | ⚡ DevTools | ❌ No | ❌ No | ❌ No |
 | **Memory Management** | ✅ Auto + Manual | ❌ Manual only | ❌ Manual only | ❌ Manual only | ❌ Manual only |
 | **Immutability** | ✅ Auto | ⚡ Manual | ⚡ Manual | ✅ Auto | ❌ Mutable |
 | **Sync/Binding** | ✅ Built-in | ❌ No | ❌ No | ❌ No | ✅ Yes |
 | **Framework Agnostic** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
-| **Middleware** | ✅ Simple | ✅ Complex | ✅ Simple | ❌ No | ✅ Yes |
+| **Middleware Support** | ✅ Simple | ✅ Complex | ✅ Yes | ✅ Yes | ✅ Yes |
 | **Nested Updates** | ✅ Dot notation + Object spread | ⚡ Reducers | ⚡ Manual | ✅ Direct | ✅ Direct |
 | **Tagged States** | ✅ Built-in | ❌ No | ❌ No | ❌ No | ❌ No |
 
 **NOTE:** Clone our repo and run the benchmarks to see how we stack up!
+
+> **💡 About This Comparison**: 
+> - **Bundle sizes** are approximate and may vary by version
+> - **Learning curve** and **boilerplate** assessments are subjective and based on typical developer experience
+> - **Feature availability** is based on core functionality (some libraries may have community plugins for additional features)
+> - **Middleware Support** includes traditional middleware, subscriptions, interceptors, and other extensibility patterns
+> - **Performance data** is based on our benchmark suite - run `npm run test:comparison` for current results
 
 ### When to Use Substate
 
@@ -1457,7 +1799,7 @@ The report generator creates multiple output formats:
 ### Migration Benefits
 
 **From Redux:**
-- 🎯 **90% less boilerplate** - No action creators, reducers, or complex setup
+- 🎯 **Significantly less boilerplate** - No action creators, reducers, or complex setup
 - 🔄 **Built-in time travel** without DevTools dependency
 - 🧠 **Automatic memory management** - No manual cleanup required
 - 🎪 **Simpler middleware** system with before/after hooks
@@ -1473,8 +1815,8 @@ The report generator creates multiple output formats:
 **From Zustand:**
 - 🔗 **Unique sync functionality** for unidirectional data binding
 - 🕰️ **Complete state history** with automatic memory management
-- 🎯 **More comprehensive TypeScript** support out of the box
-- 🌳 **Better nested property** handling with dot notation
+- 🎯 **Built-in TypeScript** support with comprehensive types
+- 🌳 **Flexible nested property** handling with dot notation
 - 📊 **Built-in memory monitoring** and optimization tools
 
 **From Vanilla State Management:**
@@ -1487,7 +1829,7 @@ The report generator creates multiple output formats:
 
 ### 🎯 What Makes Substate Unique
 
-Substate is the **only state management library** that combines all these features out of the box:
+Substate is **one of the few state management libraries** that combines all these features out of the box:
 
 1. **🔗 Built-in Sync System** - Unidirectional data binding with middleware transformations
 2. **🧠 Intelligent Memory Management** - Automatic history limits with manual controls

@@ -14,6 +14,10 @@ interface SyncContext {
   readField: string;
 }
 
+interface ISyncInstance {
+  unsync: () => void;
+}
+
 interface IState {
   [key: string]: unknown;
   $type?: string;
@@ -76,6 +80,19 @@ interface ISyncConfig {
    * ]
    */
   afterMiddleware?: AfterMiddleware[];
+
+  /**
+   * Array of event names or a single event name to listen for when syncing
+   * @type {string[] | string}
+   * @optional
+   * @example
+   * // Listen for both STATE_UPDATED and SUBSTATE_UPDATED events
+   * syncEvents: ['STATE_UPDATED', 'SUBSTATE_UPDATED']
+   *
+   * // Listen only for STATE_UPDATED event
+   * syncEvents: 'STATE_UPDATED'
+   */
+  syncEvents?: string[] | string;
 }
 
 /**
@@ -85,7 +102,7 @@ interface ISyncConfig {
  */
 interface ISubstate<TState extends IState = IState> extends IPubSub {
   /** Name identifier for this Substate instance */
-  name: string;
+  name?: string;
 
   /** Array of functions called after each state update */
   afterUpdate: UpdateMiddleware<TState>[] | [];
@@ -128,7 +145,7 @@ interface ISubstate<TState extends IState = IState> extends IPubSub {
    * @param config - Sync configuration including target object and middleware
    * @returns Function to call for cleanup (unsync)
    */
-  sync(config: ISyncConfig): () => void;
+  sync(config: ISyncConfig): ISyncInstance;
 
   /** Clears all state history except the current state */
   clearHistory(): void;
@@ -153,6 +170,12 @@ interface ISubstate<TState extends IState = IState> extends IPubSub {
 
   /** Clears all tagged states */
   clearTags(): void;
+
+  /** Returns true if the store has middleware */
+  hasMiddleware: boolean;
+
+  /** Returns true if the store has tagged states */
+  hasTaggedStates: boolean;
 }
 
 interface IConfig<TState extends IState = IState> {
@@ -176,6 +199,7 @@ export type {
   ISubstate,
   IConfig,
   IChangeStateAction,
+  ISyncInstance,
   BeforeMiddleware,
   AfterMiddleware,
   UpdateMiddleware,

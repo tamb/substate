@@ -36,12 +36,12 @@
     "dist/preact"
   ],
   "scripts": {
-    "benchmark:comparison": "cd benchmark-comparisons && npm run benchmark:all",
     "benchmark:comparison:report": "cd benchmark-comparisons && npm run report",
     "build": "npm run clean && rollup -c && node scripts/copy-declarations.js",
     "clean": "rimraf dist",
     "check": "biome check src/",
     "test": "vitest --run && vitest --run --config vitest.integration.config.ts",
+    "test:core": "vitest --run",
     "test:all": "npm run check && npm run test && npm run test:builds && npm run test:isolation && npm run test:integrations && npm run test:performance && echo 'test:all complete'",
     "test:builds": "npm run test:esm && npm run test:umd",
     "test:esm": "node build-tests/test-esm.mjs",
@@ -94,8 +94,7 @@
   "author": "Tamb (Tom Saporito) <tsaporito@protonmail.com>",
   "license": "MIT",
   "dependencies": {
-    "clone-deep": "^4.0.1",
-    "object-bystring": "^6.0.2",
+    "object-bystring": "^7.0.2",
     "rfdc": "^1.4.1"
   },
   "peerDependencies": {
@@ -135,7 +134,8 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "rimraf": "^6.0.1",
-    "rollup": "^4.46.2",
+    "rollup": "^4.47.1",
+    "rollup-plugin-strip-code": "^0.2.8",
     "stacktrace-js": "^2.0.2",
     "tslib": "^2.6.2",
     "typescript": "^5.9.2",

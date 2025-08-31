@@ -13,12 +13,17 @@ const STATE = {
 };
 
 describe('createStore factory function', () => {
-  test('creates store with required name', () => {
+  test('creates store with optional name', () => {
     const store = createStore({
       name: 'TestStore',
     });
     expect(store instanceof Substate).toBe(true);
     expect(store.name).toBe('TestStore');
+
+    const store2 = createStore({});
+    expect(store2 instanceof Substate).toBe(true);
+    // defaults to 'SubStateInstance'
+    expect(store2.name).toBe('SubStateInstance');
   });
 
   test('creates store with initial state', () => {

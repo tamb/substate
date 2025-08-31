@@ -1,17 +1,24 @@
-import byString from 'object-bystring';
+// Third party
+import { byString } from 'object-bystring';
 import rfdc from 'rfdc';
 
+import { EVENTS } from '../consts';
 import { PubSub } from '../PubSub/PubSub';
+import { canUseFastPath } from './helpers/canUseFastPath';
+import { checkForFastPathPossibility } from './helpers/checkForFastPathPossibility';
+import { isDeep } from './helpers/isDeep';
+import { requiresByString } from './helpers/requiresByString';
+import { tempUpdate } from './helpers/tempUpdate';
 import type {
   IConfig,
   IState,
   ISubstate,
   ISyncConfig,
+  ISyncInstance,
   SyncContext,
   UpdateMiddleware,
 } from './Substate.interface';
 
-const S: string = 'UPDATE_STATE';
 const cloneDeep = rfdc();
 
 /**
@@ -81,7 +88,7 @@ const cloneDeep = rfdc();
  * @since 1.0.0
  */
 class Substate<TState extends IState = IState> extends PubSub implements ISubstate<TState> {
-  name: string;
+  name?: string;
   afterUpdate: UpdateMiddleware<TState>[] | [];
   beforeUpdate: UpdateMiddleware<TState>[] | [];
   currentState: number;
@@ -111,8 +118,10 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
     if (obj.state) this.stateStorage.push(obj.state);
 
     // Optimize event binding by using arrow function to avoid bind overhead
-    this.on(S, (action: Partial<TState> & IState) => this.updateState(action));
+    this.on(EVENTS.UPDATE_STATE, (action: Partial<TState> & IState) => this.updateState(action));
   }
+
+  // #region Public API Methods
 
   /**
    * Gets a state from the state storage
@@ -140,7 +149,7 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
     const currentState = this.getCurrentState();
 
     // Fast path for direct property access (most common case)
-    if (!prop.includes('.')) {
+    if (!requiresByString(prop)) {
       return currentState[prop as keyof TState];
     }
 
@@ -154,134 +163,7 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
   public resetState(): void {
     this.currentState = 0;
     this.stateStorage = [this.stateStorage[0]];
-    this.emit('STATE_RESET');
-  }
-
-  /**
-   * Updates the state history array and sets the currentState pointer properly
-   * Automatically trims history if it exceeds maxHistorySize
-   * Also updates tagged state indices when history is trimmed
-   * @param newState - The new state object
-   */
-  private pushState(newState: TState): void {
-    this.stateStorage.push(newState);
-
-    // Trim history if it exceeds the maximum size
-    if (this.stateStorage.length > this.maxHistorySize) {
-      // Remove oldest states to maintain the limit
-      const statesToRemove = this.stateStorage.length - this.maxHistorySize;
-      this.stateStorage.splice(0, statesToRemove);
-
-      // Update tagged state indices after trimming
-      // Remove tags that reference trimmed states, update indices for remaining tags
-      for (const [tag, taggedEntry] of this.taggedStates.entries()) {
-        if (taggedEntry.stateIndex < statesToRemove) {
-          // This tagged state was trimmed, remove the tag
-          this.taggedStates.delete(tag);
-        } else {
-          // Adjust the state index
-          taggedEntry.stateIndex -= statesToRemove;
-        }
-      }
-
-      // Adjust currentState index after removal
-      this.currentState = this.stateStorage.length - 1;
-    } else {
-      this.currentState = this.stateStorage.length - 1;
-    }
-  }
-
-  /**
-   * Optimized state cloning with faster shallow clone
-   * @param deep - Whether to clone the state deeply
-   * @returns The cloned state
-   */
-  private cloneState(deep: boolean): TState {
-    if (deep) {
-      return cloneDeep(this.getCurrentState());
-    }
-
-    // Optimized shallow clone using spread operator (faster than Object.assign)
-    return { ...this.getCurrentState() } as TState;
-  }
-
-  /**
-   * Fires the beforeUpdate middleware
-   * @param action - The new state object
-   */
-  private fireBeforeMiddleware(action: IState): void {
-    if (this.beforeUpdate.length > 0) {
-      this.beforeUpdate.forEach((func) => {
-        func(this, action);
-      });
-    }
-  }
-
-  /**
-   * Fires the afterUpdate middleware
-   * @param action - The new state object
-   */
-  private fireAfterMiddleware(action: IState): void {
-    if (this.afterUpdate.length > 0) {
-      this.afterUpdate.forEach((func) => {
-        func(this, action);
-      });
-    }
-  }
-
-  /**
-   * Ultra-fast path for simple property updates without middleware or special features
-   * @param action - The new state object
-   */
-  private fastUpdateState(action: Partial<TState> & IState): void {
-    // Direct array access for maximum speed
-    const currentState = this.stateStorage[this.currentState];
-
-    // Use spread operator for faster shallow cloning
-    const newState = { ...currentState } as TState;
-
-    // Fast property assignment for direct properties
-    // Optimized loop with early exit for better performance
-    const keys = Object.keys(action);
-    for (let i = 0; i < keys.length; i++) {
-      const key = keys[i];
-      if (key !== '$deep' && key !== '$type' && key !== '$tag') {
-        (newState as unknown as IState)[key] = action[key];
-      }
-    }
-
-    (newState as IState).$type = S;
-    this.pushState(newState);
-    this.emit('STATE_UPDATED', newState);
-  }
-
-  /**
-   * Ultra-fast batch update for multiple properties at once
-   * @param actions - Array of update actions
-   */
-  private fastBatchUpdate(actions: Array<Partial<TState> & IState>): void {
-    // Get current state for batch operations
-    const currentState = this.getCurrentState();
-
-    // Pre-allocate the new state object
-    const newState = { ...currentState } as TState;
-
-    // Process all actions in a single pass
-    for (let actionIndex = 0; actionIndex < actions.length; actionIndex++) {
-      const action = actions[actionIndex];
-      const keys = Object.keys(action);
-
-      for (let keyIndex = 0; keyIndex < keys.length; keyIndex++) {
-        const key = keys[keyIndex];
-        if (key !== '$deep' && key !== '$type' && key !== '$tag') {
-          (newState as unknown as IState)[key] = action[key];
-        }
-      }
-    }
-
-    (newState as IState).$type = S;
-    this.pushState(newState);
-    this.emit('STATE_UPDATED', newState);
+    this.emit(EVENTS.STATE_RESET);
   }
 
   /**
@@ -289,26 +171,10 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
    * @param action - The new state object
    */
   public updateState(action: Partial<TState> & IState): void {
-    // Fast path for simple updates without middleware, deep cloning, or tagging
-    if (
-      !this._hasMiddleware &&
-      !action.$deep &&
-      action.$tag === undefined &&
-      !this._hasTaggedStates
-    ) {
-      // Check if all keys are direct properties (no dot notation)
-      let canUseFastPath = true;
-      const keys = Object.keys(action);
-      for (let i = 0; i < keys.length; i++) {
-        const key = keys[i];
-        if (key.includes('.') || key === '$deep' || key === '$type' || key === '$tag') {
-          canUseFastPath = false;
-          break;
-        }
-      }
-
-      if (canUseFastPath) {
-        this.fastUpdateState(action);
+    // Fast path check
+    if (checkForFastPathPossibility(this as ISubstate<IState>, action)) {
+      if (canUseFastPath(action)) {
+        this.fastUpdateStateOptimized(action, this.getCurrentState());
         return;
       }
     }
@@ -318,41 +184,28 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
       this.fireBeforeMiddleware(action);
     }
 
-    let deep: boolean = this.defaultDeep;
-    if (action.$deep !== undefined) deep = action.$deep;
-    const newState = this.cloneState(deep);
+    // Deep check
+    const deep = isDeep(action, this.defaultDeep);
 
-    //update temp new state
-    const keys = Object.keys(action);
-    for (let i = 0; i < keys.length; i++) {
-      const key = keys[i];
-      if (!key.includes('.')) {
-        (newState as unknown as IState)[key] = action[key];
-      } else {
-        byString(newState, key, action[key]);
-      }
-      //update cloned state
-    }
+    // State cloning
+    let newState = this.cloneState(deep);
 
-    if (!this.defaultDeep) (newState as IState).$deep = false; // reset $deep keyword
-    (newState as IState).$type = action.$type || S; // set $type if not already set
+    // Temp update
+    newState = tempUpdate(newState, action, this.defaultDeep);
 
-    // pushes new state
+    // Push state
     this.pushState(newState);
 
-    // Handle tagging if $tag is provided (including empty strings)
-    if (action.$tag !== undefined) {
-      this._hasTaggedStates = true;
-      this.taggedStates.set(action.$tag, {
-        stateIndex: this.currentState,
-        state: cloneDeep(newState) as TState, // Store a deep copy to prevent mutations
-      });
-    }
+    // Tagged states update
+    this.updateTaggedStates(action, newState);
 
+    // After middleware
     if (this._hasMiddleware) {
       this.fireAfterMiddleware(action);
     }
-    this.emit(action.$type || 'STATE_UPDATED', this.getCurrentState()); //emit with latest data
+
+    // Event emission
+    this.emit(action.$type || EVENTS.STATE_UPDATED, this.getCurrentState()); //emit with latest data
   }
 
   /**
@@ -456,7 +309,7 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
    *
    * @since 10.0.0
    */
-  public sync(config: ISyncConfig): () => void {
+  public sync(config: ISyncConfig): ISyncInstance {
     // Destructure configuration with defaults
     const {
       readerObj,
@@ -464,7 +317,11 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
       readField = stateField, // Default to stateField if readField not provided
       beforeMiddleware = [], // Default to empty array if no middleware
       afterMiddleware = [], // Default to empty array if no middleware
+      syncEvents = EVENTS.STATE_UPDATED,
     } = config;
+
+    // Check if the fields exist using byString to support dot notation
+    this.validateSyncFields(stateField);
 
     /**
      * Applies the beforeMiddleware transformation chain to a value
@@ -534,13 +391,27 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
 
     // SUBSCRIPTION: Register the sync handler to listen for state updates
     // Uses the existing pub/sub system - when updateState is called, it emits STATE_UPDATED
-    this.on('STATE_UPDATED', syncHandler);
+    if (Array.isArray(syncEvents)) {
+      syncEvents.forEach((event) => {
+        this.on(event, syncHandler);
+      });
+    } else {
+      this.on(syncEvents, syncHandler);
+    }
 
     // CLEANUP: Return the unsync function for memory management
     // This removes the event listener to prevent memory leaks
     // Important for component unmounting in React, Vue, etc.
-    return () => {
-      this.off('STATE_UPDATED', syncHandler);
+    return {
+      unsync: () => {
+        if (Array.isArray(syncEvents)) {
+          syncEvents.forEach((event) => {
+            this.off(event, syncHandler);
+          });
+        } else {
+          this.off(syncEvents, syncHandler);
+        }
+      },
     };
   }
 
@@ -570,7 +441,7 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
     // Clear all tagged states since they all reference old history
     this.taggedStates.clear();
 
-    this.emit('HISTORY_CLEARED', { previousLength });
+    this.emit(EVENTS.HISTORY_CLEARED, { previousLength });
   }
 
   /**
@@ -620,7 +491,7 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
       this.currentState = this.stateStorage.length - 1;
     }
 
-    this.emit('HISTORY_LIMIT_CHANGED', {
+    this.emit(EVENTS.HISTORY_LIMIT_CHANGED, {
       previousSize,
       newSize: maxSize,
       currentHistoryLength: this.stateStorage.length,
@@ -790,8 +661,8 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
     this.pushState(restoredState);
 
     // Emit state change event
-    this.emit('TAG_JUMPED', { tag, state: this.getCurrentState() });
-    this.emit('STATE_UPDATED', this.getCurrentState());
+    this.emit(EVENTS.TAG_JUMPED, { tag, state: this.getCurrentState() });
+    this.emit(EVENTS.STATE_UPDATED, this.getCurrentState());
   }
 
   /**
@@ -821,7 +692,7 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
     this.taggedStates.delete(tag);
 
     if (existed) {
-      this.emit('TAG_REMOVED', { tag });
+      this.emit(EVENTS.TAG_REMOVED, { tag });
     }
 
     return existed;
@@ -850,6 +721,193 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
 
     this.emit('TAGS_CLEARED', { clearedCount: tagCount });
   }
+
+  // #endregion
+
+  // #region Private Property Getters and Setters
+
+  get hasMiddleware(): boolean {
+    return this._hasMiddleware;
+  }
+
+  get hasTaggedStates(): boolean {
+    return this._hasTaggedStates;
+  }
+
+  // #region Private Methods
+
+  private updateTaggedStates(action: Partial<TState> & IState, newState: TState): void {
+    if (action.$tag) {
+      this._hasTaggedStates = true;
+      this.taggedStates.set(action.$tag, {
+        stateIndex: this.currentState,
+        state: cloneDeep(newState) as TState, // Store a deep copy to prevent mutations
+      });
+    }
+  }
+
+  /**
+   * Updates the state history array and sets the currentState pointer properly
+   * Uses immediate history trimming for optimal performance
+   * @param newState - The new state object
+   */
+  private pushState(newState: TState): void {
+    this.stateStorage.push(newState);
+
+    // Check if history needs trimming and do it immediately
+    if (this.stateStorage.length > this.maxHistorySize) {
+      this.performHistoryTrim();
+    }
+
+    this.currentState = this.stateStorage.length - 1;
+  }
+
+  /**
+   * Performs the actual history trimming operation
+   * This is called immediately when the history limit is exceeded
+   */
+  private performHistoryTrim(): void {
+    if (this.stateStorage.length <= this.maxHistorySize) {
+      return;
+    }
+
+    // Remove oldest states to maintain the limit
+    const statesToRemove = this.stateStorage.length - this.maxHistorySize;
+    this.stateStorage.splice(0, statesToRemove);
+
+    // Update tagged state indices after trimming
+    // Remove tags that reference trimmed states, update indices for remaining tags
+    for (const [tag, taggedEntry] of this.taggedStates.entries()) {
+      if (taggedEntry.stateIndex < statesToRemove) {
+        // This tagged state was trimmed, remove the tag
+        this.taggedStates.delete(tag);
+      } else {
+        // Adjust the state index
+        taggedEntry.stateIndex -= statesToRemove;
+      }
+    }
+
+    // Adjust currentState index after removal
+    this.currentState = this.stateStorage.length - 1;
+  }
+
+  /**
+   * Optimized state cloning with faster shallow clone
+   * @param deep - Whether to clone the state deeply
+   * @returns The cloned state
+   */
+  private cloneState(deep: boolean): TState {
+    if (deep) {
+      const result = cloneDeep(this.getCurrentState());
+      return result;
+    }
+
+    // Optimized shallow clone using spread operator (faster than Object.assign)
+    const result = { ...this.getCurrentState() } as TState;
+    return result;
+  }
+
+  /**
+   * Fires the beforeUpdate middleware
+   * @param action - The new state object
+   */
+  private fireBeforeMiddleware(action: IState): void {
+    if (this.beforeUpdate.length > 0) {
+      this.beforeUpdate.forEach((func) => {
+        func(this, action);
+      });
+    }
+  }
+
+  /**
+   * Fires the afterUpdate middleware
+   * @param action - The new state object
+   */
+  private fireAfterMiddleware(action: IState): void {
+    if (this.afterUpdate.length > 0) {
+      this.afterUpdate.forEach((func) => {
+        func(this, action);
+      });
+    }
+  }
+
+  /**
+   * Ultra-fast state update that takes current state as parameter to avoid redundant array access
+   * @param action - The new state object
+   * @param currentState - The current state (pre-fetched for performance)
+   */
+  private fastUpdateStateOptimized(action: Partial<TState> & IState, currentState: TState): void {
+    // Use provided currentState instead of array access for better performance
+    const newState = { ...currentState } as TState;
+
+    // Fast property assignment for direct properties
+    // Optimized loop with early exit for better performance
+    const keys = Object.keys(action);
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      if (key !== '$deep' && key !== '$type' && key !== '$tag') {
+        (newState as unknown as IState)[key] = action[key];
+      }
+    }
+
+    (newState as IState).$type = EVENTS.UPDATE_STATE;
+    this.pushState(newState);
+    this.emit(EVENTS.STATE_UPDATED, newState);
+  }
+
+  /**
+   * Ultra-fast batch update for multiple properties at once
+   * @param actions - Array of update actions
+   */
+  private fastBatchUpdate(actions: Array<Partial<TState> & IState>): void {
+    // Get current state for batch operations
+    const currentState = this.getCurrentState();
+
+    // Pre-allocate the new state object
+    const newState = { ...currentState } as TState;
+
+    // Process all actions in a single pass
+    for (let actionIndex = 0; actionIndex < actions.length; actionIndex++) {
+      const action = actions[actionIndex];
+      const keys = Object.keys(action);
+
+      for (let keyIndex = 0; keyIndex < keys.length; keyIndex++) {
+        const key = keys[keyIndex];
+        if (key !== '$deep' && key !== '$type' && key !== '$tag') {
+          (newState as unknown as IState)[key] = action[key];
+        }
+      }
+    }
+
+    (newState as IState).$type = EVENTS.UPDATE_STATE;
+    this.pushState(newState);
+    this.emit(EVENTS.STATE_UPDATED, newState);
+  }
+
+  private validateSyncFields(stateField: string): void {
+    // Check if stateField exists in the current state
+    const currentStateValue = this.getProp(stateField);
+    if (currentStateValue === undefined) {
+      throw new Error(
+        `State field '${stateField}' not found in current state. ` +
+          `Available state properties: ${Object.keys(this.getCurrentState()).join(', ')}`
+      );
+    }
+
+    // NOTE: removed to make the code more flexible
+    // byString already adds the field in.
+
+    // Check if readField exists in the reader object
+    // const useByString = requiresByString(readField);
+    // const readFieldExists = useByString ? byString(readerObj, readField) !== undefined : readerObj[readField] !== undefined;
+    // if (!readFieldExists) {
+    //   throw new Error(
+    //     `Read field '${readField}' not found in reader object. ` +
+    //       `Available reader properties: ${Object.keys(readerObj).join(', ')}`
+    //   );
+    // }
+  }
+  // #endregion
 }
 
 export { Substate };

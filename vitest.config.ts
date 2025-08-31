@@ -4,7 +4,7 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   test: {
     globals: true,
-    include: ['src/**/*.test.ts'],
+    include: ['src/**/*.test.ts', 'performance-tests/**/*.perf.ts'],
     exclude: [
       'src/integrations/**/*.test.ts',
       'src/integrations/**/*.test.tsx',
@@ -15,7 +15,6 @@ export default defineConfig({
       '**/*.config.*',
       'integration-tests/',
       'build-tests/',
-      'performance-tests/',
       'scripts/'
     ],
     environment: 'node',

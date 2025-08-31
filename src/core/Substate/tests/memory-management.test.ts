@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { createStore } from '../createStore/createStore';
-import { Substate } from './Substate';
-import type { IState } from './Substate.interface';
+import { createStore } from '../../createStore/createStore';
+import { Substate } from '../Substate';
+import type { IState } from '../Substate.interface';
 
 describe('Memory Management Features', () => {
   let store: Substate;
@@ -413,7 +413,7 @@ describe('Memory Management Features', () => {
 
       const uiModel = { displayName: '' };
 
-      const unsync = store.sync({
+      const synced = store.sync({
         readerObj: uiModel,
         stateField: 'userName',
         readField: 'displayName',
@@ -428,7 +428,7 @@ describe('Memory Management Features', () => {
       expect(uiModel.displayName).toBe('Bob');
       expect(store.stateStorage.length).toBe(2);
 
-      unsync();
+      synced.unsync();
     });
   });
 });

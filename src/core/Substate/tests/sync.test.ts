@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { Substate } from './Substate';
+import { Substate } from '../Substate';
 
 /**
  * Test suite for the Substate sync method
@@ -23,7 +23,7 @@ describe('Substate sync method', () => {
 
   // Test basic unidirectional sync functionality
   test('should sync basic state field to reader object', () => {
-    const unsync = store.sync({
+    const synced = store.sync({
       readerObj: uiModel,
       stateField: 'userName',
       readField: 'name',
@@ -40,12 +40,12 @@ describe('Substate sync method', () => {
     uiModel.name = 'Bob';
     expect(store.getProp('userName')).toBe('Alice');
 
-    unsync();
+    synced.unsync();
   });
 
   // Test default behavior when readField is omitted
   test('should use stateField as readField when readField is not provided', () => {
-    const unsync = store.sync({
+    const synced = store.sync({
       readerObj: uiModel,
       stateField: 'userName',
     });
@@ -55,12 +55,12 @@ describe('Substate sync method', () => {
     store.updateState({ userName: 'Alice' });
     expect(uiModel.userName).toBe('Alice');
 
-    unsync();
+    synced.unsync();
   });
 
   // Test middleware transformation pipeline
   test('should apply beforeMiddleware transformations', () => {
-    const unsync = store.sync({
+    const synced = store.sync({
       readerObj: uiModel,
       stateField: 'userName',
       readField: 'name',
@@ -75,14 +75,14 @@ describe('Substate sync method', () => {
     store.updateState({ userName: 'Alice' });
     expect(uiModel.name).toBe('Mr. ALICE');
 
-    unsync();
+    synced.unsync();
   });
 
   test('should call afterMiddleware for side effects', () => {
     const sideEffectSpy = vi.fn();
     const logSpy = vi.fn();
 
-    const unsync = store.sync({
+    const synced = store.sync({
       readerObj: uiModel,
       stateField: 'userName',
       readField: 'name',
@@ -118,11 +118,11 @@ describe('Substate sync method', () => {
     });
     expect(logSpy).toHaveBeenCalledWith('Updated to Alice');
 
-    unsync();
+    synced.unsync();
   });
 
   test('should handle nested state properties', () => {
-    const unsync = store.sync({
+    const synced = store.sync({
       readerObj: uiModel,
       stateField: 'nested.value',
       readField: 'nestedValue',
@@ -133,24 +133,24 @@ describe('Substate sync method', () => {
     store.updateState({ 'nested.value': 'updated' });
     expect(uiModel.nestedValue).toBe('updated');
 
-    unsync();
+    synced.unsync();
   });
 
   test('should handle multiple sync instances independently', () => {
     const anotherUiModel = { userName: '', age: 0 };
 
-    const unsync1 = store.sync({
+    const synced1 = store.sync({
       readerObj: uiModel,
       stateField: 'userName',
       readField: 'name',
     });
 
-    const unsync2 = store.sync({
+    const synced2 = store.sync({
       readerObj: anotherUiModel,
       stateField: 'userName',
     });
 
-    const unsync3 = store.sync({
+    const synced3 = store.sync({
       readerObj: anotherUiModel,
       stateField: 'age',
     });
@@ -167,14 +167,14 @@ describe('Substate sync method', () => {
     expect(anotherUiModel.userName).toBe('Alice');
     expect(anotherUiModel.age).toBe(30);
 
-    unsync1();
-    unsync2();
-    unsync3();
+    synced1.unsync();
+    synced2.unsync();
+    synced3.unsync();
   });
 
   // Test cleanup functionality to prevent memory leaks
   test('should stop syncing after unsync is called', () => {
-    const unsync = store.sync({
+    const synced = store.sync({
       readerObj: uiModel,
       stateField: 'userName',
       readField: 'name',
@@ -183,7 +183,7 @@ describe('Substate sync method', () => {
     expect(uiModel.name).toBe('John');
 
     // Call unsync
-    unsync();
+    synced.unsync();
 
     // Update state - should not sync anymore
     store.updateState({ userName: 'Alice' });
@@ -193,23 +193,20 @@ describe('Substate sync method', () => {
     expect(store.getProp('userName')).toBe('Alice');
   });
 
-  test('should handle undefined state values gracefully', () => {
-    const unsync = store.sync({
-      readerObj: uiModel,
-      stateField: 'nonExistentField',
-      readField: 'name',
-    });
-
-    // Should not set the reader field if state field doesn't exist
-    expect(uiModel.name).toBe('');
-
-    unsync();
+  test('should throw error for non-existent state field', () => {
+    expect(() => {
+      store.sync({
+        readerObj: uiModel,
+        stateField: 'nonExistentField',
+        readField: 'name',
+      });
+    }).toThrow("State field 'nonExistentField' not found in current state");
   });
 
   test('should work with complex middleware chain', () => {
     const processingLog: string[] = [];
 
-    const unsync = store.sync({
+    const synced = store.sync({
       readerObj: uiModel,
       stateField: 'userName',
       readField: 'name',
@@ -241,13 +238,13 @@ describe('Substate sync method', () => {
       'after2: Dr. JOHN',
     ]);
 
-    unsync();
+    synced.unsync();
   });
 
   test('should pass correct context to middleware', () => {
     const contextSpy = vi.fn();
 
-    const unsync = store.sync({
+    const synced = store.sync({
       readerObj: uiModel,
       stateField: 'userName',
       readField: 'displayName',
@@ -265,14 +262,14 @@ describe('Substate sync method', () => {
       readField: 'displayName',
     });
 
-    unsync();
+    synced.unsync();
   });
 
   test('should sync when state is reset', () => {
     // Update state first
     store.updateState({ userName: 'Alice' });
 
-    const unsync = store.sync({
+    const synced = store.sync({
       readerObj: uiModel,
       stateField: 'userName',
       readField: 'name',
@@ -288,6 +285,60 @@ describe('Substate sync method', () => {
     store.updateState({ userName: 'John' });
     expect(uiModel.name).toBe('John');
 
-    unsync();
+    synced.unsync();
+  });
+
+  test('should sync when syncEvents is provided', () => {
+    const synced = store.sync({
+      readerObj: uiModel,
+      stateField: 'userName',
+      readField: 'name',
+      syncEvents: 'STATE_UPDATED',
+    });
+
+    expect(uiModel.name).toBe('John');
+
+    store.updateState({ userName: 'Alice' });
+    expect(uiModel.name).toBe('Alice');
+
+    synced.unsync();
+  });
+
+  test('should sync when syncEvents is an array of events', () => {
+    const synced = store.sync({
+      readerObj: uiModel,
+      stateField: 'userName',
+      readField: 'name',
+      syncEvents: ['STATE_UPDATED', 'SUBSTATE_UPDATED'],
+    });
+
+    expect(uiModel.name).toBe('John');
+
+    store.updateState({ userName: 'Alice' });
+    expect(uiModel.name).toBe('Alice');
+
+    store.updateState({ userName: 'John', $type: 'SUBSTATE_UPDATED' });
+    expect(uiModel.name).toBe('John');
+
+    synced.unsync();
+  });
+
+  test('should sync when syncEvents is a single event', () => {
+    const synced = store.sync({
+      readerObj: uiModel,
+      stateField: 'userName',
+      readField: 'name',
+      syncEvents: 'MY_EVENT',
+    });
+
+    expect(uiModel.name).toBe('John');
+
+    store.updateState({ userName: 'Alice' });
+    expect(uiModel.name).toBe('John');
+
+    store.updateState({ userName: 'John', $type: 'MY_EVENT' });
+    expect(uiModel.name).toBe('John');
+
+    synced.unsync();
   });
 });
