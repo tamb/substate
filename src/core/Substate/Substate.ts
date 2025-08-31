@@ -171,11 +171,10 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
    * @param action - The new state object
    */
   public updateState(action: Partial<TState> & IState): void {
-    // Fast path for simple updates without middleware, deep cloning, or tagging
+    // Fast path check
     if (checkForFastPathPossibility(this as ISubstate<IState>, action)) {
-      // Check if all keys are direct properties (no dot notation)
       if (canUseFastPath(action)) {
-        this.fastUpdateState(action);
+        this.fastUpdateStateOptimized(action, this.getCurrentState());
         return;
       }
     }
@@ -185,29 +184,27 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
       this.fireBeforeMiddleware(action);
     }
 
+    // Deep check
     const deep = isDeep(action, this.defaultDeep);
 
-    // Clone the state with the appropriate deep flag
+    // State cloning
     let newState = this.cloneState(deep);
 
-    // update temp new state
+    // Temp update
     newState = tempUpdate(newState, action, this.defaultDeep);
 
-    // pushes new state
+    // Push state
     this.pushState(newState);
 
-    // Handle tagging if $tag is provided (including empty strings)
-    if (action.$tag) {
-      this._hasTaggedStates = true;
-      this.taggedStates.set(action.$tag, {
-        stateIndex: this.currentState,
-        state: cloneDeep(newState) as TState, // Store a deep copy to prevent mutations
-      });
-    }
+    // Tagged states update
+    this.updateTaggedStates(action, newState);
 
+    // After middleware
     if (this._hasMiddleware) {
       this.fireAfterMiddleware(action);
     }
+
+    // Event emission
     this.emit(action.$type || EVENTS.STATE_UPDATED, this.getCurrentState()); //emit with latest data
   }
 
@@ -739,38 +736,59 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
 
   // #region Private Methods
 
+  private updateTaggedStates(action: Partial<TState> & IState, newState: TState): void {
+    if (action.$tag) {
+      this._hasTaggedStates = true;
+      this.taggedStates.set(action.$tag, {
+        stateIndex: this.currentState,
+        state: cloneDeep(newState) as TState, // Store a deep copy to prevent mutations
+      });
+    }
+  }
+
   /**
    * Updates the state history array and sets the currentState pointer properly
-   * Automatically trims history if it exceeds maxHistorySize
-   * Also updates tagged state indices when history is trimmed
+   * Uses immediate history trimming for optimal performance
    * @param newState - The new state object
    */
   private pushState(newState: TState): void {
     this.stateStorage.push(newState);
 
-    // Trim history if it exceeds the maximum size
+    // Check if history needs trimming and do it immediately
     if (this.stateStorage.length > this.maxHistorySize) {
-      // Remove oldest states to maintain the limit
-      const statesToRemove = this.stateStorage.length - this.maxHistorySize;
-      this.stateStorage.splice(0, statesToRemove);
-
-      // Update tagged state indices after trimming
-      // Remove tags that reference trimmed states, update indices for remaining tags
-      for (const [tag, taggedEntry] of this.taggedStates.entries()) {
-        if (taggedEntry.stateIndex < statesToRemove) {
-          // This tagged state was trimmed, remove the tag
-          this.taggedStates.delete(tag);
-        } else {
-          // Adjust the state index
-          taggedEntry.stateIndex -= statesToRemove;
-        }
-      }
-
-      // Adjust currentState index after removal
-      this.currentState = this.stateStorage.length - 1;
-    } else {
-      this.currentState = this.stateStorage.length - 1;
+      this.performHistoryTrim();
     }
+
+    this.currentState = this.stateStorage.length - 1;
+  }
+
+  /**
+   * Performs the actual history trimming operation
+   * This is called immediately when the history limit is exceeded
+   */
+  private performHistoryTrim(): void {
+    if (this.stateStorage.length <= this.maxHistorySize) {
+      return;
+    }
+
+    // Remove oldest states to maintain the limit
+    const statesToRemove = this.stateStorage.length - this.maxHistorySize;
+    this.stateStorage.splice(0, statesToRemove);
+
+    // Update tagged state indices after trimming
+    // Remove tags that reference trimmed states, update indices for remaining tags
+    for (const [tag, taggedEntry] of this.taggedStates.entries()) {
+      if (taggedEntry.stateIndex < statesToRemove) {
+        // This tagged state was trimmed, remove the tag
+        this.taggedStates.delete(tag);
+      } else {
+        // Adjust the state index
+        taggedEntry.stateIndex -= statesToRemove;
+      }
+    }
+
+    // Adjust currentState index after removal
+    this.currentState = this.stateStorage.length - 1;
   }
 
   /**
@@ -780,11 +798,13 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
    */
   private cloneState(deep: boolean): TState {
     if (deep) {
-      return cloneDeep(this.getCurrentState());
+      const result = cloneDeep(this.getCurrentState());
+      return result;
     }
 
     // Optimized shallow clone using spread operator (faster than Object.assign)
-    return { ...this.getCurrentState() } as TState;
+    const result = { ...this.getCurrentState() } as TState;
+    return result;
   }
 
   /**
@@ -812,14 +832,12 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
   }
 
   /**
-   * Ultra-fast path for simple property updates without middleware or special features
+   * Ultra-fast state update that takes current state as parameter to avoid redundant array access
    * @param action - The new state object
+   * @param currentState - The current state (pre-fetched for performance)
    */
-  private fastUpdateState(action: Partial<TState> & IState): void {
-    // Direct array access for maximum speed
-    const currentState = this.stateStorage[this.currentState];
-
-    // Use spread operator for faster shallow cloning
+  private fastUpdateStateOptimized(action: Partial<TState> & IState, currentState: TState): void {
+    // Use provided currentState instead of array access for better performance
     const newState = { ...currentState } as TState;
 
     // Fast property assignment for direct properties

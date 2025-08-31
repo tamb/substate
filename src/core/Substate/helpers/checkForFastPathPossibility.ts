@@ -5,10 +5,7 @@ function checkForFastPathPossibility(
   action: Partial<IState> & IState
 ) {
   return (
-    !storeInstance.hasMiddleware &&
-    !action.$deep &&
-    !action.$tag &&
-    !storeInstance.hasTaggedStates
+    !storeInstance.hasMiddleware && !action.$deep && !action.$tag && !storeInstance.hasTaggedStates
   );
 }
 
