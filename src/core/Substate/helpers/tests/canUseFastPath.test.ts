@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import type { TUserState } from '../../interfaces';
 import { canUseFastPath } from '../canUseFastPath';
 
 describe('canUseFastPath', () => {
@@ -7,7 +8,7 @@ describe('canUseFastPath', () => {
       canUseFastPath({
         a: 1,
         b: 2,
-      })
+      } as TUserState)
     ).toBe(true);
   });
 
@@ -29,7 +30,7 @@ describe('canUseFastPath', () => {
         $tag: 'test',
         a: 1,
         b: 2,
-      })
+      } as TUserState)
     ).toBe(false);
   });
 
@@ -40,7 +41,7 @@ describe('canUseFastPath', () => {
         $tag: 'test',
         a: 1,
         b: 2,
-      })
+      } as TUserState)
     ).toBe(false);
   });
 
@@ -50,7 +51,7 @@ describe('canUseFastPath', () => {
         $deep: false,
         a: 1,
         b: 2,
-      })
+      } as TUserState)
     ).toBe(true);
   });
 
@@ -60,7 +61,7 @@ describe('canUseFastPath', () => {
         $deep: false,
         'a.b': 1,
         a: 2,
-      })
+      } as TUserState)
     ).toBe(false);
   });
 
@@ -70,7 +71,7 @@ describe('canUseFastPath', () => {
         $deep: false,
         'a[2]': 1,
         a: 2,
-      })
+      } as TUserState)
     ).toBe(false);
   });
 });

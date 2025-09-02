@@ -58,69 +58,6 @@ describe('Substate sync method', () => {
     synced.unsync();
   });
 
-  // Test middleware transformation pipeline
-  test('should apply beforeMiddleware transformations', () => {
-    const synced = store.sync({
-      readerObj: uiModel,
-      stateField: 'userName',
-      readField: 'name',
-      beforeMiddleware: [
-        (value: unknown) => (value as string).toUpperCase(),
-        (value: unknown) => `Mr. ${value as string}`,
-      ],
-    });
-
-    expect(uiModel.name).toBe('Mr. JOHN');
-
-    store.updateState({ userName: 'Alice' });
-    expect(uiModel.name).toBe('Mr. ALICE');
-
-    synced.unsync();
-  });
-
-  test('should call afterMiddleware for side effects', () => {
-    const sideEffectSpy = vi.fn();
-    const logSpy = vi.fn();
-
-    const synced = store.sync({
-      readerObj: uiModel,
-      stateField: 'userName',
-      readField: 'name',
-      afterMiddleware: [
-        (value: unknown, context: unknown) => {
-          sideEffectSpy(value, context);
-        },
-        (value: unknown) => {
-          logSpy(`Updated to ${value as string}`);
-        },
-      ],
-    });
-
-    // Check initial call
-    expect(sideEffectSpy).toHaveBeenCalledWith('John', {
-      source: 'substate',
-      field: 'userName',
-      readField: 'name',
-    });
-    expect(logSpy).toHaveBeenCalledWith('Updated to John');
-
-    // Reset spies
-    sideEffectSpy.mockClear();
-    logSpy.mockClear();
-
-    // Update state
-    store.updateState({ userName: 'Alice' });
-
-    expect(sideEffectSpy).toHaveBeenCalledWith('Alice', {
-      source: 'substate',
-      field: 'userName',
-      readField: 'name',
-    });
-    expect(logSpy).toHaveBeenCalledWith('Updated to Alice');
-
-    synced.unsync();
-  });
-
   test('should handle nested state properties', () => {
     const synced = store.sync({
       readerObj: uiModel,
@@ -203,68 +140,6 @@ describe('Substate sync method', () => {
     }).toThrow("State field 'nonExistentField' not found in current state");
   });
 
-  test('should work with complex middleware chain', () => {
-    const processingLog: string[] = [];
-
-    const synced = store.sync({
-      readerObj: uiModel,
-      stateField: 'userName',
-      readField: 'name',
-      beforeMiddleware: [
-        (value: unknown) => {
-          processingLog.push(`before1: ${value as string}`);
-          return (value as string).toUpperCase();
-        },
-        (value: unknown) => {
-          processingLog.push(`before2: ${value as string}`);
-          return `Dr. ${value as string}`;
-        },
-      ],
-      afterMiddleware: [
-        (value: unknown) => {
-          processingLog.push(`after1: ${value as string}`);
-        },
-        (value: unknown) => {
-          processingLog.push(`after2: ${value as string}`);
-        },
-      ],
-    });
-
-    expect(uiModel.name).toBe('Dr. JOHN');
-    expect(processingLog).toEqual([
-      'before1: John',
-      'before2: JOHN',
-      'after1: Dr. JOHN',
-      'after2: Dr. JOHN',
-    ]);
-
-    synced.unsync();
-  });
-
-  test('should pass correct context to middleware', () => {
-    const contextSpy = vi.fn();
-
-    const synced = store.sync({
-      readerObj: uiModel,
-      stateField: 'userName',
-      readField: 'displayName',
-      beforeMiddleware: [
-        (value: unknown, context: unknown) => {
-          contextSpy(context);
-          return value;
-        },
-      ],
-    });
-
-    expect(contextSpy).toHaveBeenCalledWith({
-      source: 'substate',
-      field: 'userName',
-      readField: 'displayName',
-    });
-
-    synced.unsync();
-  });
-
   test('should sync when state is reset', () => {
     // Update state first
     store.updateState({ userName: 'Alice' });
@@ -340,5 +215,132 @@ describe('Substate sync method', () => {
     expect(uiModel.name).toBe('John');
 
     synced.unsync();
+  });
+
+  describe('Sync Middleware', () => {
+    test('should work with complex middleware chain', () => {
+      const processingLog: string[] = [];
+
+      const synced = store.sync({
+        readerObj: uiModel,
+        stateField: 'userName',
+        readField: 'name',
+        beforeMiddleware: [
+          (value: unknown) => {
+            processingLog.push(`before1: ${value as string}`);
+            return (value as string).toUpperCase();
+          },
+          (value: unknown) => {
+            processingLog.push(`before2: ${value as string}`);
+            return `Dr. ${value as string}`;
+          },
+        ],
+        afterMiddleware: [
+          (value: unknown) => {
+            processingLog.push(`after1: ${value as string}`);
+          },
+          (value: unknown) => {
+            processingLog.push(`after2: ${value as string}`);
+          },
+        ],
+      });
+
+      expect(uiModel.name).toBe('Dr. JOHN');
+      expect(processingLog).toEqual([
+        'before1: John',
+        'before2: JOHN',
+        'after1: Dr. JOHN',
+        'after2: Dr. JOHN',
+      ]);
+
+      synced.unsync();
+    });
+
+    test('should pass correct context to middleware', () => {
+      const contextSpy = vi.fn();
+
+      const synced = store.sync({
+        readerObj: uiModel,
+        stateField: 'userName',
+        readField: 'displayName',
+        beforeMiddleware: [
+          (value: unknown, context: unknown) => {
+            contextSpy(context);
+            return value;
+          },
+        ],
+      });
+
+      expect(contextSpy).toHaveBeenCalledWith({
+        source: 'substate',
+        field: 'userName',
+        readField: 'displayName',
+      });
+
+      synced.unsync();
+    });
+
+    // Test middleware transformation pipeline
+    test('should apply beforeMiddleware transformations', () => {
+      const synced = store.sync({
+        readerObj: uiModel,
+        stateField: 'userName',
+        readField: 'name',
+        beforeMiddleware: [
+          (value: unknown) => (value as string).toUpperCase(),
+          (value: unknown) => `Mr. ${value as string}`,
+        ],
+      });
+
+      expect(uiModel.name).toBe('Mr. JOHN');
+
+      store.updateState({ userName: 'Alice' });
+      expect(uiModel.name).toBe('Mr. ALICE');
+
+      synced.unsync();
+    });
+
+    test('should call afterMiddleware for side effects', () => {
+      const sideEffectSpy = vi.fn();
+      const logSpy = vi.fn();
+
+      const synced = store.sync({
+        readerObj: uiModel,
+        stateField: 'userName',
+        readField: 'name',
+        afterMiddleware: [
+          (value: unknown, context: unknown) => {
+            sideEffectSpy(value, context);
+          },
+          (value: unknown) => {
+            logSpy(`Updated to ${value as string}`);
+          },
+        ],
+      });
+
+      // Check initial call
+      expect(sideEffectSpy).toHaveBeenCalledWith('John', {
+        source: 'substate',
+        field: 'userName',
+        readField: 'name',
+      });
+      expect(logSpy).toHaveBeenCalledWith('Updated to John');
+
+      // Reset spies
+      sideEffectSpy.mockClear();
+      logSpy.mockClear();
+
+      // Update state
+      store.updateState({ userName: 'Alice' });
+
+      expect(sideEffectSpy).toHaveBeenCalledWith('Alice', {
+        source: 'substate',
+        field: 'userName',
+        readField: 'name',
+      });
+      expect(logSpy).toHaveBeenCalledWith('Updated to Alice');
+
+      synced.unsync();
+    });
   });
 });

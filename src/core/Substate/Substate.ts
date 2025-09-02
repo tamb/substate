@@ -10,87 +10,20 @@ import { isDeep } from './helpers/isDeep';
 import { requiresByString } from './helpers/requiresByString';
 import { tempUpdate } from './helpers/tempUpdate';
 import type {
-  IConfig,
-  IState,
-  ISubstate,
-  ISyncConfig,
-  ISyncInstance,
-  SyncContext,
-  UpdateMiddleware,
-} from './Substate.interface';
+  ISyncContext,
+  TSyncConfig,
+  TSyncMiddleware,
+  TUpdateMiddleware,
+  TUserState,
+} from './interfaces';
+import type { ISubstate, ISubstateConfig } from './Substate.interface';
 
 const cloneDeep = rfdc();
 
-/**
- * Substate - A lightweight, pub/sub-based state management library
- *
- * Substate provides immutable state management with middleware support, state history,
- * and a powerful sync feature for unidirectional data binding to external objects.
- *
- * @template TState - The type of the state object stored in this Substate instance
- * @class Substate
- * @extends PubSub
- * @implements ISubstate
- *
- * @example
- * // Basic usage
- * const store = new Substate({
- *   name: "AppStore",
- *   state: { counter: 0, user: { name: "John" } }
- * });
- *
- * // Update state
- * store.updateState({ counter: 1 });
- * store.updateState({ "user.name": "Jane" }); // Nested updates
- *
- * // Listen to changes
- * store.on("STATE_UPDATED", (newState) => {
- *   console.log("State changed:", newState);
- * });
- *
- * @example
- * // With middleware
- * const store = new Substate({
- *   state: { data: [] },
- *   beforeUpdate: [(store, action) => console.log("Before:", action)],
- *   afterUpdate: [(store, action) => console.log("After:", action)]
- * });
- *
- * @example
- * // Using sync for UI binding
- * const uiModel = { displayName: "", formattedName: "" };
- *
- * // Basic sync
- * const unsync1 = store.sync({
- *   readerObj: uiModel,
- *   stateField: "user.name",
- *   readField: "displayName"
- * });
- *
- * // Sync with transformations
- * const unsync2 = store.sync({
- *   readerObj: uiModel,
- *   stateField: "user.name",
- *   readField: "formattedName",
- *   beforeMiddleware: [
- *     (value) => value.toUpperCase(),
- *     (value) => `Hello, ${value}!`
- *   ],
- *   afterMiddleware: [
- *     (value) => console.log(`UI updated: ${value}`)
- *   ]
- * });
- *
- * // Cleanup when component unmounts
- * unsync1();
- * unsync2();
- *
- * @since 1.0.0
- */
-class Substate<TState extends IState = IState> extends PubSub implements ISubstate<TState> {
+class Substate<TState extends TUserState = TUserState> extends PubSub implements ISubstate<TState> {
   name?: string;
-  afterUpdate: UpdateMiddleware<TState>[] | [];
-  beforeUpdate: UpdateMiddleware<TState>[] | [];
+  afterUpdate: TUpdateMiddleware[] | [];
+  beforeUpdate: TUpdateMiddleware[] | [];
   currentState: number;
   stateStorage: TState[];
   defaultDeep: boolean;
@@ -99,26 +32,26 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
   private _hasMiddleware: boolean;
   private _hasTaggedStates: boolean;
 
-  constructor(obj: IConfig<TState> = {} as IConfig<TState>) {
+  constructor(conf: ISubstateConfig<TState> = {} as ISubstateConfig<TState>) {
     super();
 
-    this.name = obj.name || 'SubStateInstance';
-    this.afterUpdate = obj.afterUpdate || [];
-    this.beforeUpdate = obj.beforeUpdate || [];
-    this.currentState = obj.currentState || 0;
-    this.stateStorage = obj.stateStorage || [];
-    this.defaultDeep = obj.defaultDeep || false;
-    this.maxHistorySize = obj.maxHistorySize || 50;
+    this.name = conf.name || 'SubStateInstance';
+    this.afterUpdate = conf.afterUpdate || [];
+    this.beforeUpdate = conf.beforeUpdate || [];
+    this.currentState = conf.currentState || 0;
+    this.stateStorage = conf.stateStorage || [];
+    this.defaultDeep = conf.defaultDeep || false;
+    this.maxHistorySize = conf.maxHistorySize || 50;
     this.taggedStates = new Map();
 
     // Pre-compute middleware flags for performance
     this._hasMiddleware = this.beforeUpdate.length > 0 || this.afterUpdate.length > 0;
     this._hasTaggedStates = false;
 
-    if (obj.state) this.stateStorage.push(obj.state);
+    if (conf.state) this.stateStorage.push(conf.state);
 
     // Optimize event binding by using arrow function to avoid bind overhead
-    this.on(EVENTS.UPDATE_STATE, (action: Partial<TState> & IState) => this.updateState(action));
+    this.on(EVENTS.UPDATE_STATE, (action: object) => this.updateState(action as TState));
   }
 
   // #region Public API Methods
@@ -170,10 +103,10 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
    * Updates the state with a new state object
    * @param action - The new state object
    */
-  public updateState(action: Partial<TState> & IState): void {
+  public updateState(action: Partial<TState>): void {
     // Fast path check
-    if (checkForFastPathPossibility(this as ISubstate<IState>, action)) {
-      if (canUseFastPath(action)) {
+    if (checkForFastPathPossibility(this as ISubstate, action as TUserState)) {
+      if (canUseFastPath(action as TUserState)) {
         this.fastUpdateStateOptimized(action, this.getCurrentState());
         return;
       }
@@ -191,7 +124,7 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
     let newState = this.cloneState(deep);
 
     // Temp update
-    newState = tempUpdate(newState, action, this.defaultDeep);
+    newState = tempUpdate(newState as TUserState, action as TUserState, this.defaultDeep) as TState;
 
     // Push state
     this.pushState(newState);
@@ -212,7 +145,7 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
    * Batch update multiple properties at once for better performance
    * @param actions - Array of update actions
    */
-  public batchUpdateState(actions: Array<Partial<TState> & IState>): void {
+  public batchUpdateState(actions: Array<Partial<TState>>): void {
     if (actions.length === 0) return;
 
     // Fast path for batch updates without middleware, deep cloning, or tagging
@@ -309,7 +242,7 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
    *
    * @since 10.0.0
    */
-  public sync(config: ISyncConfig): ISyncInstance {
+  public sync(config: TSyncConfig): { unsync: () => void } {
     // Destructure configuration with defaults
     const {
       readerObj,
@@ -325,20 +258,23 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
 
     /**
      * Applies the beforeMiddleware transformation chain to a value
-     * Each middleware function receives the transformed value from the previous function
-     * and a context object containing metadata about the sync operation
+     * Each middleware function receives the transformed value, sync context, and substate instance
      */
     const applyBeforeMiddleware = (value: unknown): unknown => {
-      const context: SyncContext = {
-        source: 'substate', // Indicates this sync originated from substate
-        field: stateField, // The original state field being watched
-        readField, // The target field in the reader object
+      const context: ISyncContext = {
+        source: 'substate',
+        field: stateField,
+        readField,
       };
 
-      // Use reduce to chain transformations - each middleware gets the result of the previous
-      return beforeMiddleware.reduce((transformedValue, middleware) => {
-        return middleware(transformedValue, context);
-      }, value);
+      let transformedValue = value;
+
+      // Apply each middleware function in sequence
+      beforeMiddleware.forEach((middleware: TSyncMiddleware) => {
+        transformedValue = middleware(transformedValue, context, this);
+      });
+
+      return transformedValue;
     };
 
     /**
@@ -347,15 +283,15 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
      * Return values are ignored
      */
     const applyAfterMiddleware = (value: unknown): void => {
-      const context: SyncContext = {
+      const context: ISyncContext = {
         source: 'substate',
         field: stateField,
         readField,
       };
 
       // Execute each afterMiddleware function with the final synced value
-      afterMiddleware.forEach((middleware) => {
-        middleware(value, context);
+      afterMiddleware.forEach((middleware: TSyncMiddleware) => {
+        middleware(value, context, this);
       });
     };
 
@@ -363,9 +299,9 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
      * The main sync handler that executes when the state is updated
      * This function is called every time STATE_UPDATED is emitted
      */
-    const syncHandler = (state: IState) => {
+    const syncHandler = (state: object) => {
       // Extract the value from the state using dot notation support (via byString)
-      const stateValue = byString(state, stateField);
+      const stateValue = byString(state as TState, stateField);
 
       // Only proceed if the state field exists and has a value
       if (stateValue !== undefined) {
@@ -655,7 +591,7 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
     const restoredState = cloneDeep(taggedEntry.state);
 
     // Remove the $tag metadata to avoid re-tagging
-    delete (restoredState as IState).$tag;
+    delete (restoredState as TState).$tag;
 
     // Add it as a new state in history
     this.pushState(restoredState);
@@ -733,10 +669,11 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
   get hasTaggedStates(): boolean {
     return this._hasTaggedStates;
   }
+  // #endregion
 
   // #region Private Methods
 
-  private updateTaggedStates(action: Partial<TState> & IState, newState: TState): void {
+  private updateTaggedStates(action: Partial<TState>, newState: TState): void {
     if (action.$tag) {
       this._hasTaggedStates = true;
       this.taggedStates.set(action.$tag, {
@@ -811,10 +748,10 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
    * Fires the beforeUpdate middleware
    * @param action - The new state object
    */
-  private fireBeforeMiddleware(action: IState): void {
+  private fireBeforeMiddleware(action: Partial<TState>): void {
     if (this.beforeUpdate.length > 0) {
       this.beforeUpdate.forEach((func) => {
-        func(this, action);
+        func(this as unknown as ISubstate, action as TUserState);
       });
     }
   }
@@ -823,10 +760,10 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
    * Fires the afterUpdate middleware
    * @param action - The new state object
    */
-  private fireAfterMiddleware(action: IState): void {
+  private fireAfterMiddleware(action: Partial<TState>): void {
     if (this.afterUpdate.length > 0) {
       this.afterUpdate.forEach((func) => {
-        func(this, action);
+        func(this as unknown as ISubstate, action as TUserState);
       });
     }
   }
@@ -836,7 +773,7 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
    * @param action - The new state object
    * @param currentState - The current state (pre-fetched for performance)
    */
-  private fastUpdateStateOptimized(action: Partial<TState> & IState, currentState: TState): void {
+  private fastUpdateStateOptimized(action: Partial<TState>, currentState: TState): void {
     // Use provided currentState instead of array access for better performance
     const newState = { ...currentState } as TState;
 
@@ -846,11 +783,11 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
     for (let i = 0; i < keys.length; i++) {
       const key = keys[i];
       if (key !== '$deep' && key !== '$type' && key !== '$tag') {
-        (newState as unknown as IState)[key] = action[key];
+        (newState as Record<string, unknown>)[key] = (action as Record<string, unknown>)[key];
       }
     }
 
-    (newState as IState).$type = EVENTS.UPDATE_STATE;
+    (newState as TState).$type = EVENTS.UPDATE_STATE;
     this.pushState(newState);
     this.emit(EVENTS.STATE_UPDATED, newState);
   }
@@ -859,7 +796,7 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
    * Ultra-fast batch update for multiple properties at once
    * @param actions - Array of update actions
    */
-  private fastBatchUpdate(actions: Array<Partial<TState> & IState>): void {
+  private fastBatchUpdate(actions: Array<Partial<TState>>): void {
     // Get current state for batch operations
     const currentState = this.getCurrentState();
 
@@ -874,12 +811,12 @@ class Substate<TState extends IState = IState> extends PubSub implements ISubsta
       for (let keyIndex = 0; keyIndex < keys.length; keyIndex++) {
         const key = keys[keyIndex];
         if (key !== '$deep' && key !== '$type' && key !== '$tag') {
-          (newState as unknown as IState)[key] = action[key];
+          (newState as Record<string, unknown>)[key] = (action as Record<string, unknown>)[key];
         }
       }
     }
 
-    (newState as IState).$type = EVENTS.UPDATE_STATE;
+    (newState as TState).$type = EVENTS.UPDATE_STATE;
     this.pushState(newState);
     this.emit(EVENTS.STATE_UPDATED, newState);
   }

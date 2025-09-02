@@ -1,26 +1,26 @@
 import { describe, expect, it } from 'vitest';
-import type { IState, ISubstate } from '../../Substate.interface';
+import type { ISubstate } from '../../Substate.interface';
 import { checkForFastPathPossibility } from '../checkForFastPathPossibility';
 
 const MOCK_STORE_NO_MIDDLEWARE_NO_TAGGED_STATES = {
   hasMiddleware: false,
   hasTaggedStates: false,
-} as ISubstate<IState>;
+} as ISubstate;
 
 const MOCK_STORE_NO_MIDDLEWARE_HAS_TAGGED_STATES = {
   hasMiddleware: false,
   hasTaggedStates: true,
-} as ISubstate<IState>;
+} as ISubstate;
 
 const MOCK_STORE_HAS_MIDDLEWARE_NO_TAGGED_STATES = {
   hasMiddleware: true,
   hasTaggedStates: false,
-} as ISubstate<IState>;
+} as ISubstate;
 
 const MOCK_STORE_HAS_MIDDLEWARE_HAS_TAGGED_STATES = {
   hasMiddleware: true,
   hasTaggedStates: true,
-} as ISubstate<IState>;
+} as ISubstate;
 
 describe('checkForFastPathPossibility', () => {
   it('should return true if the fast path is possible', () => {

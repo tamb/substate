@@ -1,13 +1,17 @@
-// Export the createStore function and its types
+// 🎯 Main API - Simple and intuitive
 export { createStore } from './core/createStore/createStore';
-export type { ICreateStoreConfig } from './core/createStore/createStore.interface';
-export type { IEvents, IPubSub } from './core/PubSub/PubSub.interface';
-// Export the Substate class and its types
+// 🔧 Common types you'll need
+export type { IPubSub } from './core/PubSub/PubSub.interface';
+export type {
+  ISyncContext,
+  TSyncConfig,
+  TSyncMiddleware,
+  TUpdateMiddleware,
+  TUserState,
+} from './core/Substate/interfaces';
+// The Substate class itself (for advanced usage)
 export { Substate } from './core/Substate/Substate';
 export type {
-  IChangeStateAction,
-  IConfig,
-  IState,
   ISubstate,
-  ISyncConfig,
+  ISubstateConfig as CreateStoreConfig,
 } from './core/Substate/Substate.interface';

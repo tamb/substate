@@ -1,9 +1,7 @@
-import type { IState, ISubstate } from '../Substate.interface';
+import type { TUserState } from '../interfaces';
+import type { ISubstate } from '../Substate.interface';
 
-function checkForFastPathPossibility(
-  storeInstance: ISubstate<IState>,
-  action: Partial<IState> & IState
-) {
+function checkForFastPathPossibility(storeInstance: ISubstate, action: Partial<TUserState>) {
   return (
     !storeInstance.hasMiddleware && !action.$deep && !action.$tag && !storeInstance.hasTaggedStates
   );

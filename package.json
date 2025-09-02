@@ -40,6 +40,8 @@
     "build": "npm run clean && rollup -c && node scripts/copy-declarations.js",
     "clean": "rimraf dist",
     "check": "biome check src/",
+    "format": "biome format --write src/",
+    "lint": "biome check src/",
     "test": "vitest --run && vitest --run --config vitest.integration.config.ts",
     "test:core": "vitest --run",
     "test:all": "npm run check && npm run test && npm run test:builds && npm run test:isolation && npm run test:integrations && npm run test:performance && echo 'test:all complete'",

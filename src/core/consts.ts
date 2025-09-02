@@ -6,6 +6,9 @@ const EVENTS = {
   TAG_JUMPED: 'TAG_JUMPED',
   HISTORY_LIMIT_CHANGED: 'HISTORY_LIMIT_CHANGED',
   HISTORY_CLEARED: 'HISTORY_CLEARED',
-};
+} as const;
 
-export { EVENTS };
+// Type for event names with better type inference
+type EventName = (typeof EVENTS)[keyof typeof EVENTS];
+
+export { EVENTS, type EventName };

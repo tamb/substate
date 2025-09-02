@@ -1,6 +1,6 @@
-import type { IState } from '../Substate.interface';
+import type { TUserState } from '../interfaces';
 
-function isDeep(action: Partial<IState> & IState, defaultDeep: boolean) {
+function isDeep(action: Partial<TUserState>, defaultDeep: boolean) {
   return action.$deep !== undefined ? action.$deep : defaultDeep;
 }
 
