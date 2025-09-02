@@ -1,10 +1,10 @@
 import { useState } from 'preact/hooks'
-import { createStore, type IState } from 'substate'
+import { createStore, type TUserState } from 'substate'
 import { useSubstate, useSubstateActions } from 'substate/preact'
 import './app.css'
 
-// Define state interface that extends IState
-interface CounterState extends IState {
+// Define state interface that extends TUserState
+interface CounterState extends TUserState {
   count: number
   lastUpdated: number
 }

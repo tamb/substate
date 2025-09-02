@@ -1,5 +1,5 @@
-import React, { useRef, useEffect } from 'react'
-import type { IState, ISubstate } from 'substate'
+import React, { useRef } from 'react'
+import type { TUserState, ISubstate } from 'substate'
 import { useSubstate, useSubstateActions } from 'substate/react'
 
 interface Todo {
@@ -9,7 +9,7 @@ interface Todo {
   createdAt: number
 }
 
-interface TodoState extends IState {
+interface TodoState extends TUserState {
   todos: Todo[]
   filter: 'all' | 'active' | 'completed'
   newTodoText: string
@@ -29,27 +29,26 @@ export default function TodoApp({ store }: TodoProps) {
   
   const { 
     updateState, 
-    sync, 
     jumpToTag, 
     getAvailableTags,
     clearHistory 
   } = useSubstateActions(store)
   
   // Test sync functionality with form
-  useEffect(() => {
-    if (!formRef.current) return
+  // useEffect(() => {
+  //   if (!formRef.current) return
     
-    const inputElement = formRef.current.querySelector('input[name="newTodo"]') as HTMLInputElement
-    if (!inputElement) return
+  //   const inputElement = formRef.current.querySelector('input[name="newTodo"]') as HTMLInputElement
+  //   if (!inputElement) return
     
-    const unsync = sync({
-      readerObj: inputElement as unknown as Record<string, unknown>,
-      stateField: 'newTodoText',
-      readField: 'value'
-    })
+  //   const unsync = sync({
+  //     readerObj: inputElement as unknown as Record<string, unknown>,
+  //     stateField: 'newTodoText',
+  //     readField: 'value'
+  //   })
     
-    return unsync // Test cleanup
-  }, [sync])
+  //   return unsync // Test cleanup
+  // }, [sync])
   
   const addTodo = (e: React.FormEvent) => {
     e.preventDefault()
