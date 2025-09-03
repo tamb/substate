@@ -8,6 +8,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
+    "test": "echo \"Running Preact integration tests...\" && npm run build",
     "test:with-build": "echo \"Running Preact integration tests...\" && npm run build && vitest run"
   },
   "dependencies": {
