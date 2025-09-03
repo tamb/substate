@@ -2,34 +2,34 @@
 
 **🖥️ Test Environment**: win32, Node.js v22.18.0
 **📊 Method**: Averaged over 1000 runs for statistical accuracy
-**📅 Generated**: 8/30/2025, 2:00:29 PM
+**📅 Generated**: 9/1/2025, 9:50:03 PM
 
 ## 🎯 Property Access Performance (Average per access)
 
 | Library | Small State | Medium State | Large State |
 |---------|-------------|--------------|-------------|
-| native | 50.76ns | **58.44ns** | **144.48ns** |
-| redux | 50.71ns | 59.25ns | 146.23ns |
-| substate | 66.01ns | 74.85ns | 160.89ns |
-| zustand | **50.71ns** | 62.11ns | 158.13ns |
+| native | 50.02ns | **57.99ns** | **142.61ns** |
+| redux | **49.01ns** | 59.19ns | 143.75ns |
+| substate | 62.48ns | 69.93ns | 151.84ns |
+| zustand | 49.07ns | 61.31ns | 153.13ns |
 
 ## 🔄 Update Performance (Average per update)
 
 | Library | Small State | Medium State | Large State |
 |---------|-------------|--------------|-------------|
-| native | **91.80ns** | **123.37ns** | **470.62ns** |
-| redux | 99.77ns | 128.26ns | 482.82ns |
-| substate | 314.59ns | 367.74ns | 601.73ns |
-| zustand | 96.95ns | 146.17ns | 782.91ns |
+| native | 97.33ns | **114.21ns** | **464.77ns** |
+| redux | 96.46ns | 128.00ns | 467.75ns |
+| substate | 307.13ns | 359.94ns | 569.79ns |
+| zustand | **95.96ns** | 137.15ns | 747.83ns |
 
 ## 🏗️ Store Creation Performance
 
 | Library | Small State | Medium State | Large State |
 |---------|-------------|--------------|-------------|
-| native | **876.80ns** | 7.34μs | 222.00μs |
-| redux | 3.96μs | **1.78μs** | **2.08μs** |
-| substate | 6.73μs | 3.38μs | 4.49μs |
-| zustand | 4.64μs | 9.67μs | 220.58μs |
+| native | **1.16μs** | 6.34μs | 220.58μs |
+| redux | 3.85μs | **2.30μs** | **1.98μs** |
+| substate | 6.74μs | 3.94μs | 3.99μs |
+| zustand | 4.99μs | 9.42μs | 206.97μs |
 
 ## 🧠 Memory Usage (Estimated)
 
@@ -42,9 +42,9 @@
 
 ## 📈 Key Performance Insights
 
-- **Fastest Property Access**: zustand (50.71ns)
-- **Fastest Updates**: native (91.80ns)
-- **Fastest Store Creation**: native (876.80ns)
+- **Fastest Property Access**: redux (49.01ns)
+- **Fastest Updates**: zustand (95.96ns)
+- **Fastest Store Creation**: native (1.16μs)
 
 - **Native JavaScript**: Baseline performance for direct object operations
 - **Substate**: Optimized for reactive state management with built-in features

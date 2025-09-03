@@ -1,13 +1,13 @@
 import { useState } from 'react'
-import { createStore, type IState } from 'substate'
+import { createStore, type TUserState } from 'substate'
 import Counter from './components/Counter'
 import TodoApp from './components/TodoApp'
 import './App.css'
 
 // Define state interfaces that extend IState
-interface CounterState extends IState {
+interface CounterState extends TUserState {
   count: number
-  lastUpdated: number
+  lastUpdated: number,
 }
 
 interface Todo {
@@ -17,7 +17,7 @@ interface Todo {
   createdAt: number
 }
 
-interface TodoState extends IState {
+interface TodoState extends TUserState {
   todos: Todo[]
   filter: 'all' | 'active' | 'completed'
   newTodoText: string
@@ -63,7 +63,7 @@ function App() {
 
       <div className="demo-container">
         {activeDemo === 'counter' && <Counter store={counterStore} />}
-        {activeDemo === 'todo' && <TodoApp store={todoStore} />}
+        {activeDemo === 'todo' && <TodoApp store={todoStore} counterStore={counterStore} />}
       </div>
 
       <footer>
@@ -77,3 +77,4 @@ function App() {
 }
 
 export default App
+export type { CounterState, TodoState }

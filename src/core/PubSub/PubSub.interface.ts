@@ -1,6 +1,8 @@
 // Event handler type that can accept various parameter types
-// biome-ignore lint/suspicious/noExplicitAny: Event handlers need flexibility for different parameter types
-type EventHandler = (...args: any[]) => void;
+type EventHandler = (data: object) => void;
+
+// Type-safe event handler (for future use)
+type TypedEventHandler<T> = (payload: T) => void;
 
 interface IEvents {
   [id: string]: EventHandler[];
@@ -15,4 +17,4 @@ interface IPubSub {
   emit(eventName: string, data: object): void; //Emits an event with data
 }
 
-export type { EventHandler, IEvents, IPubSub };
+export type { EventHandler, TypedEventHandler, IEvents, IPubSub };

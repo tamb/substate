@@ -36,9 +36,9 @@ export class Multiplier extends LitElement {
 
     disconnectedCallback() {
         super.disconnectedCallback();
-        this.syncedMultiplier();
-        this.syncedMultipliedCount();
-        this.syncedCount();
+        this.syncedMultiplier.unsync();
+        this.syncedMultipliedCount.unsync();
+        this.syncedCount.unsync();
     }
 
   /**

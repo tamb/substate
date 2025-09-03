@@ -1,5 +1,6 @@
 import { LitElement, css, html } from 'lit'
 import { customElement, property } from 'lit/decorators.js'
+import { type ISyncInstance } from 'substate';
 import { store } from '../../store';
 
 /**
@@ -19,33 +20,30 @@ export class Counter extends LitElement {
   @property({ type: Boolean })
   isMultiplierEven = false;
 
-  private unsyncFunctions: (() => void)[] = [];
-  private syncTarget: Record<string, unknown> = {};
+  private syncedCount: ISyncInstance;
+  private syncedIsMultiplierEven: ISyncInstance;
 
   constructor() {
     super();
     
     // Set up sync for count
-    this.unsyncFunctions.push(
-      store.sync({
-        readerObj: this.syncTarget,
+      this.syncedCount = store.sync({
+        readerObj: this,
         stateField: 'count',        
       })
-    );
+    
 
-    this.unsyncFunctions.push(
-      store.sync({
-        readerObj: this.syncTarget,
+      this.syncedIsMultiplierEven = store.sync({
+        readerObj: this,
         stateField: 'isMultiplierEven',
       })
-    );
+    
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    // Clean up all sync subscriptions
-    this.unsyncFunctions.forEach(unsync => unsync());
-    this.unsyncFunctions = [];
+    this.syncedCount.unsync();
+    this.syncedIsMultiplierEven.unsync();
   }
 
   render() {

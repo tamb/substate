@@ -9,9 +9,7 @@
 
 **A lightweight, type-safe state management library that combines the Pub/Sub pattern with immutable state management.**
 
-Substate provides a simple yet powerful way to manage application state with built-in event handling, middleware support, and seamless synchronization capabilities. Perfect for applications that need reactive state management without the complexity of larger frameworks.
-
-## 📑 Table of Contents
+Substate provides a simple yet powerful way to manage application state with built-in event handling, middleware support, and seamless synchronization capabilities. Perfect for applications that need reactive state management without the complexity of larger frameworks.## 📑 Table of Contents
 
 - [✨ Features](#-features)
 - [🚀 Quick Start](#-quick-start)
@@ -27,7 +25,6 @@ Substate provides a simple yet powerful way to manage application state with bui
 - [🛠️ Development](#-development)
 - [🤝 Contributing](#-contributing)
 - [📄 License](#-license)
-
 ## ✨ Features
 
 - 🚀 **Lightweight** - Tiny bundle size at 10kb
@@ -40,13 +37,11 @@ Substate provides a simple yet powerful way to manage application state with bui
 - 🎪 **Middleware** - Extensible with before/after update hooks
 - 🌳 **Nested Props** - Easy access to nested properties with optional dot notation or standard object spread
 - 📦 **Framework Agnostic** - Works with any JavaScript framework or vanilla JS
-
 ## Installation
 
 ```bash
 npm install substate
 ```
-
 ## 🚀 Quick Start
 
 ### Installation & Basic Usage
@@ -73,7 +68,6 @@ counterStore.on('UPDATE_STATE', (newState) => {
   console.log('Counter updated:', newState.count);
 });
 ```
-
 ## 🏷️ Tagged States - Named State Checkpoint System
 
 Tagged states is a **Named State Checkpoint System** that allows you to create semantic, named checkpoints in your application's state history. Instead of navigating by numeric indices, you can jump to meaningful moments in your app's lifecycle.
@@ -321,7 +315,6 @@ workflowStore.updateState({ status: "approved", $tag: "workflow-approved" });
 // User session states
 sessionStore.updateState({ user: userData, $tag: "user-logged-in" });
 ```
-
 ## 📚 Usage Examples
 
 ### 1. Todo List Management
@@ -531,7 +524,6 @@ userStore.updateState({
 console.log(userStore.getProp('profile.personal.name')); // 'Jane Doe'
 console.log(userStore.getProp('profile.preferences')); // { theme: 'light', notifications: true }
 ```
-
 ## 🔗 Sync - Unidirectional Data Binding
 
 One of Substate's most powerful features is the `sync` method, which provides unidirectional data binding between your store and any target object (like UI models, form objects, or API payloads).
@@ -750,152 +742,6 @@ const unsync3 = dataStore.sync({
 // One update triggers all syncs
 dataStore.updateState({ timestamp: Date.now() });
 ```
-
-### Framework Integration Examples
-
-#### React Integration with Sync
-
-Substate's sync feature works seamlessly with React's useState and useEffect:
-
-```typescript
-import React, { useState, useEffect } from 'react';
-import { createStore } from 'substate';
-
-const userStore = createStore({
-  name: 'UserStore',
-  state: { userName: 'John', age: 25 }
-});
-
-function UserProfile() {
-  const [displayName, setDisplayName] = useState('');
-  const [formattedAge, setFormattedAge] = useState('');
-
-  useEffect(() => {
-    // Sync userName to displayName with transformation
-    const unsyncName = userStore.sync({
-      readerObj: { displayName },
-      stateField: 'userName',
-      readField: 'displayName',
-      beforeMiddleware: [
-        (name) => name.toUpperCase(),
-        (upperName) => `User: ${upperName}`
-      ],
-      afterMiddleware: [
-        (value) => setDisplayName(value as string)
-      ]
-    });
-
-    // Sync age to formattedAge with calculation
-    const unsyncAge = userStore.sync({
-      readerObj: { formattedAge },
-      stateField: 'age',
-      readField: 'formattedAge',
-      beforeMiddleware: [
-        (age) => `${age} years old`,
-        (ageText) => `Age: ${ageText}`
-      ],
-      afterMiddleware: [
-        (value) => setFormattedAge(value as string)
-      ]
-    });
-
-    // Cleanup on unmount
-    return () => {
-      unsyncName();
-      unsyncAge();
-    };
-  }, []);
-
-  return (
-    <div>
-      <h2>{displayName}</h2>
-      <p>{formattedAge}</p>
-    </div>
-  );
-}
-```
-
-#### Lit Integration with Sync
-
-Substate's sync feature integrates perfectly with Lit components using `requestUpdate()`:
-
-```typescript
-import { LitElement, html, property } from 'lit';
-import { createStore } from 'substate';
-
-const productStore = createStore({
-  name: 'ProductStore',
-  state: { 
-    price: 29.99,
-    currency: 'USD',
-    name: 'awesome widget'
-  }
-});
-
-class ProductDisplay extends LitElement {
-  @property({ type: String }) formattedPrice = '';
-  @property({ type: String }) productTitle = '';
-
-  private syncTarget: Record<string, unknown> = {};
-
-  connectedCallback() {
-    super.connectedCallback();
-    
-    // Sync price with currency formatting
-    this.unsyncPrice = productStore.sync({
-      readerObj: this.syncTarget,
-      stateField: 'price',
-      readField: 'formattedPrice',
-      beforeMiddleware: [
-        (price) => `$${price.toFixed(2)}`,
-        (formatted) => `${formatted} USD`
-      ],
-      afterMiddleware: [
-        (value) => {
-          this.formattedPrice = value as string;
-          this.requestUpdate('formattedPrice');
-        }
-      ]
-    });
-
-    // Sync product name with title case transformation
-    this.unsyncName = productStore.sync({
-      readerObj: this.syncTarget,
-      stateField: 'name',
-      readField: 'productTitle',
-      beforeMiddleware: [
-        (name) => name.split(' ').map(word => 
-          word.charAt(0).toUpperCase() + word.slice(1)
-        ).join(' ')
-      ],
-      afterMiddleware: [
-        (value) => {
-          this.productTitle = value as string;
-          this.requestUpdate('productTitle');
-        }
-      ]
-    });
-  }
-
-  disconnectedCallback() {
-    super.disconnectedCallback();
-    this.unsyncPrice();
-    this.unsyncName();
-  }
-
-  render() {
-    return html`
-      <div>
-        <h2>${this.productTitle}</h2>
-        <p>Price: ${this.formattedPrice}</p>
-      </div>
-    `;
-  }
-}
-
-customElements.define('product-display', ProductDisplay);
-```
-
 ### TypeScript Support
 
 ```typescript
@@ -909,7 +755,6 @@ const config: ICreateStoreConfig = {
 
 const store: ISubstate = createStore(config);
 ```
-
 ## 📖 API Reference
 
 ### createStore(config)
@@ -1445,7 +1290,6 @@ store.off('UPDATE_STATE', handler); // Removes this specific handler
 | `maxHistorySize` | `number` | Maximum number of states to keep in history |
 | `beforeUpdate` | `UpdateMiddleware[]` | Pre-update middleware functions |
 | `afterUpdate` | `UpdateMiddleware[]` | Post-update middleware functions |
-
 ## 🧠 Memory Management
 
 Substate automatically manages memory through configurable history limits and provides tools for monitoring and optimization.
@@ -1568,7 +1412,6 @@ The default settings are optimized for most use cases:
 - **Automatic cleanup**: No manual intervention required
 
 > **💡 Note**: The 50-state default is designed for smaller applications. For enterprise applications with large state objects or high-frequency updates, consider customizing `maxHistorySize` based on your specific memory constraints.
-
 ## ⚡ Performance Benchmarks
 
 Substate delivers excellent performance across different use cases. Here are real benchmark results from our test suite (averaged over 5 runs for statistical accuracy):
@@ -1636,7 +1479,6 @@ const value = store.getProp('deeply.nested.property'); // ~1μs
 > - **Method**: Averaged over 5 runs for statistical accuracy
 > 
 > Your results may vary based on hardware and usage patterns.
-
 ## 🔬 Performance Comparison Benchmarks
 
 Substate includes comprehensive performance benchmarks comparing it with other popular state management libraries. These benchmarks provide **scientifically accurate** performance data based on real measurements, not estimates.
@@ -1679,10 +1521,10 @@ Here's a sample comparison from our benchmark suite:
 
 | Library | Property Access | Update Performance | Store Creation | Memory (Small State) |
 |---------|----------------|-------------------|----------------|---------------------|
-| **Native JS** | **54.04ns** | **163.94ns** | **3.22μs** | **1KB** |
-| **Redux** | 55.32ns | 221.18ns | 40.68μs | 61KB |
-| **Zustand** | 58.76ns | 179.82ns | 65.52μs | 61KB |
-| **Substate** | 65.44ns | 1.05μs | 50.68μs | 126KB |
+| **Native JS** | 47.90ns | **75.19ns** | **525.13ns** | **1KB** |
+| **Redux** | **47.76ns** | 78.20ns | 2.23μs | 61KB |
+| **Zustand** | 48.07ns | 78.62ns | 3.29μs | 61KB |
+| **Substate** | 61.42ns | 285.69ns | 5.45μs | 7KB |
 
 ### 🔬 Benchmark Methodology
 
@@ -1744,7 +1586,6 @@ The report generator creates multiple output formats:
 > **💡 Note**: Performance varies by use case. Choose based on your specific requirements, not just raw speed. The comparison benchmarks help you make informed decisions based on real data.
 > 
 > **📊 Latest Results**: The most recent benchmark results are available in `benchmark-comparisons/results/performance-tables-latest.md` and can be included directly in documentation.
-
 ## 🔄 Why Choose Substate?
 
 ### Comparison with Other State Management Solutions
@@ -1840,7 +1681,6 @@ Substate is **one of the few state management libraries** that combines all thes
 7. **⚡ Production Ready** - Optimized defaults that scale from prototype to enterprise
 
 > **💡 Key Insight**: Most libraries make you choose between features and simplicity. Substate gives you enterprise-grade capabilities with a learning curve measured in minutes, not weeks.
-
 ## 📋 TypeScript Definitions
 
 ### Core Interfaces
@@ -1888,17 +1728,40 @@ interface ISyncConfig {
 ### Middleware Types
 
 ```typescript
-type UpdateMiddleware = (store: ISubstate, action: IState) => void;
-type BeforeMiddleware = (value: unknown, context: SyncContext) => unknown;
-type AfterMiddleware = (value: unknown, context: SyncContext) => void;
+// Update middleware for state changes
+type TUpdateMiddleware = (store: ISubstate, action: Partial<TUserState>) => void;
 
-interface SyncContext {
+// Sync middleware for unidirectional data binding
+type TSyncMiddleware = (value: unknown, context: ISyncContext, store: ISubstate) => unknown;
+
+// Sync configuration with middleware support
+type TSyncConfig = {
+  readerObj: Record<string, unknown> | object;
+  stateField: string;
+  readField?: string;
+  beforeMiddleware?: TSyncMiddleware[];
+  afterMiddleware?: TSyncMiddleware[];
+  syncEvents?: string[] | string;
+};
+
+// Context provided to sync middleware
+interface ISyncContext {
   source: string;
   field: string;
   readField: string;
 }
-```
 
+// State keywords for special functionality
+type TStateKeywords = {
+  $type?: string;
+  $deep?: boolean;
+  $tag?: string;
+  [key: string]: unknown;
+};
+
+// User-defined state with keyword support
+type TUserState = object & TStateKeywords;
+```
 ## 📈 Migration Guide
 
 ### Version 10.x Migration
@@ -2000,7 +1863,6 @@ const increment = () => store.updateState({
   count: store.getProp('count') + 1 
 });
 ```
-
 ## 🛠️ Development
 
 ### Project Structure
@@ -2008,26 +1870,46 @@ const increment = () => store.updateState({
 ```
 substate/
 ├── src/
-│   ├── index.ts                    # Main exports
-│   ├── core/
-│   │   ├── createStore/
-│   │   │   ├── createStore.ts      # Factory function
-│   │   │   ├── createStore.interface.ts
-│   │   │   └── createStore.test.ts
-│   │   ├── Substate/
-│   │   │   ├── Substate.ts         # Main Substate class
-│   │   │   ├── Substate.interface.ts
-│   │   │   ├── Substate.test.ts
-│   │   │   └── sync.test.ts        # Sync functionality tests
-│   │   └── PubSub/
-│   │       ├── PubSub.ts           # PubSub base class
-│   │       ├── PubSub.interface.ts
-│   │       └── PubSub.test.ts
-│   └── integrations/                      # Future React bindings
-│   └── vue/                        # Future Vue bindings
-├── dist/                           # Compiled output
+│   ├── index.ts                    # Main exports and type definitions
+│   ├── index.test.ts               # Main export tests
+│   └── core/
+│       ├── consts.ts               # Event constants and shared values
+│       ├── createStore/
+│       │   ├── createStore.ts      # Factory function for store creation
+│       │   └── createStore.interface.ts
+│       ├── Substate/
+│       │   ├── Substate.ts         # Main Substate class implementation
+│       │   ├── Substate.interface.ts # Substate class interfaces
+│       │   ├── interfaces.ts       # Type definitions for state and middleware
+│       │   ├── helpers/            # Utility functions for optimization
+│       │   │   ├── canUseFastPath.ts
+│       │   │   ├── checkForFastPathPossibility.ts
+│       │   │   ├── isDeep.ts
+│       │   │   ├── requiresByString.ts
+│       │   │   ├── tempUpdate.ts
+│       │   │   └── tests/          # Helper function tests
+│       │   └── tests/              # Substate class tests
+│       │       ├── Substate.test.ts
+│       │       ├── sync.test.ts    # Sync functionality tests
+│       │       ├── tagging.test.ts # Tag functionality tests
+│       │       ├── memory-management.test.ts
+│       │       └── mocks.ts        # Test utilities
+│       └── PubSub/
+│           ├── PubSub.ts           # Event system base class
+│           ├── PubSub.interface.ts
+│           └── PubSub.test.ts
+│   └── integrations/               # Framework-specific integrations
+│       ├── preact/                 # Preact hooks and components
+│       └── react/                  # React hooks and components
+├── dist/                           # Compiled output (ESM, UMD, declarations)
 ├── coverage/                       # Test coverage reports
-└── docs/                          # Additional documentation
+├── integration-tests/              # End-to-end integration tests
+│   ├── lit-vite/                   # Lit integration test
+│   ├── preact-vite/                # Preact integration test
+│   └── react-vite/                 # React integration test
+├── benchmark-comparisons/          # Performance comparison suite
+├── performance-tests/              # Internal performance testing
+└── scripts/                        # Build and utility scripts
 ```
 
 ### Contributing
@@ -2043,22 +1925,80 @@ substate/
 
 ### Scripts
 
+#### Core Development
 ```bash
-npm test              # Run all tests
-npm run test:coverage # Run tests with coverage
-npm run build         # Build for production
-npm run lint          # Check linting
-npm run lint:fix      # Fix linting issues
-
-# Performance testing
-npm run test:performance     # Run performance tests (single run)
-npm run test:performance:avg # Run performance tests (5 runs, averaged)
-npm run test:perf:shallow    # Shallow state performance only
-npm run test:perf:deep       # Deep state performance only
-npm run test:perf:shallow:avg # Shallow performance (5 runs, averaged)
-npm run test:perf:deep:avg   # Deep performance (5 runs, averaged)
+npm run build         # Build all distributions (ESM, UMD, declarations)
+npm run clean         # Clean dist directory
+npm run fix           # Auto-fix formatting and linting issues
+npm run format        # Format code with Biome
+npm run lint          # Check code linting with Biome
+npm run check         # Run Biome checks on source code
 ```
 
+#### Testing Suite
+```bash
+npm test              # Run all tests (core + integration)
+npm run test:core     # Run core unit tests only
+npm run test:watch    # Run tests in watch mode
+npm run test:coverage # Run tests with coverage report
+npm run test:all      # Comprehensive test suite (check + test + builds + integrations + perf)
+```
+
+#### Build Testing
+```bash
+npm run test:builds   # Test both ESM and UMD builds
+npm run _test:esm     # Test ESM build specifically
+npm run _test:umd     # Test UMD build specifically
+```
+
+#### Performance Testing
+```bash
+npm run test:perf           # Run all performance tests (shallow + deep)
+npm run _test:perf:shallow   # Shallow state performance test
+npm run _test:perf:deep      # Deep state performance test
+npm run test:perf:avg        # Run performance tests with 5-run averages
+npm run _test:perf:shallow:avg # Shallow performance with averaging
+npm run _test:perf:deep:avg    # Deep performance with averaging
+```
+
+#### Integration Testing
+```bash
+npm run test:integrations           # Run all integration tests
+npm run _test:integrations:check     # Check dependency compatibility
+npm run _test:integration:react      # Test React integration
+npm run _test:integration:preact     # Test Preact integration
+```
+
+#### Isolation Testing
+```bash
+npm run test:isolation # Test module isolation and integrity
+```
+
+#### Development Servers
+```bash
+npm run dev:react     # Start React integration dev server
+npm run dev:preact    # Start Preact integration dev server
+```
+
+#### Setup and Maintenance
+```bash
+npm run integration:setup           # Setup all integration test environments
+npm run _integration:setup:react    # Setup React integration only
+npm run _integration:setup:preact   # Setup Preact integration only
+npm run reset                       # Clear all dependencies and reinstall
+npm run refresh                     # Clean install and setup integrations
+```
+
+#### Performance Benchmarking
+```bash
+npm run benchmark   # Run performance comparisons vs other libraries
+```
+
+#### Publishing
+```bash
+npm run pre         # Pre-publish checks (test + build) - publishes to 'next' tag
+npm run safe-publish # Full publish pipeline (test + build + publish)
+```
 ## 🤝 Contributing
 
 Contributions are welcome! Please read our contributing guidelines and submit pull requests to help improve Substate.

@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
-import type { IState, ISubstate } from '../../core/Substate/Substate.interface';
+import type { TUserState } from '../../core/Substate/interfaces';
+import type { ISubstate } from '../../core/Substate/Substate.interface';
 import type { StateSelector, StringSelector } from './types';
+
+// Simple state type alias
+type State = TUserState;
 
 /**
  * Shallow equality comparison for objects and arrays
@@ -57,16 +61,16 @@ function shallowEqual(a: unknown, b: unknown): boolean {
  * // Get nested property with string selector
  * const userName = useSubstate(store, 'user.profile.name');
  */
-function useSubstate<TState extends IState = IState>(store: ISubstate<TState>): TState;
-function useSubstate<TState extends IState = IState, TReturn = unknown>(
+function useSubstate<TState extends State = State>(store: ISubstate<TState>): TState;
+function useSubstate<TState extends State = State, TReturn = unknown>(
   store: ISubstate<TState>,
   selector: StateSelector<TState, TReturn>
 ): TReturn;
-function useSubstate<TState extends IState = IState>(
+function useSubstate<TState extends State = State>(
   store: ISubstate<TState>,
   selector: StringSelector
 ): unknown;
-function useSubstate<TState extends IState = IState, TReturn = unknown>(
+function useSubstate<TState extends State = State, TReturn = unknown>(
   store: ISubstate<TState>,
   selector?: StateSelector<TState, TReturn> | StringSelector
 ): TReturn | TState | unknown {
@@ -98,8 +102,8 @@ function useSubstate<TState extends IState = IState, TReturn = unknown>(
 
   useEffect(() => {
     // Update handler that only triggers re-render if selected value actually changed
-    const handleStateUpdate = (newState: TState) => {
-      const newSelectedValue = memoizedSelector(newState);
+    const handleStateUpdate = (newState: object) => {
+      const newSelectedValue = memoizedSelector(newState as TState);
 
       // Only update if the selected value has actually changed (shallow equality)
       if (!shallowEqual(lastValueRef.current, newSelectedValue)) {

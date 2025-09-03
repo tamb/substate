@@ -1,16 +1,16 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { render } from '@testing-library/react'
 import { screen, fireEvent, waitFor } from '@testing-library/dom'
-import { createStore, type IState } from 'substate'
+import { createStore, type TUserState } from 'substate'
 import { useSubstate, useSubstateActions } from 'substate/react'
 
 // Test state interfaces
-interface CounterState extends IState {
+interface CounterState extends TUserState {
   count: number
   lastUpdated: number
 }
 
-interface TodoState extends IState {
+interface TodoState extends TUserState {
   todos: Array<{ id: string; text: string; completed: boolean }>
   filter: 'all' | 'active' | 'completed'
 }
@@ -90,7 +90,7 @@ describe('React Integration Tests', () => {
 
     it('should enforce type constraints at compile time', () => {
       // This test verifies that our generic typing works
-      interface TestState extends IState {
+      interface TestState extends TUserState {
         value: string
       }
 
@@ -251,7 +251,7 @@ describe('React Integration Tests', () => {
 
   describe('Type Safety Integration', () => {
     it('should maintain type safety throughout the flow', () => {
-      interface StrictState extends IState {
+      interface StrictState extends TUserState {
         requiredField: string
         optionalField?: number
       }

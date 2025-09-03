@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { createStore, type IState } from '../../index';
+import { createStore, type TUserState } from '../../index';
 import * as ReactIntegration from './index';
 
 describe('React Integration Index', () => {
@@ -47,7 +47,7 @@ describe('React Integration Index', () => {
 
   describe('Integration with store', () => {
     test('should work with createStore', () => {
-      interface TestState extends IState {
+      interface TestState extends TUserState {
         count: number;
         user: { name: string };
       }
@@ -99,7 +99,7 @@ describe('React Integration Index', () => {
       expect(typeof ReactIntegration.useSubstate).toBe('function');
 
       // Test with complex state
-      interface ComplexState extends IState {
+      interface ComplexState extends TUserState {
         user: {
           profile: {
             name: string;
@@ -145,7 +145,7 @@ describe('React Integration Index', () => {
     });
 
     test('should be compatible with store methods', () => {
-      interface TestState extends IState {
+      interface TestState extends TUserState {
         count: number;
       }
 

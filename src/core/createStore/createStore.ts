@@ -1,26 +1,38 @@
+import type { TUserState } from '../Substate/interfaces';
 import { Substate } from '../Substate/Substate';
-import type { IConfig } from '../Substate/Substate.interface';
-import type { ICreateStoreConfig } from './createStore.interface';
+import type { ISubstateConfig } from '../Substate/Substate.interface';
 
 /**
- * Factory function to create a new Substate store
- * @template TState - The type of the state object
- * @param config - Configuration object for the store
- * @returns A new Substate instance with typed state
+ * Creates a new Substate store instance
+ *
+ * @param config - Configuration options for the store
+ * @returns A new Substate store instance
+ *
+ * @example
+ * // Basic usage
+ * const store = createStore({
+ *   state: { count: 0, user: { name: "John" } }
+ * });
+ *
+ * @example
+ * // With middleware
+ * const store = createStore({
+ *   state: { data: [] },
+ *   beforeUpdate: [(store, action) => console.log("Before:", action)],
+ *   afterUpdate: [(store, action) => console.log("After:", action)]
+ * });
  */
-function createStore<TState extends Record<string, unknown> = Record<string, unknown>>(
-  config: ICreateStoreConfig<TState>
+function createStore<TState extends TUserState = TUserState>(
+  config: ISubstateConfig<TState> = {} as ISubstateConfig<TState>
 ): Substate<TState> {
-  const substateConfig: IConfig<TState> = {
+  return new Substate<TState>({
     name: config.name,
     state: config.state,
     defaultDeep: config.defaultDeep ?? false,
     beforeUpdate: config.beforeUpdate || [],
     afterUpdate: config.afterUpdate || [],
     maxHistorySize: config.maxHistorySize ?? 50,
-  };
-
-  return new Substate<TState>(substateConfig);
+  });
 }
 
 export { createStore };

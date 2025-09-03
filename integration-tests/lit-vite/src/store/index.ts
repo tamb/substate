@@ -1,6 +1,12 @@
-import { createStore } from 'substate';
+import { createStore, type TUserState } from 'substate';
 
-const store = createStore({
+interface ICounterState extends TUserState {
+    count: number;
+    multipliedCount: number;
+    isMultiplierEven: boolean;
+}
+
+const store = createStore<ICounterState>({
     name: 'counter',
     state: {
         count: 0,
@@ -8,7 +14,7 @@ const store = createStore({
         isMultiplierEven: false,
     },
     afterUpdate: [
-        (store, action) => {
+        (store: any, action: Partial<ICounterState>) => {
             // Compute derived values after any state update
             const currentState = store.getCurrentState();
             const count = currentState.count;

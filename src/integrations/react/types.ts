@@ -1,26 +1,33 @@
-import type { IState, ISubstate } from '../../core/Substate/Substate.interface';
+import type { TUserState } from '../../core/Substate/interfaces';
+import type { ISubstate } from '../../core/Substate/Substate.interface';
+
+// Simple state type alias
+type State = TUserState;
 
 /**
  * Selector function that extracts a value from the store state
+ * @template TState - Your state type
+ * @template TReturn - The type this selector returns
  */
-export type StateSelector<TState extends IState = IState, TReturn = unknown> = (
+export type StateSelector<TState extends State = State, TReturn = unknown> = (
   state: TState
 ) => TReturn;
 
 /**
- * String selector using dot notation for nested property access
+ * String selector for accessing nested properties (e.g., "user.name")
  */
 export type StringSelector = string;
 
 /**
- * Union type for all supported selector types
+ * All supported selector types
  */
-export type Selector<T extends IState = IState> = StateSelector<T> | StringSelector;
+export type Selector<TState extends State = State> = StateSelector<TState> | StringSelector;
 
 /**
- * Return type for useSubstateActions hook containing all bound store methods
+ * Actions available on the store (for useSubstateActions hook)
+ * @template TState - Your state type
  */
-export interface SubstateActions<TState extends IState = IState> {
+export interface SubstateActions<TState extends State = State> {
   // Core state methods
   updateState: ISubstate<TState>['updateState'];
   resetState: ISubstate<TState>['resetState'];
@@ -51,17 +58,33 @@ export interface SubstateActions<TState extends IState = IState> {
 
 /**
  * Hook overloads for useSubstate with different selector types
+ *
+ * @example
+ * // Define your state type
+ * interface AppState {
+ *   count: number;
+ *   user: { name: string; age: number };
+ * }
+ *
+ * // Get entire state
+ * const state = useSubstate(store); // Returns AppState & IState
+ *
+ * // Get specific property with function selector
+ * const count = useSubstate(store, state => state.count); // Returns number
+ *
+ * // Get nested property with string selector
+ * const userName = useSubstate(store, 'user.name'); // Returns unknown
  */
 export interface UseSubstateHook {
   // No selector - returns entire state
-  <TState extends IState = IState>(store: ISubstate<TState>): TState;
+  <TState extends State = State>(store: ISubstate<TState>): TState;
 
   // Function selector - returns selected value with type inference
-  <TState extends IState = IState, TReturn = unknown>(
+  <TState extends State = State, TReturn = unknown>(
     store: ISubstate<TState>,
     selector: StateSelector<TState, TReturn>
   ): TReturn;
 
   // String selector - returns unknown (since we can't infer dot notation types)
-  <TState extends IState = IState>(store: ISubstate<TState>, selector: StringSelector): unknown;
+  <TState extends State = State>(store: ISubstate<TState>, selector: StringSelector): unknown;
 }

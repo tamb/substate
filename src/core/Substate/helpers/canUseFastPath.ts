@@ -1,14 +1,14 @@
-import type { IState } from '../Substate.interface';
+import type { TUserState } from '../interfaces';
 import { requiresByString } from './requiresByString';
 
-function canUseFastPath(action: Partial<IState> & IState) {
+function canUseFastPath(action: Partial<TUserState>) {
   let result = true;
   const keys = Object.keys(action);
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
     if (
       requiresByString(key) ||
-      (key === '$deep' && action.deep) ||
+      (key === '$deep' && action.$deep) ||
       key === '$type' ||
       key === '$tag'
     ) {

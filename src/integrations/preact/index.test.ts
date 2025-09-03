@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { createStore, type IState } from '../../index';
+import { createStore, type TUserState } from '../../index';
 import * as PreactIntegration from './index';
 
 describe('Preact Integration Index', () => {
@@ -39,7 +39,7 @@ describe('Preact Integration Index', () => {
 
   describe('Integration with store', () => {
     test('should work with createStore', () => {
-      interface TestState extends IState {
+      interface TestState extends TUserState {
         count: number;
         user: { name: string };
       }

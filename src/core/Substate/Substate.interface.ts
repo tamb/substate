@@ -1,207 +1,46 @@
 import type { IPubSub } from '../PubSub/PubSub.interface';
-
-// Type definitions for middleware functions
-type BeforeMiddleware = (value: unknown, context: SyncContext) => unknown;
-type AfterMiddleware = (value: unknown, context: SyncContext) => void;
-type UpdateMiddleware<TState extends IState = IState> = (
-  store: ISubstate<TState>,
-  action: IState
-) => void;
-
-interface SyncContext {
-  source: string;
-  field: string;
-  readField: string;
-}
+import type { TSyncConfig, TUpdateMiddleware, TUserState } from './interfaces';
 
 interface ISyncInstance {
   unsync: () => void;
 }
-
-interface IState {
-  [key: string]: unknown;
-  $type?: string;
-  $deep?: boolean;
-  $tag?: string;
-}
-
-/**
- * Configuration object for the sync method
- * @interface ISyncConfig
- */
-interface ISyncConfig {
-  /**
-   * The target object to synchronize state values to (e.g., a UI model)
-   * @type {Record<string, unknown>}
-   */
-  readerObj: Record<string, unknown>;
-
-  /**
-   * The property name in the store's state to watch for changes
-   * Supports nested properties using dot notation (e.g., "user.profile.name")
-   * @type {string}
-   */
-  stateField: string;
-
-  /**
-   * The property name in readerObj to update when stateField changes
-   * If not provided, defaults to the value of stateField
-   * @type {string}
-   * @optional
-   */
-  readField?: string;
-
-  /**
-   * Array of transformation functions applied to the value before syncing
-   * Each function receives (value, context) and should return the transformed value
-   * Functions are applied in sequence, with each receiving the output of the previous
-   * @type {BeforeMiddleware[]}
-   * @optional
-   * @example
-   * // Transform username to uppercase then add prefix
-   * beforeMiddleware: [
-   *   (value) => value.toUpperCase(),
-   *   (value) => `User: ${value}`
-   * ]
-   */
-  beforeMiddleware?: BeforeMiddleware[];
-
-  /**
-   * Array of functions called after syncing for side effects (logging, notifications, etc.)
-   * Each function receives (value, context) where value is the final synced value
-   * These functions should not return anything as their return values are ignored
-   * @type {AfterMiddleware[]}
-   * @optional
-   * @example
-   * // Log changes and trigger UI update
-   * afterMiddleware: [
-   *   (value) => console.log(`Synced: ${value}`),
-   *   (value) => triggerRerender()
-   * ]
-   */
-  afterMiddleware?: AfterMiddleware[];
-
-  /**
-   * Array of event names or a single event name to listen for when syncing
-   * @type {string[] | string}
-   * @optional
-   * @example
-   * // Listen for both STATE_UPDATED and SUBSTATE_UPDATED events
-   * syncEvents: ['STATE_UPDATED', 'SUBSTATE_UPDATED']
-   *
-   * // Listen only for STATE_UPDATED event
-   * syncEvents: 'STATE_UPDATED'
-   */
-  syncEvents?: string[] | string;
-}
-
-/**
- * Interface defining the public API of the Substate class
- * Extends IPubSub to inherit event management capabilities
- * @template TState - The type of the state object stored in this Substate instance
- */
-interface ISubstate<TState extends IState = IState> extends IPubSub {
-  /** Name identifier for this Substate instance */
+interface ISubstateConfig<TState extends TUserState = TUserState> {
   name?: string;
-
-  /** Array of functions called after each state update */
-  afterUpdate: UpdateMiddleware<TState>[] | [];
-
-  /** Array of functions called before each state update */
-  beforeUpdate: UpdateMiddleware<TState>[] | [];
-
-  /** Index pointing to the current state in the state history */
-  currentState: number;
-
-  /** Array storing the complete state history */
-  stateStorage: TState[];
-
-  /** Default setting for deep cloning during state updates */
-  defaultDeep: boolean;
-
-  /** Maximum number of states to keep in history (default: 50) */
-  maxHistorySize: number;
-
-  /** Retrieves a specific state from history by index */
-  getState(index: number): TState;
-
-  /** Gets the current active state object */
-  getCurrentState(): TState;
-
-  /** Extracts a property value from current state using dot notation */
-  getProp(prop: string): unknown;
-
-  /** Resets state to the initial state (index 0) */
-  resetState(): void;
-
-  /** Updates the current state with new values and emits change events */
-  updateState(action: Partial<TState> & IState): void;
-
-  /** Batch updates multiple properties at once for better performance */
-  batchUpdateState(actions: Array<Partial<TState> & IState>): void;
-
-  /**
-   * Establishes unidirectional sync between state property and target object
-   * @param config - Sync configuration including target object and middleware
-   * @returns Function to call for cleanup (unsync)
-   */
-  sync(config: ISyncConfig): ISyncInstance;
-
-  /** Clears all state history except the current state */
-  clearHistory(): void;
-
-  /** Sets a new limit for state history size and trims if necessary */
-  limitHistory(maxSize: number): void;
-
-  /** Returns estimated memory usage information for the store */
-  getMemoryUsage(): { stateCount: number; taggedCount: number; estimatedSizeKB: number | null };
-
-  /** Retrieves a tagged state by its tag name */
-  getTaggedState(tag: string): TState | undefined;
-
-  /** Returns an array of all available tag names */
-  getAvailableTags(): string[];
-
-  /** Jumps to a tagged state, making it the current state */
-  jumpToTag(tag: string): void;
-
-  /** Removes a tag from the tagged states collection */
-  removeTag(tag: string): void;
-
-  /** Clears all tagged states */
-  clearTags(): void;
-
-  /** Returns true if the store has middleware */
-  hasMiddleware: boolean;
-
-  /** Returns true if the store has tagged states */
-  hasTaggedStates: boolean;
-}
-
-interface IConfig<TState extends IState = IState> {
-  name?: string;
-  afterUpdate?: UpdateMiddleware<TState>[] | [];
-  beforeUpdate?: UpdateMiddleware<TState>[] | [];
+  afterUpdate?: TUpdateMiddleware[];
+  beforeUpdate?: TUpdateMiddleware[];
   currentState?: number;
   stateStorage?: TState[];
   defaultDeep?: boolean;
-  state?: TState;
   maxHistorySize?: number;
+  state?: TState;
+}
+interface ISubstate<TState extends TUserState = TUserState> extends IPubSub {
+  name?: string;
+  afterUpdate: TUpdateMiddleware[];
+  beforeUpdate: TUpdateMiddleware[];
+  currentState: number;
+  stateStorage: TState[];
+  defaultDeep: boolean;
+  maxHistorySize: number;
+  taggedStates: Map<string, { stateIndex: number; state: TState }>;
+  // methods
+  getState(index: number): TState;
+  getCurrentState(): TState;
+  getProp(prop: string): unknown;
+  resetState(): void;
+  updateState(action: Partial<TState>): void;
+  sync(config: TSyncConfig): ISyncInstance;
+  clearHistory(): void;
+  limitHistory(maxSize: number): void;
+  getMemoryUsage(): { stateCount: number; taggedCount: number; estimatedSizeKB: number | null };
+  getTaggedState(tag: string): TState | undefined;
+  getAvailableTags(): string[];
+  jumpToTag(tag: string): void;
+  removeTag(tag: string): void;
+  clearTags(): void;
+  // getters and setters
+  hasMiddleware: boolean;
+  hasTaggedStates: boolean;
 }
 
-interface IChangeStateAction extends IState {
-  $requestedState: number;
-}
-
-export type {
-  IState,
-  ISyncConfig,
-  ISubstate,
-  IConfig,
-  IChangeStateAction,
-  ISyncInstance,
-  BeforeMiddleware,
-  AfterMiddleware,
-  UpdateMiddleware,
-  SyncContext,
-};
+export type { ISubstate, ISubstateConfig, ISyncInstance };

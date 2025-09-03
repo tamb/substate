@@ -1,6 +1,11 @@
 import { useMemo } from 'preact/hooks';
-import type { IState, ISubstate } from '../../core/Substate/Substate.interface';
+import type { TUserState } from '../../core/Substate/interfaces';
+import type { ISubstate } from '../../core/Substate/Substate.interface';
+
 import type { SubstateActions } from './types';
+
+// Simple state type alias
+type State = TUserState;
 
 /**
  * Preact hook that returns all Substate store methods bound to the provided store
@@ -21,7 +26,7 @@ import type { SubstateActions } from './types';
  * updateState({ count: count + 1 });
  * jumpToTag('checkpoint-1');
  */
-export function useSubstateActions<TState extends IState = IState>(
+export function useSubstateActions<TState extends State = State>(
   store: ISubstate<TState>
 ): SubstateActions<TState> {
   return useMemo(

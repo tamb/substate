@@ -1,10 +1,14 @@
 import { byString } from 'object-bystring';
 
 import { EVENTS } from '../../consts';
-import type { IState } from '../Substate.interface';
+import type { TUserState } from '../interfaces';
 import { requiresByString } from './requiresByString';
 
-function tempUpdate(newState: IState, action: Partial<IState> & IState, defaultDeep: boolean): any {
+function tempUpdate(
+  newState: TUserState,
+  action: Partial<TUserState>,
+  defaultDeep: boolean
+): TUserState {
   const keys = Object.keys(action);
 
   const directKeys: string[] = [];
@@ -21,7 +25,7 @@ function tempUpdate(newState: IState, action: Partial<IState> & IState, defaultD
 
   for (let i = 0; i < directKeys.length; i++) {
     const key = directKeys[i];
-    (newState as unknown as IState)[key] = action[key];
+    (newState as unknown as TUserState)[key] = action[key];
   }
 
   for (let i = 0; i < nestedKeys.length; i++) {
@@ -29,8 +33,8 @@ function tempUpdate(newState: IState, action: Partial<IState> & IState, defaultD
     byString(newState, key, action[key]);
   }
 
-  if (!defaultDeep) (newState as IState).$deep = false; // reset $deep keyword
-  (newState as IState).$type = action.$type || EVENTS.UPDATE_STATE; // set $type if not already set
+  if (!defaultDeep) (newState as TUserState).$deep = false; // reset $deep keyword
+  (newState as TUserState).$type = action.$type || EVENTS.UPDATE_STATE; // set $type if not already set
 
   return newState;
 }
