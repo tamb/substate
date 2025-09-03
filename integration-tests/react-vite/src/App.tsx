@@ -7,7 +7,7 @@ import './App.css'
 // Define state interfaces that extend IState
 interface CounterState extends TUserState {
   count: number
-  lastUpdated: number
+  lastUpdated: number,
 }
 
 interface Todo {
@@ -63,7 +63,7 @@ function App() {
 
       <div className="demo-container">
         {activeDemo === 'counter' && <Counter store={counterStore} />}
-        {activeDemo === 'todo' && <TodoApp store={todoStore} />}
+        {activeDemo === 'todo' && <TodoApp store={todoStore} counterStore={counterStore} />}
       </div>
 
       <footer>
@@ -77,3 +77,4 @@ function App() {
 }
 
 export default App
+export type { CounterState, TodoState }

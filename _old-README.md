@@ -9,7 +9,9 @@
 
 **A lightweight, type-safe state management library that combines the Pub/Sub pattern with immutable state management.**
 
-Substate provides a simple yet powerful way to manage application state with built-in event handling, middleware support, and seamless synchronization capabilities. Perfect for applications that need reactive state management without the complexity of larger frameworks.## 📑 Table of Contents
+Substate provides a simple yet powerful way to manage application state with built-in event handling, middleware support, and seamless synchronization capabilities. Perfect for applications that need reactive state management without the complexity of larger frameworks.
+
+## 📑 Table of Contents
 
 - [✨ Features](#-features)
 - [🚀 Quick Start](#-quick-start)
@@ -25,6 +27,7 @@ Substate provides a simple yet powerful way to manage application state with bui
 - [🛠️ Development](#-development)
 - [🤝 Contributing](#-contributing)
 - [📄 License](#-license)
+
 ## ✨ Features
 
 - 🚀 **Lightweight** - Tiny bundle size at 10kb
@@ -37,11 +40,13 @@ Substate provides a simple yet powerful way to manage application state with bui
 - 🎪 **Middleware** - Extensible with before/after update hooks
 - 🌳 **Nested Props** - Easy access to nested properties with optional dot notation or standard object spread
 - 📦 **Framework Agnostic** - Works with any JavaScript framework or vanilla JS
+
 ## Installation
 
 ```bash
 npm install substate
 ```
+
 ## 🚀 Quick Start
 
 ### Installation & Basic Usage
@@ -68,6 +73,7 @@ counterStore.on('UPDATE_STATE', (newState) => {
   console.log('Counter updated:', newState.count);
 });
 ```
+
 ## 🏷️ Tagged States - Named State Checkpoint System
 
 Tagged states is a **Named State Checkpoint System** that allows you to create semantic, named checkpoints in your application's state history. Instead of navigating by numeric indices, you can jump to meaningful moments in your app's lifecycle.
@@ -315,6 +321,7 @@ workflowStore.updateState({ status: "approved", $tag: "workflow-approved" });
 // User session states
 sessionStore.updateState({ user: userData, $tag: "user-logged-in" });
 ```
+
 ## 📚 Usage Examples
 
 ### 1. Todo List Management
@@ -524,6 +531,7 @@ userStore.updateState({
 console.log(userStore.getProp('profile.personal.name')); // 'Jane Doe'
 console.log(userStore.getProp('profile.preferences')); // { theme: 'light', notifications: true }
 ```
+
 ## 🔗 Sync - Unidirectional Data Binding
 
 One of Substate's most powerful features is the `sync` method, which provides unidirectional data binding between your store and any target object (like UI models, form objects, or API payloads).
@@ -755,6 +763,7 @@ const config: ICreateStoreConfig = {
 
 const store: ISubstate = createStore(config);
 ```
+
 ## 📖 API Reference
 
 ### createStore(config)
@@ -1290,6 +1299,7 @@ store.off('UPDATE_STATE', handler); // Removes this specific handler
 | `maxHistorySize` | `number` | Maximum number of states to keep in history |
 | `beforeUpdate` | `UpdateMiddleware[]` | Pre-update middleware functions |
 | `afterUpdate` | `UpdateMiddleware[]` | Post-update middleware functions |
+
 ## 🧠 Memory Management
 
 Substate automatically manages memory through configurable history limits and provides tools for monitoring and optimization.
@@ -1412,6 +1422,7 @@ The default settings are optimized for most use cases:
 - **Automatic cleanup**: No manual intervention required
 
 > **💡 Note**: The 50-state default is designed for smaller applications. For enterprise applications with large state objects or high-frequency updates, consider customizing `maxHistorySize` based on your specific memory constraints.
+
 ## ⚡ Performance Benchmarks
 
 Substate delivers excellent performance across different use cases. Here are real benchmark results from our test suite (averaged over 5 runs for statistical accuracy):
@@ -1479,6 +1490,7 @@ const value = store.getProp('deeply.nested.property'); // ~1μs
 > - **Method**: Averaged over 5 runs for statistical accuracy
 > 
 > Your results may vary based on hardware and usage patterns.
+
 ## 🔬 Performance Comparison Benchmarks
 
 Substate includes comprehensive performance benchmarks comparing it with other popular state management libraries. These benchmarks provide **scientifically accurate** performance data based on real measurements, not estimates.
@@ -1521,10 +1533,10 @@ Here's a sample comparison from our benchmark suite:
 
 | Library | Property Access | Update Performance | Store Creation | Memory (Small State) |
 |---------|----------------|-------------------|----------------|---------------------|
-| **Native JS** | 47.90ns | **75.19ns** | **525.13ns** | **1KB** |
-| **Redux** | **47.76ns** | 78.20ns | 2.23μs | 61KB |
-| **Zustand** | 48.07ns | 78.62ns | 3.29μs | 61KB |
-| **Substate** | 61.42ns | 285.69ns | 5.45μs | 7KB |
+| **Native JS** | **54.04ns** | **163.94ns** | **3.22μs** | **1KB** |
+| **Redux** | 55.32ns | 221.18ns | 40.68μs | 61KB |
+| **Zustand** | 58.76ns | 179.82ns | 65.52μs | 61KB |
+| **Substate** | 65.44ns | 1.05μs | 50.68μs | 126KB |
 
 ### 🔬 Benchmark Methodology
 
@@ -1586,6 +1598,7 @@ The report generator creates multiple output formats:
 > **💡 Note**: Performance varies by use case. Choose based on your specific requirements, not just raw speed. The comparison benchmarks help you make informed decisions based on real data.
 > 
 > **📊 Latest Results**: The most recent benchmark results are available in `benchmark-comparisons/results/performance-tables-latest.md` and can be included directly in documentation.
+
 ## 🔄 Why Choose Substate?
 
 ### Comparison with Other State Management Solutions
@@ -1681,6 +1694,7 @@ Substate is **one of the few state management libraries** that combines all thes
 7. **⚡ Production Ready** - Optimized defaults that scale from prototype to enterprise
 
 > **💡 Key Insight**: Most libraries make you choose between features and simplicity. Substate gives you enterprise-grade capabilities with a learning curve measured in minutes, not weeks.
+
 ## 📋 TypeScript Definitions
 
 ### Core Interfaces
@@ -1762,6 +1776,7 @@ type TStateKeywords = {
 // User-defined state with keyword support
 type TUserState = object & TStateKeywords;
 ```
+
 ## 📈 Migration Guide
 
 ### Version 10.x Migration
@@ -1863,6 +1878,7 @@ const increment = () => store.updateState({
   count: store.getProp('count') + 1 
 });
 ```
+
 ## 🛠️ Development
 
 ### Project Structure
@@ -1999,6 +2015,7 @@ npm run benchmark   # Run performance comparisons vs other libraries
 npm run pre         # Pre-publish checks (test + build) - publishes to 'next' tag
 npm run safe-publish # Full publish pipeline (test + build + publish)
 ```
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please read our contributing guidelines and submit pull requests to help improve Substate.

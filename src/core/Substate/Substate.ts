@@ -16,7 +16,7 @@ import type {
   TUpdateMiddleware,
   TUserState,
 } from './interfaces';
-import type { ISubstate, ISubstateConfig } from './Substate.interface';
+import type { ISubstate, ISubstateConfig, ISyncInstance } from './Substate.interface';
 
 const cloneDeep = rfdc();
 
@@ -190,7 +190,7 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
    * meaning changes to the target object do not affect the state.
    *
    * @param {ISyncConfig} config - Configuration object for the sync operation
-   * @returns {Function} unsync - Function to call for cleanup that removes the sync listener
+   * @returns {ISyncInstance} unsync - Function to call for cleanup that removes the sync listener
    *
    * @example
    * // Basic usage - sync userName to a UI model
@@ -242,7 +242,7 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
    *
    * @since 10.0.0
    */
-  public sync(config: TSyncConfig): { unsync: () => void } {
+  public sync(config: TSyncConfig): ISyncInstance {
     // Destructure configuration with defaults
     const {
       readerObj,

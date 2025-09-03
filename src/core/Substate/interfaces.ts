@@ -12,7 +12,7 @@ type TUserState = object & TStateKeywords;
 // #endregion
 
 // #region Middleware Interfaces
-type TUpdateMiddleware = (store: ISubstate, action: TUserState) => void;
+type TUpdateMiddleware = (store: ISubstate, action: Partial<TUserState>) => void;
 // #endregion
 
 // #region Sync Interfaces

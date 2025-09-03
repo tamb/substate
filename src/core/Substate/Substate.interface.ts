@@ -1,6 +1,9 @@
 import type { IPubSub } from '../PubSub/PubSub.interface';
 import type { TSyncConfig, TUpdateMiddleware, TUserState } from './interfaces';
 
+interface ISyncInstance {
+  unsync: () => void;
+}
 interface ISubstateConfig<TState extends TUserState = TUserState> {
   name?: string;
   afterUpdate?: TUpdateMiddleware[];
@@ -26,7 +29,7 @@ interface ISubstate<TState extends TUserState = TUserState> extends IPubSub {
   getProp(prop: string): unknown;
   resetState(): void;
   updateState(action: Partial<TState>): void;
-  sync(config: TSyncConfig): { unsync: () => void };
+  sync(config: TSyncConfig): ISyncInstance;
   clearHistory(): void;
   limitHistory(maxSize: number): void;
   getMemoryUsage(): { stateCount: number; taggedCount: number; estimatedSizeKB: number | null };
@@ -40,4 +43,4 @@ interface ISubstate<TState extends TUserState = TUserState> extends IPubSub {
   hasTaggedStates: boolean;
 }
 
-export type { ISubstate, ISubstateConfig };
+export type { ISubstate, ISubstateConfig, ISyncInstance };

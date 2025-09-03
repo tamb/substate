@@ -2,6 +2,8 @@ import React, { useRef } from 'react'
 import type { TUserState, ISubstate } from 'substate'
 import { useSubstate, useSubstateActions } from 'substate/react'
 
+import { type CounterState } from '../App'
+
 interface Todo {
   id: string
   text: string
@@ -17,15 +19,17 @@ interface TodoState extends TUserState {
 
 interface TodoProps {
   store: ISubstate<TodoState>
+  counterStore: ISubstate<CounterState>
 }
 
-export default function TodoApp({ store }: TodoProps) {
+export default function TodoApp({ store, counterStore }: TodoProps) {
   const formRef = useRef<HTMLFormElement>(null)
   
   // Test multiple selectors for performance optimization
   const todos = useSubstate(store, (state) => state.todos)
   const filter = useSubstate(store, (state) => state.filter)
   const newTodoText = useSubstate(store, (state) => state.newTodoText)
+  const count = useSubstate(counterStore, (state) => state.count)
   
   const { 
     updateState, 
@@ -103,7 +107,7 @@ export default function TodoApp({ store }: TodoProps) {
   
   return (
     <div style={{ padding: '1rem', textAlign: 'left' }}>
-      <h2>Todo App Example</h2>
+      <h2>Todo App Example</h2> <span>Counter: {count}</span>
       <p>Testing: Complex state, sync functionality, tagged states, memory management</p>
       
       <form ref={formRef} onSubmit={addTodo} style={{ marginBottom: '1rem' }}>

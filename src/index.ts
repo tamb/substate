@@ -14,4 +14,5 @@ export { Substate } from './core/Substate/Substate';
 export type {
   ISubstate,
   ISubstateConfig as CreateStoreConfig,
+  ISyncInstance,
 } from './core/Substate/Substate.interface';
