@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { createStore } from '../../createStore/createStore';
+import type { TUserState } from '../interfaces';
 import { Substate } from '../Substate';
-import { TUserState } from '../interfaces';
 
 describe('Memory Management Features', () => {
   let store: Substate;

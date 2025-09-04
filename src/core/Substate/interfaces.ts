@@ -24,7 +24,6 @@ type TSyncConfig = {
   readField?: string;
   beforeUpdate?: TSyncMiddleware[];
   afterUpdate?: TSyncMiddleware[];
-  syncEvents?: string[] | string;
 };
 
 interface ISyncContext {

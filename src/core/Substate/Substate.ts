@@ -250,7 +250,6 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
       readField = stateField, // Default to stateField if readField not provided
       beforeUpdate = [], // Default to empty array if no middleware
       afterUpdate = [], // Default to empty array if no middleware
-      syncEvents = EVENTS.STATE_UPDATED,
     } = config;
 
     // Check if the fields exist using byString to support dot notation
@@ -327,26 +326,14 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
 
     // SUBSCRIPTION: Register the sync handler to listen for state updates
     // Uses the existing pub/sub system - when updateState is called, it emits STATE_UPDATED
-    if (Array.isArray(syncEvents)) {
-      syncEvents.forEach((event) => {
-        this.on(event, syncHandler);
-      });
-    } else {
-      this.on(syncEvents, syncHandler);
-    }
+    this.on(EVENTS.STATE_UPDATED, syncHandler);
 
     // CLEANUP: Return the unsync function for memory management
     // This removes the event listener to prevent memory leaks
     // Important for component unmounting in React, Vue, etc.
     return {
       unsync: () => {
-        if (Array.isArray(syncEvents)) {
-          syncEvents.forEach((event) => {
-            this.off(event, syncHandler);
-          });
-        } else {
-          this.off(syncEvents, syncHandler);
-        }
+        this.off(EVENTS.STATE_UPDATED, syncHandler);
       },
     };
   }
