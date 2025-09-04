@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { createStore } from '../../createStore/createStore';
 import { Substate } from '../Substate';
-import type { IState } from '../Substate.interface';
+import { TUserState } from '../interfaces';
 
 describe('Memory Management Features', () => {
   let store: Substate;
@@ -45,7 +45,7 @@ describe('Memory Management Features', () => {
       });
     });
 
-    test('should not trim history when under limit', () => {
+    test('should not trim history when under or equal to limit', () => {
       // Make 3 updates (total: initial + 3 = 4 states)
       store.updateState({ counter: 1 });
       store.updateState({ counter: 2 });
@@ -54,6 +54,11 @@ describe('Memory Management Features', () => {
       expect(store.stateStorage.length).toBe(4);
       expect(store.currentState).toBe(3);
       expect(store.getCurrentState().counter).toBe(3);
+
+      store.updateState({ counter: 4 });
+      expect(store.stateStorage.length).toBe(5);
+      expect(store.currentState).toBe(4);
+      expect(store.getCurrentState().counter).toBe(4);
     });
 
     test('should trim oldest states when exceeding limit', () => {
@@ -304,7 +309,7 @@ describe('Memory Management Features', () => {
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       // Create a state with circular reference that will cause JSON.stringify to throw
-      const circularState: IState = { data: 'test' };
+      const circularState: TUserState = { data: 'test' };
       circularState.self = circularState; // Circular reference
 
       store.updateState(circularState);

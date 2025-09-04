@@ -21,7 +21,9 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
+      include: ['src/**/*.ts'],
       exclude: [
+        'benchmark-comparisons/',
         'node_modules/',
         'dist/',
         'coverage/',

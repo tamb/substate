@@ -1291,6 +1291,21 @@ store.off('UPDATE_STATE', handler); // Removes this specific handler
 | `maxHistorySize` | `number` | Maximum number of states to keep in history |
 | `beforeUpdate` | `UpdateMiddleware[]` | Pre-update middleware functions |
 | `afterUpdate` | `UpdateMiddleware[]` | Post-update middleware functions |
+
+#### Middleware Order
+
+updateState(action)
+├── store.beforeUpdate[] (store-wide)
+├── State Processing
+│   ├── Clone state
+│   ├── Apply temp updates
+│   ├── Push to history
+│   └── Update tagged states
+├── sync.beforeUpdate[] (per sync instance)
+├── sync.afterUpdate[] (per sync instance)
+├── store.afterUpdate[] (store-wide)
+└── emit STATE_UPDATED or `$type` event
+
 ## 🧠 Memory Management
 
 Substate automatically manages memory through configurable history limits and provides tools for monitoring and optimization.
