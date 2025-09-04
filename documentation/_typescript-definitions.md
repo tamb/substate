@@ -37,8 +37,8 @@ interface ISyncConfig {
   readerObj: Record<string, unknown>;
   stateField: string;
   readField?: string;
-  beforeMiddleware?: BeforeMiddleware[];
-  afterMiddleware?: AfterMiddleware[];
+  beforeUpdate?: BeforeMiddleware[];
+  afterUpdate?: AfterMiddleware[];
 }
 ```
 
@@ -56,8 +56,8 @@ type TSyncConfig = {
   readerObj: Record<string, unknown> | object;
   stateField: string;
   readField?: string;
-  beforeMiddleware?: TSyncMiddleware[];
-  afterMiddleware?: TSyncMiddleware[];
+  beforeUpdate?: TSyncMiddleware[];
+  afterUpdate?: TSyncMiddleware[];
   syncEvents?: string[] | string;
 };
 

@@ -240,8 +240,8 @@ const unsync = store.sync({
   readerObj: targetObject,
   stateField: 'user.name',
   readField: 'displayName',
-  beforeMiddleware: [(value) => value.toUpperCase()],
-  afterMiddleware: [(value) => console.log('Synced:', value)]
+  beforeUpdate: [(value) => value.toUpperCase()],
+  afterUpdate: [(value) => console.log('Synced:', value)]
 });
 
 // Call to cleanup the sync
@@ -255,8 +255,8 @@ unsync();
 | `readerObj` | `Record<string, unknown>` | ✅ | Target object to sync to |
 | `stateField` | `string` | ✅ | State property to watch (supports dot notation) |
 | `readField` | `string` | ❌ | Target property name (defaults to `stateField`) |
-| `beforeMiddleware` | `BeforeMiddleware[]` | ❌ | Transform functions applied before sync |
-| `afterMiddleware` | `AfterMiddleware[]` | ❌ | Side-effect functions called after sync |
+| `beforeUpdate` | `BeforeMiddleware[]` | ❌ | Transform functions applied before sync |
+| `afterUpdate` | `AfterMiddleware[]` | ❌ | Side-effect functions called after sync |
 
 **Returns:** Function to call for cleanup (removes event listeners)
 

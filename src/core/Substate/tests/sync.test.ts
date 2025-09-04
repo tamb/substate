@@ -225,7 +225,7 @@ describe('Substate sync method', () => {
         readerObj: uiModel,
         stateField: 'userName',
         readField: 'name',
-        beforeMiddleware: [
+        beforeUpdate: [
           (value: unknown) => {
             processingLog.push(`before1: ${value as string}`);
             return (value as string).toUpperCase();
@@ -235,7 +235,7 @@ describe('Substate sync method', () => {
             return `Dr. ${value as string}`;
           },
         ],
-        afterMiddleware: [
+        afterUpdate: [
           (value: unknown) => {
             processingLog.push(`after1: ${value as string}`);
           },
@@ -263,7 +263,7 @@ describe('Substate sync method', () => {
         readerObj: uiModel,
         stateField: 'userName',
         readField: 'displayName',
-        beforeMiddleware: [
+        beforeUpdate: [
           (value: unknown, context: unknown) => {
             contextSpy(context);
             return value;
@@ -281,12 +281,12 @@ describe('Substate sync method', () => {
     });
 
     // Test middleware transformation pipeline
-    test('should apply beforeMiddleware transformations', () => {
+    test('should apply beforeUpdate transformations', () => {
       const synced = store.sync({
         readerObj: uiModel,
         stateField: 'userName',
         readField: 'name',
-        beforeMiddleware: [
+        beforeUpdate: [
           (value: unknown) => (value as string).toUpperCase(),
           (value: unknown) => `Mr. ${value as string}`,
         ],
@@ -300,7 +300,7 @@ describe('Substate sync method', () => {
       synced.unsync();
     });
 
-    test('should call afterMiddleware for side effects', () => {
+    test('should call afterUpdate for side effects', () => {
       const sideEffectSpy = vi.fn();
       const logSpy = vi.fn();
 
@@ -308,7 +308,7 @@ describe('Substate sync method', () => {
         readerObj: uiModel,
         stateField: 'userName',
         readField: 'name',
-        afterMiddleware: [
+        afterUpdate: [
           (value: unknown, context: unknown) => {
             sideEffectSpy(value, context);
           },

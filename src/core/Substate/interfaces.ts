@@ -22,8 +22,8 @@ type TSyncConfig = {
   readerObj: Record<string, unknown> | object;
   stateField: string;
   readField?: string;
-  beforeMiddleware?: TSyncMiddleware[];
-  afterMiddleware?: TSyncMiddleware[];
+  beforeUpdate?: TSyncMiddleware[];
+  afterUpdate?: TSyncMiddleware[];
   syncEvents?: string[] | string;
 };
 

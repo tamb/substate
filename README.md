@@ -9,7 +9,8 @@
 
 **A lightweight, type-safe state management library that combines the Pub/Sub pattern with immutable state management.**
 
-Substate provides a simple yet powerful way to manage application state with built-in event handling, middleware support, and seamless synchronization capabilities. Perfect for applications that need reactive state management without the complexity of larger frameworks.## 📑 Table of Contents
+Substate provides a simple yet powerful way to manage application state with built-in event handling, middleware support, and seamless synchronization capabilities. Perfect for applications that need reactive state management without the complexity of larger frameworks.
+## 📑 Table of Contents
 
 - [✨ Features](#-features)
 - [🚀 Quick Start](#-quick-start)
@@ -581,7 +582,7 @@ const unsyncPrice = productStore.sync({
   readerObj: displayModel,
   stateField: 'price',
   readField: 'formattedPrice',
-  beforeMiddleware: [
+  beforeUpdate: [
     // Transform price to currency format
     (price, context) => `$${price.toFixed(2)}`,
     // Add currency symbol based on store state
@@ -590,7 +591,7 @@ const unsyncPrice = productStore.sync({
       return currency === 'EUR' ? formattedPrice.replace('$', '€') : formattedPrice;
     }
   ],
-  afterMiddleware: [
+  afterUpdate: [
     // Log the transformation
     (finalValue, context) => {
       console.log(`Price synced: ${finalValue} for field ${context.readField}`);
@@ -602,9 +603,9 @@ const unsyncName = productStore.sync({
   readerObj: displayModel,
   stateField: 'name',
   readField: 'productTitle',
-  beforeMiddleware: [
+  beforeUpdate: [
     // Transform to title case
-    (name) => name.split(' ').map(word => 
+    (name) => name.split(' ').map(word =>
       word.charAt(0).toUpperCase() + word.slice(1)
     ).join(' ')
   ]
@@ -652,7 +653,7 @@ const unsyncName = formStore.sync({
   readerObj: formUI,
   stateField: 'user',
   readField: 'fullName',
-  beforeMiddleware: [
+  beforeUpdate: [
     (user) => `${user.firstName} ${user.lastName}`.trim()
   ]
 });
@@ -669,7 +670,7 @@ const unsyncAge = formStore.sync({
   readerObj: formUI,
   stateField: 'user.birthDate',
   readField: 'ageDisplay',
-  beforeMiddleware: [
+  beforeUpdate: [
     (birthDate) => {
       if (!birthDate) return 'Not provided';
       const age = new Date().getFullYear() - new Date(birthDate).getFullYear();
@@ -722,7 +723,7 @@ const unsync1 = dataStore.sync({
   readerObj: dashboard,
   stateField: 'timestamp',
   readField: 'lastUpdate',
-  beforeMiddleware: [(ts) => new Date(ts).toLocaleString()]
+  beforeUpdate: [(ts) => new Date(ts).toLocaleString()]
 });
 
 // Sync to report with ISO string
@@ -730,7 +731,7 @@ const unsync2 = dataStore.sync({
   readerObj: report,
   stateField: 'timestamp', 
   readField: 'generatedAt',
-  beforeMiddleware: [(ts) => new Date(ts).toISOString()]
+  beforeUpdate: [(ts) => new Date(ts).toISOString()]
 });
 
 // Sync to API with raw timestamp
@@ -997,8 +998,8 @@ const unsync = store.sync({
   readerObj: targetObject,
   stateField: 'user.name',
   readField: 'displayName',
-  beforeMiddleware: [(value) => value.toUpperCase()],
-  afterMiddleware: [(value) => console.log('Synced:', value)]
+  beforeUpdate: [(value) => value.toUpperCase()],
+  afterUpdate: [(value) => console.log('Synced:', value)]
 });
 
 // Call to cleanup the sync
@@ -1012,8 +1013,8 @@ unsync();
 | `readerObj` | `Record<string, unknown>` | ✅ | Target object to sync to |
 | `stateField` | `string` | ✅ | State property to watch (supports dot notation) |
 | `readField` | `string` | ❌ | Target property name (defaults to `stateField`) |
-| `beforeMiddleware` | `BeforeMiddleware[]` | ❌ | Transform functions applied before sync |
-| `afterMiddleware` | `AfterMiddleware[]` | ❌ | Side-effect functions called after sync |
+| `beforeUpdate` | `BeforeMiddleware[]` | ❌ | Transform functions applied before sync |
+| `afterUpdate` | `AfterMiddleware[]` | ❌ | Side-effect functions called after sync |
 
 **Returns:** Function to call for cleanup (removes event listeners)
 
@@ -1592,7 +1593,7 @@ The report generator creates multiple output formats:
 
 | Feature | Substate | Redux | Zustand | Valtio | MobX |
 |---------|----------|-------|---------|--------|------|
-| **Bundle Size** | ~11KB | ~13KB | ~8KB | ~14KB | ~20KB |
+| **Bundle Size** | ~11KB | ~4KB | ~2KB | ~7KB | ~63KB |
 | **TypeScript** | ✅ Excellent | ✅ Excellent | ✅ Excellent | ✅ Excellent | ✅ Excellent |
 | **Learning Curve** | 🟢 Low | 🔴 High | 🟢 Low | 🟡 Medium | 🔴 High |
 | **Boilerplate** | 🟢 Minimal | 🔴 Heavy | 🟢 Minimal | 🟢 Minimal | 🟡 Some |
@@ -1720,8 +1721,8 @@ interface ISyncConfig {
   readerObj: Record<string, unknown>;
   stateField: string;
   readField?: string;
-  beforeMiddleware?: BeforeMiddleware[];
-  afterMiddleware?: AfterMiddleware[];
+  beforeUpdate?: BeforeMiddleware[];
+  afterUpdate?: AfterMiddleware[];
 }
 ```
 
@@ -1739,8 +1740,8 @@ type TSyncConfig = {
   readerObj: Record<string, unknown> | object;
   stateField: string;
   readField?: string;
-  beforeMiddleware?: TSyncMiddleware[];
-  afterMiddleware?: TSyncMiddleware[];
+  beforeUpdate?: TSyncMiddleware[];
+  afterUpdate?: TSyncMiddleware[];
   syncEvents?: string[] | string;
 };
 

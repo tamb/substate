@@ -213,11 +213,11 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
    *   readerObj: uiModel,
    *   stateField: "userName",
    *   readField: "formattedName",
-   *   beforeMiddleware: [
+   *   beforeUpdate: [
    *     (value) => value.toUpperCase(),
    *     (value) => `Dr. ${value}`
    *   ],
-   *   afterMiddleware: [
+   *   afterUpdate: [
    *     (value) => console.log(`Name updated to: ${value}`)
    *   ]
    * });
@@ -248,8 +248,8 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
       readerObj,
       stateField,
       readField = stateField, // Default to stateField if readField not provided
-      beforeMiddleware = [], // Default to empty array if no middleware
-      afterMiddleware = [], // Default to empty array if no middleware
+      beforeUpdate = [], // Default to empty array if no middleware
+      afterUpdate = [], // Default to empty array if no middleware
       syncEvents = EVENTS.STATE_UPDATED,
     } = config;
 
@@ -257,10 +257,10 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
     this.validateSyncFields(stateField);
 
     /**
-     * Applies the beforeMiddleware transformation chain to a value
+     * Applies the beforeUpdate transformation chain to a value
      * Each middleware function receives the transformed value, sync context, and substate instance
      */
-    const applyBeforeMiddleware = (value: unknown): unknown => {
+    const applyBeforeUpdate = (value: unknown): unknown => {
       const context: ISyncContext = {
         source: 'substate',
         field: stateField,
@@ -270,7 +270,7 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
       let transformedValue = value;
 
       // Apply each middleware function in sequence
-      beforeMiddleware.forEach((middleware: TSyncMiddleware) => {
+      beforeUpdate.forEach((middleware: TSyncMiddleware) => {
         transformedValue = middleware(transformedValue, context, this);
       });
 
@@ -278,19 +278,19 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
     };
 
     /**
-     * Applies the afterMiddleware side effects after syncing is complete
+     * Applies the afterUpdate side effects after syncing is complete
      * These functions are called for their side effects only (logging, notifications, etc.)
      * Return values are ignored
      */
-    const applyAfterMiddleware = (value: unknown): void => {
+    const applyAfterUpdate = (value: unknown): void => {
       const context: ISyncContext = {
         source: 'substate',
         field: stateField,
         readField,
       };
 
-      // Execute each afterMiddleware function with the final synced value
-      afterMiddleware.forEach((middleware: TSyncMiddleware) => {
+      // Execute each afterUpdate function with the final synced value
+      afterUpdate.forEach((middleware: TSyncMiddleware) => {
         middleware(value, context, this);
       });
     };
@@ -306,13 +306,13 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
       // Only proceed if the state field exists and has a value
       if (stateValue !== undefined) {
         // Apply transformation middleware first
-        const transformedValue = applyBeforeMiddleware(stateValue);
+        const transformedValue = applyBeforeUpdate(stateValue);
 
         // Set the transformed value on the reader object (supports nested paths)
         byString(readerObj, readField, transformedValue);
 
         // Execute side effect middleware after the sync is complete
-        applyAfterMiddleware(transformedValue);
+        applyAfterUpdate(transformedValue);
       }
     };
 
@@ -320,9 +320,9 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
     // Get the current value from state to initialize the reader object
     const currentStateValue = this.getProp(stateField);
     if (currentStateValue !== undefined) {
-      const transformedValue = applyBeforeMiddleware(currentStateValue);
+      const transformedValue = applyBeforeUpdate(currentStateValue);
       byString(readerObj, readField, transformedValue);
-      applyAfterMiddleware(transformedValue);
+      applyAfterUpdate(transformedValue);
     }
 
     // SUBSCRIPTION: Register the sync handler to listen for state updates

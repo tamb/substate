@@ -4,7 +4,7 @@
 
 | Feature | Substate | Redux | Zustand | Valtio | MobX |
 |---------|----------|-------|---------|--------|------|
-| **Bundle Size** | ~11KB | ~13KB | ~8KB | ~14KB | ~20KB |
+| **Bundle Size** | ~11KB | ~4KB | ~2KB | ~7KB | ~63KB |
 | **TypeScript** | ✅ Excellent | ✅ Excellent | ✅ Excellent | ✅ Excellent | ✅ Excellent |
 | **Learning Curve** | 🟢 Low | 🔴 High | 🟢 Low | 🟡 Medium | 🔴 High |
 | **Boilerplate** | 🟢 Minimal | 🔴 Heavy | 🟢 Minimal | 🟢 Minimal | 🟡 Some |

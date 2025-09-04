@@ -55,7 +55,7 @@ const unsyncPrice = productStore.sync({
   readerObj: displayModel,
   stateField: 'price',
   readField: 'formattedPrice',
-  beforeMiddleware: [
+  beforeUpdate: [
     // Transform price to currency format
     (price, context) => `$${price.toFixed(2)}`,
     // Add currency symbol based on store state
@@ -64,7 +64,7 @@ const unsyncPrice = productStore.sync({
       return currency === 'EUR' ? formattedPrice.replace('$', '€') : formattedPrice;
     }
   ],
-  afterMiddleware: [
+  afterUpdate: [
     // Log the transformation
     (finalValue, context) => {
       console.log(`Price synced: ${finalValue} for field ${context.readField}`);
@@ -76,9 +76,9 @@ const unsyncName = productStore.sync({
   readerObj: displayModel,
   stateField: 'name',
   readField: 'productTitle',
-  beforeMiddleware: [
+  beforeUpdate: [
     // Transform to title case
-    (name) => name.split(' ').map(word => 
+    (name) => name.split(' ').map(word =>
       word.charAt(0).toUpperCase() + word.slice(1)
     ).join(' ')
   ]
@@ -126,7 +126,7 @@ const unsyncName = formStore.sync({
   readerObj: formUI,
   stateField: 'user',
   readField: 'fullName',
-  beforeMiddleware: [
+  beforeUpdate: [
     (user) => `${user.firstName} ${user.lastName}`.trim()
   ]
 });
@@ -143,7 +143,7 @@ const unsyncAge = formStore.sync({
   readerObj: formUI,
   stateField: 'user.birthDate',
   readField: 'ageDisplay',
-  beforeMiddleware: [
+  beforeUpdate: [
     (birthDate) => {
       if (!birthDate) return 'Not provided';
       const age = new Date().getFullYear() - new Date(birthDate).getFullYear();
@@ -196,7 +196,7 @@ const unsync1 = dataStore.sync({
   readerObj: dashboard,
   stateField: 'timestamp',
   readField: 'lastUpdate',
-  beforeMiddleware: [(ts) => new Date(ts).toLocaleString()]
+  beforeUpdate: [(ts) => new Date(ts).toLocaleString()]
 });
 
 // Sync to report with ISO string
@@ -204,7 +204,7 @@ const unsync2 = dataStore.sync({
   readerObj: report,
   stateField: 'timestamp', 
   readField: 'generatedAt',
-  beforeMiddleware: [(ts) => new Date(ts).toISOString()]
+  beforeUpdate: [(ts) => new Date(ts).toISOString()]
 });
 
 // Sync to API with raw timestamp
