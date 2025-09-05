@@ -58,12 +58,17 @@ function readBenchmarkResults() {
     try {
       const filePath = path.join(resultsDir, file);
       const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-      
-      // Extract library name from filename (e.g., "substate-benchmark-2024-01-01.json" -> "substate")
-      const libraryName = file.split('-')[0];
-      results[libraryName] = data;
-      
-      console.log(`✅ Loaded: ${libraryName} (${data.timestamp})`);
+
+      // Skip summary files and only load benchmark result files
+      if (data.library && data.results && Array.isArray(data.results)) {
+        // Extract library name from filename (e.g., "substate-benchmark-2024-01-01.json" -> "substate")
+        const libraryName = file.split('-')[0];
+        results[libraryName] = data;
+
+        console.log(`✅ Loaded: ${libraryName} (${data.timestamp})`);
+      } else {
+        console.log(`⏭️  Skipped ${file}: Not a benchmark result file`);
+      }
     } catch (error) {
       console.log(`⚠️  Skipped ${file}: ${error.message}`);
     }
@@ -130,8 +135,8 @@ function generateMarkdownTables(results) {
   
   // Property Access Comparison
   markdown += `## 🎯 Property Access Performance (Average per access)\n\n`;
-  markdown += `| Library | Small State | Medium State | Large State |\n`;
-  markdown += `|---------|-------------|--------------|-------------|\n`;
+  markdown += `| Library | Small State | Small % | Medium State | Medium % | Large State | Large % |\n`;
+  markdown += `|---------|-------------|---------|--------------|----------|-------------|---------|\n`;
   
   // Find fastest for each column
   const fastestAccess = {
@@ -163,24 +168,29 @@ function generateMarkdownTables(results) {
     const small = findTestResult(libraryResults, 'small')?.averages?.avgAccess || 'N/A';
     const medium = findTestResult(libraryResults, 'medium')?.averages?.avgAccess || 'N/A';
     const large = findTestResult(libraryResults, 'large')?.averages?.avgAccess || 'N/A';
-    
+
     const smallStr = typeof small === 'number' ? formatTime(small) : small;
     const mediumStr = typeof medium === 'number' ? formatTime(medium) : medium;
     const largeStr = typeof large === 'number' ? formatTime(large) : large;
-    
+
+    // Calculate percentages relative to fastest
+    const smallPct = (fastestAccess.small && typeof small === 'number') ? ((small / fastestAccess.small.value) * 100).toFixed(1) + '%' : 'N/A';
+    const mediumPct = (fastestAccess.medium && typeof medium === 'number') ? ((medium / fastestAccess.medium.value) * 100).toFixed(1) + '%' : 'N/A';
+    const largePct = (fastestAccess.large && typeof large === 'number') ? ((large / fastestAccess.large.value) * 100).toFixed(1) + '%' : 'N/A';
+
     // Bold the fastest in each column
     const smallBold = (fastestAccess.small && typeof small === 'number' && small === fastestAccess.small.value) ? `**${smallStr}**` : smallStr;
     const mediumBold = (fastestAccess.medium && typeof medium === 'number' && medium === fastestAccess.medium.value) ? `**${mediumStr}**` : mediumStr;
     const largeBold = (fastestAccess.large && typeof large === 'number' && large === fastestAccess.large.value) ? `**${largeStr}**` : largeStr;
-    
-    markdown += `| ${library} | ${smallBold} | ${mediumBold} | ${largeBold} |\n`;
+
+    markdown += `| ${library} | ${smallBold} | ${smallPct} | ${mediumBold} | ${mediumPct} | ${largeBold} | ${largePct} |\n`;
   }
   markdown += '\n';
   
   // Update Performance Comparison
   markdown += `## 🔄 Update Performance (Average per update)\n\n`;
-  markdown += `| Library | Small State | Medium State | Large State |\n`;
-  markdown += `|---------|-------------|--------------|-------------|\n`;
+  markdown += `| Library | Small State | Small % | Medium State | Medium % | Large State | Large % |\n`;
+  markdown += `|---------|-------------|---------|--------------|----------|-------------|---------|\n`;
   
   // Find fastest for each column
   const fastestUpdate = {
@@ -212,24 +222,29 @@ function generateMarkdownTables(results) {
     const small = findTestResult(libraryResults, 'small')?.averages?.avgUpdate || 'N/A';
     const medium = findTestResult(libraryResults, 'medium')?.averages?.avgUpdate || 'N/A';
     const large = findTestResult(libraryResults, 'large')?.averages?.avgUpdate || 'N/A';
-    
+
     const smallStr = typeof small === 'number' ? formatTime(small) : small;
     const mediumStr = typeof medium === 'number' ? formatTime(medium) : medium;
     const largeStr = typeof large === 'number' ? formatTime(large) : large;
-    
+
+    // Calculate percentages relative to fastest
+    const smallPct = (fastestUpdate.small && typeof small === 'number') ? ((small / fastestUpdate.small.value) * 100).toFixed(1) + '%' : 'N/A';
+    const mediumPct = (fastestUpdate.medium && typeof medium === 'number') ? ((medium / fastestUpdate.medium.value) * 100).toFixed(1) + '%' : 'N/A';
+    const largePct = (fastestUpdate.large && typeof large === 'number') ? ((large / fastestUpdate.large.value) * 100).toFixed(1) + '%' : 'N/A';
+
     // Bold the fastest in each column
     const smallBold = (fastestUpdate.small && typeof small === 'number' && small === fastestUpdate.small.value) ? `**${smallStr}**` : smallStr;
     const mediumBold = (fastestUpdate.medium && typeof medium === 'number' && medium === fastestUpdate.medium.value) ? `**${mediumStr}**` : mediumStr;
     const largeBold = (fastestUpdate.large && typeof large === 'number' && large === fastestUpdate.large.value) ? `**${largeStr}**` : largeStr;
-    
-    markdown += `| ${library} | ${smallBold} | ${mediumBold} | ${largeBold} |\n`;
+
+    markdown += `| ${library} | ${smallBold} | ${smallPct} | ${mediumBold} | ${mediumPct} | ${largeBold} | ${largePct} |\n`;
   }
   markdown += '\n';
   
   // Store Creation Performance
   markdown += `## 🏗️ Store Creation Performance\n\n`;
-  markdown += `| Library | Small State | Medium State | Large State |\n`;
-  markdown += `|---------|-------------|--------------|-------------|\n`;
+  markdown += `| Library | Small State | Small % | Medium State | Medium % | Large State | Large % |\n`;
+  markdown += `|---------|-------------|---------|--------------|----------|-------------|---------|\n`;
   
   // Find fastest for each column
   const fastestCreation = {
@@ -261,24 +276,29 @@ function generateMarkdownTables(results) {
     const small = findTestResult(libraryResults, 'small')?.averages?.creation || 'N/A';
     const medium = findTestResult(libraryResults, 'medium')?.averages?.creation || 'N/A';
     const large = findTestResult(libraryResults, 'large')?.averages?.creation || 'N/A';
-    
+
     const smallStr = typeof small === 'number' ? formatTime(small) : small;
     const mediumStr = typeof medium === 'number' ? formatTime(medium) : medium;
     const largeStr = typeof large === 'number' ? formatTime(large) : large;
-    
+
+    // Calculate percentages relative to fastest
+    const smallPct = (fastestCreation.small && typeof small === 'number') ? ((small / fastestCreation.small.value) * 100).toFixed(1) + '%' : 'N/A';
+    const mediumPct = (fastestCreation.medium && typeof medium === 'number') ? ((medium / fastestCreation.medium.value) * 100).toFixed(1) + '%' : 'N/A';
+    const largePct = (fastestCreation.large && typeof large === 'number') ? ((large / fastestCreation.large.value) * 100).toFixed(1) + '%' : 'N/A';
+
     // Bold the fastest in each column
     const smallBold = (fastestCreation.small && typeof small === 'number' && small === fastestCreation.small.value) ? `**${smallStr}**` : smallStr;
     const mediumBold = (fastestCreation.medium && typeof medium === 'number' && medium === fastestCreation.medium.value) ? `**${mediumStr}**` : mediumStr;
     const largeBold = (fastestCreation.large && typeof large === 'number' && large === fastestCreation.large.value) ? `**${largeStr}**` : largeStr;
-    
-    markdown += `| ${library} | ${smallBold} | ${mediumBold} | ${largeBold} |\n`;
+
+    markdown += `| ${library} | ${smallBold} | ${smallPct} | ${mediumBold} | ${mediumPct} | ${largeBold} | ${largePct} |\n`;
   }
   markdown += '\n';
   
   // Memory Usage Comparison
   markdown += `## 🧠 Memory Usage (Estimated)\n\n`;
-  markdown += `| Library | Small State | Medium State | Large State |\n`;
-  markdown += `|---------|-------------|--------------|-------------|\n`;
+  markdown += `| Library | Small State | Small % | Medium State | Medium % | Large State | Large % |\n`;
+  markdown += `|---------|-------------|---------|--------------|----------|-------------|---------|\n`;
   
   // Find lowest memory for each column
   const lowestMemory = {
@@ -310,17 +330,22 @@ function generateMarkdownTables(results) {
     const small = findTestResult(libraryResults, 'small')?.averages?.memoryKB || 'N/A';
     const medium = findTestResult(libraryResults, 'medium')?.averages?.memoryKB || 'N/A';
     const large = findTestResult(libraryResults, 'large')?.averages?.memoryKB || 'N/A';
-    
+
     const smallStr = typeof small === 'number' ? `${small.toFixed(0)}KB` : small;
     const mediumStr = typeof medium === 'number' ? `${medium.toFixed(0)}KB` : medium;
     const largeStr = typeof large === 'number' ? `${large.toFixed(0)}KB` : large;
-    
+
+    // Calculate percentages relative to lowest memory (lower memory = better, so 100% = best)
+    const smallPct = (lowestMemory.small && typeof small === 'number') ? ((small / lowestMemory.small.value) * 100).toFixed(1) + '%' : 'N/A';
+    const mediumPct = (lowestMemory.medium && typeof medium === 'number') ? ((medium / lowestMemory.medium.value) * 100).toFixed(1) + '%' : 'N/A';
+    const largePct = (lowestMemory.large && typeof large === 'number') ? ((large / lowestMemory.large.value) * 100).toFixed(1) + '%' : 'N/A';
+
     // Bold the lowest memory in each column
     const smallBold = (lowestMemory.small && typeof small === 'number' && small === lowestMemory.small.value) ? `**${smallStr}**` : smallStr;
     const mediumBold = (lowestMemory.medium && typeof medium === 'number' && medium === lowestMemory.medium.value) ? `**${mediumStr}**` : mediumStr;
     const largeBold = (lowestMemory.large && typeof large === 'number' && large === lowestMemory.large.value) ? `**${largeStr}**` : largeStr;
-    
-    markdown += `| ${library} | ${smallBold} | ${mediumBold} | ${largeBold} |\n`;
+
+    markdown += `| ${library} | ${smallBold} | ${smallPct} | ${mediumBold} | ${mediumPct} | ${largeBold} | ${largePct} |\n`;
   }
   markdown += '\n';
   
@@ -394,80 +419,196 @@ function generateComparisonTable(results) {
   // Property Access Comparison
   console.log('### 🎯 Property Access Performance (Average per access)');
   console.log();
-  console.log('| Library | Small State | Medium State | Large State |');
-  console.log('|---------|-------------|--------------|-------------|');
+  console.log('| Library | Small State | Small % | Medium State | Medium % | Large State | Large % |');
+  console.log('|---------|-------------|---------|--------------|----------|-------------|---------|');
   
   for (const library of libraries) {
     const libraryResults = results[library].results;
     const small = findTestResult(libraryResults, 'small')?.averages?.avgAccess || 'N/A';
     const medium = findTestResult(libraryResults, 'medium')?.averages?.avgAccess || 'N/A';
     const large = findTestResult(libraryResults, 'large')?.averages?.avgAccess || 'N/A';
-    
+
     const smallStr = typeof small === 'number' ? formatTime(small) : small;
     const mediumStr = typeof medium === 'number' ? formatTime(medium) : medium;
     const largeStr = typeof large === 'number' ? formatTime(large) : large;
-    
-    console.log(`| ${library} | ${smallStr} | ${mediumStr} | ${largeStr} |`);
+
+    // Calculate percentages relative to fastest for each state size
+    const fastestAccessSmall = libraries.reduce((fastest, lib) => {
+      const avg = findTestResult(results[lib].results, 'small')?.averages?.avgAccess;
+      if (avg && (!fastest || avg < fastest.value)) {
+        return { value: avg };
+      }
+      return fastest;
+    }, null);
+
+    const fastestAccessMedium = libraries.reduce((fastest, lib) => {
+      const avg = findTestResult(results[lib].results, 'medium')?.averages?.avgAccess;
+      if (avg && (!fastest || avg < fastest.value)) {
+        return { value: avg };
+      }
+      return fastest;
+    }, null);
+
+    const fastestAccessLarge = libraries.reduce((fastest, lib) => {
+      const avg = findTestResult(results[lib].results, 'large')?.averages?.avgAccess;
+      if (avg && (!fastest || avg < fastest.value)) {
+        return { value: avg };
+      }
+      return fastest;
+    }, null);
+
+    const smallPct = (fastestAccessSmall && typeof small === 'number') ? ((small / fastestAccessSmall.value) * 100).toFixed(1) + '%' : 'N/A';
+    const mediumPct = (fastestAccessMedium && typeof medium === 'number') ? ((medium / fastestAccessMedium.value) * 100).toFixed(1) + '%' : 'N/A';
+    const largePct = (fastestAccessLarge && typeof large === 'number') ? ((large / fastestAccessLarge.value) * 100).toFixed(1) + '%' : 'N/A';
+
+    console.log(`| ${library} | ${smallStr} | ${smallPct} | ${mediumStr} | ${mediumPct} | ${largeStr} | ${largePct} |`);
   }
   console.log();
   
   // Update Performance Comparison
   console.log('### 🔄 Update Performance (Average per update)');
   console.log();
-  console.log('| Library | Small State | Medium State | Large State |');
-  console.log('|---------|-------------|--------------|-------------|');
+  console.log('| Library | Small State | Small % | Medium State | Medium % | Large State | Large % |');
+  console.log('|---------|-------------|---------|--------------|----------|-------------|---------|');
   
   for (const library of libraries) {
     const libraryResults = results[library].results;
     const small = findTestResult(libraryResults, 'small')?.averages?.avgUpdate || 'N/A';
     const medium = findTestResult(libraryResults, 'medium')?.averages?.avgUpdate || 'N/A';
     const large = findTestResult(libraryResults, 'large')?.averages?.avgUpdate || 'N/A';
-    
+
     const smallStr = typeof small === 'number' ? formatTime(small) : small;
     const mediumStr = typeof medium === 'number' ? formatTime(medium) : medium;
     const largeStr = typeof large === 'number' ? formatTime(large) : large;
-    
-    console.log(`| ${library} | ${smallStr} | ${mediumStr} | ${largeStr} |`);
+
+    // Calculate percentages relative to fastest for each state size
+    const fastestUpdateSmall = libraries.reduce((fastest, lib) => {
+      const avg = findTestResult(results[lib].results, 'small')?.averages?.avgUpdate;
+      if (avg && (!fastest || avg < fastest.value)) {
+        return { value: avg };
+      }
+      return fastest;
+    }, null);
+
+    const fastestUpdateMedium = libraries.reduce((fastest, lib) => {
+      const avg = findTestResult(results[lib].results, 'medium')?.averages?.avgUpdate;
+      if (avg && (!fastest || avg < fastest.value)) {
+        return { value: avg };
+      }
+      return fastest;
+    }, null);
+
+    const fastestUpdateLarge = libraries.reduce((fastest, lib) => {
+      const avg = findTestResult(results[lib].results, 'large')?.averages?.avgUpdate;
+      if (avg && (!fastest || avg < fastest.value)) {
+        return { value: avg };
+      }
+      return fastest;
+    }, null);
+
+    const smallPct = (fastestUpdateSmall && typeof small === 'number') ? ((small / fastestUpdateSmall.value) * 100).toFixed(1) + '%' : 'N/A';
+    const mediumPct = (fastestUpdateMedium && typeof medium === 'number') ? ((medium / fastestUpdateMedium.value) * 100).toFixed(1) + '%' : 'N/A';
+    const largePct = (fastestUpdateLarge && typeof large === 'number') ? ((large / fastestUpdateLarge.value) * 100).toFixed(1) + '%' : 'N/A';
+
+    console.log(`| ${library} | ${smallStr} | ${smallPct} | ${mediumStr} | ${mediumPct} | ${largeStr} | ${largePct} |`);
   }
   console.log();
   
   // Store Creation Performance
   console.log('### 🏗️ Store Creation Performance');
   console.log();
-  console.log('| Library | Small State | Medium State | Large State |');
-  console.log('|---------|-------------|--------------|-------------|');
+  console.log('| Library | Small State | Small % | Medium State | Medium % | Large State | Large % |');
+  console.log('|---------|-------------|---------|--------------|----------|-------------|---------|');
   
   for (const library of libraries) {
     const libraryResults = results[library].results;
     const small = findTestResult(libraryResults, 'small')?.averages?.creation || 'N/A';
     const medium = findTestResult(libraryResults, 'medium')?.averages?.creation || 'N/A';
     const large = findTestResult(libraryResults, 'large')?.averages?.creation || 'N/A';
-    
+
     const smallStr = typeof small === 'number' ? formatTime(small) : small;
     const mediumStr = typeof medium === 'number' ? formatTime(medium) : medium;
     const largeStr = typeof large === 'number' ? formatTime(large) : large;
-    
-    console.log(`| ${library} | ${smallStr} | ${mediumStr} | ${largeStr} |`);
+
+    // Calculate percentages relative to fastest for each state size
+    const fastestCreationSmall = libraries.reduce((fastest, lib) => {
+      const avg = findTestResult(results[lib].results, 'small')?.averages?.creation;
+      if (avg && (!fastest || avg < fastest.value)) {
+        return { value: avg };
+      }
+      return fastest;
+    }, null);
+
+    const fastestCreationMedium = libraries.reduce((fastest, lib) => {
+      const avg = findTestResult(results[lib].results, 'medium')?.averages?.creation;
+      if (avg && (!fastest || avg < fastest.value)) {
+        return { value: avg };
+      }
+      return fastest;
+    }, null);
+
+    const fastestCreationLarge = libraries.reduce((fastest, lib) => {
+      const avg = findTestResult(results[lib].results, 'large')?.averages?.creation;
+      if (avg && (!fastest || avg < fastest.value)) {
+        return { value: avg };
+      }
+      return fastest;
+    }, null);
+
+    const smallPct = (fastestCreationSmall && typeof small === 'number') ? ((small / fastestCreationSmall.value) * 100).toFixed(1) + '%' : 'N/A';
+    const mediumPct = (fastestCreationMedium && typeof medium === 'number') ? ((medium / fastestCreationMedium.value) * 100).toFixed(1) + '%' : 'N/A';
+    const largePct = (fastestCreationLarge && typeof large === 'number') ? ((large / fastestCreationLarge.value) * 100).toFixed(1) + '%' : 'N/A';
+
+    console.log(`| ${library} | ${smallStr} | ${smallPct} | ${mediumStr} | ${mediumPct} | ${largeStr} | ${largePct} |`);
   }
   console.log();
   
   // Memory Usage Comparison
   console.log('### 🧠 Memory Usage (Estimated)');
   console.log();
-  console.log('| Library | Small State | Medium State | Large State |');
-  console.log('|---------|-------------|--------------|-------------|');
+  console.log('| Library | Small State | Small % | Medium State | Medium % | Large State | Large % |');
+  console.log('|---------|-------------|---------|--------------|----------|-------------|---------|');
   
   for (const library of libraries) {
     const libraryResults = results[library].results;
     const small = findTestResult(libraryResults, 'small')?.averages?.memoryKB || 'N/A';
     const medium = findTestResult(libraryResults, 'medium')?.averages?.memoryKB || 'N/A';
     const large = findTestResult(libraryResults, 'large')?.averages?.memoryKB || 'N/A';
-    
+
     const smallStr = typeof small === 'number' ? `${small.toFixed(0)}KB` : small;
     const mediumStr = typeof medium === 'number' ? `${medium.toFixed(0)}KB` : medium;
     const largeStr = typeof large === 'number' ? `${large.toFixed(0)}KB` : large;
-    
-    console.log(`| ${library} | ${smallStr} | ${mediumStr} | ${largeStr} |`);
+
+    // Calculate percentages relative to lowest memory for each state size
+    const lowestMemorySmall = libraries.reduce((lowest, lib) => {
+      const avg = findTestResult(results[lib].results, 'small')?.averages?.memoryKB;
+      if (avg && (!lowest || avg < lowest.value)) {
+        return { value: avg };
+      }
+      return lowest;
+    }, null);
+
+    const lowestMemoryMedium = libraries.reduce((lowest, lib) => {
+      const avg = findTestResult(results[lib].results, 'medium')?.averages?.memoryKB;
+      if (avg && (!lowest || avg < lowest.value)) {
+        return { value: avg };
+      }
+      return lowest;
+    }, null);
+
+    const lowestMemoryLarge = libraries.reduce((lowest, lib) => {
+      const avg = findTestResult(results[lib].results, 'large')?.averages?.memoryKB;
+      if (avg && (!lowest || avg < lowest.value)) {
+        return { value: avg };
+      }
+      return lowest;
+    }, null);
+
+    const smallPct = (lowestMemorySmall && typeof small === 'number') ? ((small / lowestMemorySmall.value) * 100).toFixed(1) + '%' : 'N/A';
+    const mediumPct = (lowestMemoryMedium && typeof medium === 'number') ? ((medium / lowestMemoryMedium.value) * 100).toFixed(1) + '%' : 'N/A';
+    const largePct = (lowestMemoryLarge && typeof large === 'number') ? ((large / lowestMemoryLarge.value) * 100).toFixed(1) + '%' : 'N/A';
+
+    console.log(`| ${library} | ${smallStr} | ${smallPct} | ${mediumStr} | ${mediumPct} | ${largeStr} | ${largePct} |`);
   }
   console.log();
   

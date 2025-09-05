@@ -4,11 +4,8 @@ import rfdc from 'rfdc';
 
 import { EVENTS } from '../consts';
 import { PubSub } from '../PubSub/PubSub';
-import { canUseFastPath } from './helpers/canUseFastPath';
-import { checkForFastPathPossibility } from './helpers/checkForFastPathPossibility';
 import { isDeep } from './helpers/isDeep';
 import { requiresByString } from './helpers/requiresByString';
-import { tempUpdate } from './helpers/tempUpdate';
 import type {
   ISyncContext,
   TSyncConfig,
@@ -104,12 +101,14 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
    * @param action - The new state object
    */
   public updateState(action: Partial<TState>): void {
-    // Fast path check
-    if (checkForFastPathPossibility(this as ISubstate, action as TUserState)) {
-      if (canUseFastPath(action as TUserState)) {
-        this.fastUpdateStateOptimized(action, this.getCurrentState());
-        return;
-      }
+    // Pre-compute keys and cache current state for performance
+    const keys = Object.keys(action);
+    const currentState = this.getCurrentState();
+
+    // Combined fast path check - single pass through logic
+    if (this.canUseFastPathOptimized(action, keys)) {
+      this.fastUpdateStateOptimized(action, currentState, keys);
+      return;
     }
 
     // Standard path with full feature support
@@ -120,11 +119,16 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
     // Deep check
     const deep = isDeep(action, this.defaultDeep);
 
-    // State cloning
-    let newState = this.cloneState(deep);
+    // State cloning using cached current state
+    let newState = this.cloneStateOptimized(deep, currentState);
 
-    // Temp update
-    newState = tempUpdate(newState as TUserState, action as TUserState, this.defaultDeep) as TState;
+    // Temp update with pre-computed keys
+    newState = this.tempUpdateOptimized(
+      newState as TUserState,
+      action as TUserState,
+      keys,
+      this.defaultDeep
+    ) as TState;
 
     // Push state
     this.pushState(newState);
@@ -137,8 +141,8 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
       this.fireAfterMiddleware(action);
     }
 
-    // Event emission
-    this.emit(action.$type || EVENTS.STATE_UPDATED, this.getCurrentState()); //emit with latest data
+    // Event emission using already computed newState
+    this.emit(action.$type || EVENTS.STATE_UPDATED, newState);
   }
 
   /**
@@ -716,22 +720,6 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
   }
 
   /**
-   * Optimized state cloning with faster shallow clone
-   * @param deep - Whether to clone the state deeply
-   * @returns The cloned state
-   */
-  private cloneState(deep: boolean): TState {
-    if (deep) {
-      const result = cloneDeep(this.getCurrentState());
-      return result;
-    }
-
-    // Optimized shallow clone using spread operator (faster than Object.assign)
-    const result = { ...this.getCurrentState() } as TState;
-    return result;
-  }
-
-  /**
    * Fires the beforeUpdate middleware
    * @param action - The new state object
    */
@@ -756,17 +744,120 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
   }
 
   /**
+   * Combined and optimized fast path check - single pass through logic
+   * @param action - The action to check
+   * @param keys - Pre-computed keys to avoid Object.keys() call
+   * @returns true if fast path can be used
+   */
+  private canUseFastPathOptimized(action: Partial<TState>, keys: string[]): boolean {
+    // Quick checks first - most likely to fail
+    if (this._hasMiddleware || this._hasTaggedStates || action.$deep || action.$tag) {
+      return false;
+    }
+
+    // Single pass through keys with early exit
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      if (key.includes('.') || key.includes('[') || key === '$type') {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Optimized state cloning using cached current state
+   * @param deep - Whether to clone deeply
+   * @param currentState - Pre-fetched current state
+   * @returns The cloned state
+   */
+  private cloneStateOptimized(deep: boolean, currentState: TState): TState {
+    if (deep) {
+      return cloneDeep(currentState);
+    }
+    // Optimized shallow clone using spread operator
+    return { ...currentState } as TState;
+  }
+
+  /**
+   * Optimized tempUpdate with pre-computed keys and fast path for direct properties
+   * @param newState - The state to update
+   * @param action - The action containing updates
+   * @param keys - Pre-computed keys
+   * @param defaultDeep - Default deep setting
+   * @returns Updated state
+   */
+  private tempUpdateOptimized(
+    newState: TUserState,
+    action: Partial<TUserState>,
+    keys: string[],
+    defaultDeep: boolean
+  ): TUserState {
+    // Fast path: if all keys are direct properties, skip array allocation
+    let hasNestedKeys = false;
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      if (key.includes('.') || key.includes('[')) {
+        hasNestedKeys = true;
+        break;
+      }
+    }
+
+    if (!hasNestedKeys) {
+      // Fast path: all direct properties
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+        (newState as Record<string, unknown>)[key] = (action as Record<string, unknown>)[key];
+      }
+    } else {
+      // Standard path: separate direct and nested keys
+      const directKeys: string[] = [];
+      const nestedKeys: string[] = [];
+
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+        if (key.includes('.') || key.includes('[')) {
+          nestedKeys.push(key);
+        } else {
+          directKeys.push(key);
+        }
+      }
+
+      // Process direct keys
+      for (let i = 0; i < directKeys.length; i++) {
+        const key = directKeys[i];
+        (newState as Record<string, unknown>)[key] = (action as Record<string, unknown>)[key];
+      }
+
+      // Process nested keys
+      for (let i = 0; i < nestedKeys.length; i++) {
+        const key = nestedKeys[i];
+        byString(newState, key, (action as Record<string, unknown>)[key]);
+      }
+    }
+
+    if (!defaultDeep) (newState as TUserState).$deep = false;
+    (newState as TUserState).$type = action.$type || EVENTS.UPDATE_STATE;
+
+    return newState;
+  }
+
+  /**
    * Ultra-fast state update that takes current state as parameter to avoid redundant array access
    * @param action - The new state object
    * @param currentState - The current state (pre-fetched for performance)
+   * @param keys - Pre-computed keys for performance
    */
-  private fastUpdateStateOptimized(action: Partial<TState>, currentState: TState): void {
+  private fastUpdateStateOptimized(
+    action: Partial<TState>,
+    currentState: TState,
+    keys: string[]
+  ): void {
     // Use provided currentState instead of array access for better performance
     const newState = { ...currentState } as TState;
 
     // Fast property assignment for direct properties
-    // Optimized loop with early exit for better performance
-    const keys = Object.keys(action);
+    // Use pre-computed keys to avoid Object.keys() call
     for (let i = 0; i < keys.length; i++) {
       const key = keys[i];
       if (key !== '$deep' && key !== '$type' && key !== '$tag') {

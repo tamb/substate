@@ -100,7 +100,7 @@
   "author": "Tamb (Tom Saporito) <tsaporito@protonmail.com>",
   "license": "MIT",
   "dependencies": {
-    "object-bystring": "^7.0.2",
+    "object-bystring": "^8.0.0",
     "rfdc": "^1.4.1"
   },
   "peerDependencies": {
