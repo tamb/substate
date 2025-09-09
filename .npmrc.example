@@ -1,0 +1,12 @@
+# Substate - Complete Dependency Isolation Configuration
+# This prevents ANY hoisting of dependencies to ensure integration tests
+# are completely isolated and realistic
+
+# npm configuration for dependency isolation
+legacy-peer-deps=true
+package-lock-only=false
+prefer-dedupe=false
+
+
+registry=https://registry.npmjs.org
+token=npm_xxxx
