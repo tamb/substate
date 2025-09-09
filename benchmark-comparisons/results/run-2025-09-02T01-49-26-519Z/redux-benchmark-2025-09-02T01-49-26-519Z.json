@@ -1,0 +1,159 @@
+{
+  "library": "redux",
+  "timestamp": "2025-09-02T01:49:45.866Z",
+  "runId": "2025-09-02T01-49-26-519Z",
+  "environment": {
+    "platform": "win32",
+    "nodeVersion": "v22.18.0",
+    "isCI": false
+  },
+  "results": [
+    {
+      "testName": "Small State",
+      "stateSize": 10,
+      "iterations": 100000,
+      "averages": {
+        "creation": 0.0038492999999999735,
+        "singleUpdate": 0.005119200000000026,
+        "avgUpdate": 0.00009646049999999996,
+        "avgAccess": 0.00004901070499999997,
+        "memoryKB": 61.213818359375
+      },
+      "stats": {
+        "creation": {
+          "mean": 0.0038492999999999735,
+          "median": 0.0024,
+          "min": 0.0007,
+          "max": 0.1214,
+          "stdDev": 0.005122893665693247
+        },
+        "singleUpdate": {
+          "mean": 0.005119200000000026,
+          "median": 0.0032,
+          "min": 0.0013,
+          "max": 0.552,
+          "stdDev": 0.01779788165372498
+        },
+        "batchUpdate": {
+          "mean": 0.09646049999999996,
+          "median": 0.0721,
+          "min": 0.0641,
+          "max": 2.1837,
+          "stdDev": 0.08824864990327048
+        },
+        "propertyAccess": {
+          "mean": 4.901070499999997,
+          "median": 4.8846,
+          "min": 4.4491,
+          "max": 6.6413,
+          "stdDev": 0.20682232282746932
+        },
+        "memoryKB": {
+          "mean": 61.213818359375,
+          "median": 61.23046875,
+          "min": 60.9375,
+          "max": 61.572265625,
+          "stdDev": 0.10356535095084614
+        }
+      }
+    },
+    {
+      "testName": "Medium State",
+      "stateSize": 100,
+      "iterations": 10000,
+      "averages": {
+        "creation": 0.0023002,
+        "singleUpdate": 0.010011400000000004,
+        "avgUpdate": 0.00012800179999999977,
+        "avgAccess": 0.00005918837999999994,
+        "memoryKB": 622.709375
+      },
+      "stats": {
+        "creation": {
+          "mean": 0.0023002,
+          "median": 0.0016,
+          "min": 0.0005,
+          "max": 0.478,
+          "stdDev": 0.015136583496945405
+        },
+        "singleUpdate": {
+          "mean": 0.010011400000000004,
+          "median": 0.0086,
+          "min": 0.0034,
+          "max": 0.2207,
+          "stdDev": 0.012853330698305401
+        },
+        "batchUpdate": {
+          "mean": 0.12800179999999978,
+          "median": 0.1194,
+          "min": 0.0906,
+          "max": 0.7843,
+          "stdDev": 0.05100266342809951
+        },
+        "propertyAccess": {
+          "mean": 0.5918837999999994,
+          "median": 0.5759,
+          "min": 0.5169,
+          "max": 1.4027,
+          "stdDev": 0.06350580538470477
+        },
+        "memoryKB": {
+          "mean": 622.709375,
+          "median": 622.705078125,
+          "min": 621.484375,
+          "max": 623.92578125,
+          "stdDev": 0.3287995298953069
+        }
+      }
+    },
+    {
+      "testName": "Large State",
+      "stateSize": 1000,
+      "iterations": 1000,
+      "averages": {
+        "creation": 0.0019755000000000033,
+        "singleUpdate": 0.21790660000000017,
+        "avgUpdate": 0.00046775030000000066,
+        "avgAccess": 0.00014375039999999978,
+        "memoryKB": 6413.3658203125
+      },
+      "stats": {
+        "creation": {
+          "mean": 0.0019755000000000033,
+          "median": 0.0019,
+          "min": 0.0011,
+          "max": 0.0275,
+          "stdDev": 0.0010496140957513866
+        },
+        "singleUpdate": {
+          "mean": 0.21790660000000017,
+          "median": 0.183,
+          "min": 0.1336,
+          "max": 2.2969,
+          "stdDev": 0.12311341590760932
+        },
+        "batchUpdate": {
+          "mean": 0.4677503000000007,
+          "median": 0.4262,
+          "min": 0.3601,
+          "max": 3.3188,
+          "stdDev": 0.14911670979440902
+        },
+        "propertyAccess": {
+          "mean": 0.14375039999999978,
+          "median": 0.1397,
+          "min": 0.1266,
+          "max": 0.4118,
+          "stdDev": 0.02061720397726132
+        },
+        "memoryKB": {
+          "mean": 6413.3658203125,
+          "median": 6413.37890625,
+          "min": 6410.05859375,
+          "max": 6416.845703125,
+          "stdDev": 1.0497458377400422
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "substate-performance-comparison",
+  "version": "1.0.0",
+  "description": "Performance comparison benchmarks for Substate vs other state management libraries",
+  "type": "module",
+  "scripts": {
+    "report": "node benchmark-start.mjs"
+  },
+  "dependencies": {
+    "clone-deep": "^4.0.1",
+    "redux": "^4.2.1",
+    "zustand": "^4.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
+  }
+}

@@ -1,0 +1,5 @@
+- [x] remove `syncEvents` option
+- [ ] Weigh the use case for sync events
+    - There probably isn't any
+- [ ] Release beta
+- [ ] Integration documtation

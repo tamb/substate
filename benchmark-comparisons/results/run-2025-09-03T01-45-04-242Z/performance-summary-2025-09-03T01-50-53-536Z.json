@@ -1,0 +1,181 @@
+{
+  "timestamp": "2025-09-03T01:50:53.522Z",
+  "environment": {
+    "platform": "win32",
+    "nodeVersion": "v22.18.0"
+  },
+  "libraries": {
+    "native": {
+      "timestamp": "2025-09-03T01:50:53.426Z",
+      "environment": {
+        "platform": "win32",
+        "nodeVersion": "v22.18.0",
+        "isCI": false
+      },
+      "results": {
+        "small-state": {
+          "stateSize": 10,
+          "iterations": 100000,
+          "averages": {
+            "creation": 0.0005251299999999845,
+            "singleUpdate": 0.000329009999999979,
+            "avgUpdate": 0.00007518586999999948,
+            "avgAccess": 0.00004789639960000028,
+            "memoryKB": 1.224330859375
+          }
+        },
+        "medium-state": {
+          "stateSize": 100,
+          "iterations": 10000,
+          "averages": {
+            "creation": 0.005230209999999916,
+            "singleUpdate": 0.00037563999999998916,
+            "avgUpdate": 0.00010853766000000005,
+            "avgAccess": 0.000058274408999999895,
+            "memoryKB": 12.454082421875
+          }
+        },
+        "large-state": {
+          "stateSize": 1000,
+          "iterations": 1000,
+          "averages": {
+            "creation": 0.26736332000000035,
+            "singleUpdate": 0.008323449999999918,
+            "avgUpdate": 0.0005442032599999997,
+            "avgAccess": 0.0001616580299999999,
+            "memoryKB": 128.26780908203125
+          }
+        }
+      }
+    },
+    "redux": {
+      "timestamp": "2025-09-03T01:48:09.032Z",
+      "environment": {
+        "platform": "win32",
+        "nodeVersion": "v22.18.0",
+        "isCI": false
+      },
+      "results": {
+        "small-state": {
+          "stateSize": 10,
+          "iterations": 100000,
+          "averages": {
+            "creation": 0.0022280099999999925,
+            "singleUpdate": 0.0028797700000000033,
+            "avgUpdate": 0.0000781962299999999,
+            "avgAccess": 0.000047760685600000176,
+            "memoryKB": 61.2144873046875
+          }
+        },
+        "medium-state": {
+          "stateSize": 100,
+          "iterations": 10000,
+          "averages": {
+            "creation": 0.0006006999999999989,
+            "singleUpdate": 0.007064239999999954,
+            "avgUpdate": 0.00011202120999999938,
+            "avgAccess": 0.00005953590899999992,
+            "memoryKB": 622.6991064453125
+          }
+        },
+        "large-state": {
+          "stateSize": 1000,
+          "iterations": 1000,
+          "averages": {
+            "creation": 0.0011117200000000103,
+            "singleUpdate": 0.24449672999999988,
+            "avgUpdate": 0.0004987833400000002,
+            "avgAccess": 0.00014633437000000066,
+            "memoryKB": 6413.375502929687
+          }
+        }
+      }
+    },
+    "substate": {
+      "timestamp": "2025-09-03T01:46:51.025Z",
+      "environment": {
+        "platform": "win32",
+        "nodeVersion": "v22.18.0",
+        "isCI": false
+      },
+      "results": {
+        "small-state": {
+          "stateSize": 10,
+          "iterations": 100000,
+          "averages": {
+            "creation": 0.005447599999999968,
+            "singleUpdate": 0.0042044900000000295,
+            "avgUpdate": 0.00028569453000000105,
+            "avgAccess": 0.00006141863930000001,
+            "memoryKB": 7
+          }
+        },
+        "medium-state": {
+          "stateSize": 100,
+          "iterations": 10000,
+          "averages": {
+            "creation": 0.0014378099999999923,
+            "singleUpdate": 0.00676884000000007,
+            "avgUpdate": 0.0003316933399999995,
+            "avgAccess": 0.00007027507500000042,
+            "memoryKB": 70
+          }
+        },
+        "large-state": {
+          "stateSize": 1000,
+          "iterations": 1000,
+          "averages": {
+            "creation": 0.0032774799999999707,
+            "singleUpdate": 0.2584219000000016,
+            "avgUpdate": 0.0006005449299999995,
+            "avgAccess": 0.00015318296999999932,
+            "memoryKB": 722.9876
+          }
+        }
+      }
+    },
+    "zustand": {
+      "timestamp": "2025-09-03T01:49:33.699Z",
+      "environment": {
+        "platform": "win32",
+        "nodeVersion": "v22.18.0",
+        "isCI": false
+      },
+      "results": {
+        "small-state": {
+          "stateSize": 10,
+          "iterations": 100000,
+          "averages": {
+            "creation": 0.0032905199999999917,
+            "singleUpdate": 0.004103720000000089,
+            "avgUpdate": 0.00007861825999999964,
+            "avgAccess": 0.00004807339170000023,
+            "memoryKB": 61.2154248046875
+          }
+        },
+        "medium-state": {
+          "stateSize": 100,
+          "iterations": 10000,
+          "averages": {
+            "creation": 0.0067905799999999515,
+            "singleUpdate": 0.010883059999999722,
+            "avgUpdate": 0.00012063844000000027,
+            "avgAccess": 0.00005909696100000006,
+            "memoryKB": 622.7042626953125
+          }
+        },
+        "large-state": {
+          "stateSize": 1000,
+          "iterations": 1000,
+          "averages": {
+            "creation": 0.23018711000000003,
+            "singleUpdate": 0.30844023000000065,
+            "avgUpdate": 0.0008137950199999988,
+            "avgAccess": 0.00016195725000000028,
+            "memoryKB": 6413.371259765625
+          }
+        }
+      }
+    }
+  }
+}

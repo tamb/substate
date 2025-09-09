@@ -1,0 +1,80 @@
+name: Publish Alpha
+
+on:
+  push:
+    branches: [ v10 ]
+  workflow_dispatch:
+    inputs:
+      alpha_version:
+        description: 'Alpha version suffix (e.g., "1" for alpha.1)'
+        required: false
+        default: '1'
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish-alpha:
+    name: Publish Alpha Release
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run tests
+        run: |
+          npm run check
+          npm test
+          npm run test:builds
+          
+      - name: Build package
+        run: npm run build
+        
+      - name: Generate alpha version
+        id: version
+        run: |
+          BASE_VERSION=$(node -p "require('./package.json').version.split('-')[0]")
+          ALPHA_SUFFIX="${{ github.event.inputs.alpha_version || '1' }}"
+          ALPHA_VERSION="${BASE_VERSION}-alpha.${ALPHA_SUFFIX}"
+          echo "ALPHA_VERSION=${ALPHA_VERSION}" >> $GITHUB_OUTPUT
+          echo "📦 Alpha version: ${ALPHA_VERSION}"
+          
+      - name: Update package.json for alpha
+        run: |
+          npm version ${{ steps.version.outputs.ALPHA_VERSION }} --no-git-tag-version
+          echo "✅ Package version updated to ${{ steps.version.outputs.ALPHA_VERSION }}"
+          
+      - name: Publish alpha to npm
+        run: npm publish --tag alpha --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          
+      - name: Create alpha release summary
+        run: |
+          echo "## 🧪 Alpha Release Published" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📦 Installation" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+          echo "npm install substate@alpha" >> $GITHUB_STEP_SUMMARY
+          echo "# or specific version:" >> $GITHUB_STEP_SUMMARY
+          echo "npm install substate@${{ steps.version.outputs.ALPHA_VERSION }}" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ⚠️ Alpha Notice" >> $GITHUB_STEP_SUMMARY
+          echo "This is an alpha release for testing purposes. Not recommended for production use." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔗 Links" >> $GITHUB_STEP_SUMMARY
+          echo "- [NPM Package](https://www.npmjs.com/package/substate/v/${{ steps.version.outputs.ALPHA_VERSION }})" >> $GITHUB_STEP_SUMMARY
+          echo "- [GitHub Repository](https://github.com/tamb/substate)" >> $GITHUB_STEP_SUMMARY

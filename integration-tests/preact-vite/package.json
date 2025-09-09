@@ -1,0 +1,26 @@
+{
+  "name": "substate-preact-integration-test",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Integration test for Substate Preact hooks",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "echo \"Running Preact integration tests...\" && npm run build",
+    "test:with-build": "echo \"Running Preact integration tests...\" && npm run build && vitest run"
+  },
+  "dependencies": {
+    "preact": "10.27.1",
+    "preact-render-to-string": "6.5.1",
+    "substate": "file:../../"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.8.2",
+    "@types/node": "^24.3.0",
+    "jsdom": "^24.0.0",
+    "typescript": "^5.2.2",
+    "vite": "^7.1.2"
+  }
+}

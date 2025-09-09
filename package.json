@@ -1,24 +1,84 @@
 {
   "name": "substate",
-  "version": "9.0.0",
+  "version": "10.0.0-beta.1",
   "description": "Pub/Sub pattern with State Management",
-  "main": "dist/index.js",
+  "type": "module",
+  "main": "dist/index.umd.js",
+  "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.umd.js"
+    },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "import": "./dist/react/index.js"
+    },
+    "./preact": {
+      "types": "./dist/preact/index.d.ts",
+      "import": "./dist/preact/index.js"
+    }
+  },
   "files": [
     "LICENSE",
     "README.md",
-    "dist"
+    "CHANGELOG.md",
+    "dist/index.esm.js",
+    "dist/index.umd.js",
+    "dist/index.d.ts",
+    "dist/index.esm.js.map",
+    "dist/index.umd.js.map",
+    "dist/index.d.ts.map",
+    "dist/core",
+    "dist/react",
+    "dist/preact"
   ],
   "scripts": {
-    "test": "jest",
-    "build": "rollup -c",
-    "test.watch": "jest --watch",
-    "pre": "npm test && npm run build && npm publish --tag next",
-    "safe-publish": "npm test && npm run build && npm publish"
+    "benchmark": "cd benchmark-comparisons && npm run report",
+    "build": "npm run clean && rollup -c && node scripts/copy-declarations.js",
+    "clean": "rimraf dist",
+    "check": "biome check src/",
+    "docs": "node scripts/combine-docs.js",
+    "format": "biome format --write src/",
+    "lint": "biome check src/",
+    "test": "vitest --run && vitest --run --config vitest.integration.config.ts",
+    "test:core": "vitest --run",
+    "test:all": "npm run check && npm run test && npm run test:builds && npm run test:isolation && npm run test:integrations && npm run test:perf && echo 'test:all complete'",
+    "test:builds": "npm run _test:esm && npm run _test:umd",
+    "_test:esm": "node build-tests/test-esm.mjs",
+    "_test:umd": "node build-tests/test-umd.cjs",
+    "test:integrations": "npm run _test:integrations:check && npm run _test:integration:react && npm run _test:integration:preact && npm run _test:integration:lit",
+    "_test:integrations:check": "node scripts/check-dependency-match.js",
+    "_test:integration:react": "cd integration-tests/react-vite && npm install && npm test",
+    "_test:integration:preact": "cd integration-tests/preact-vite && npm install && npm test",
+    "_test:integration:lit": "cd integration-tests/lit-vite && npm install && npm test",
+    "test:perf": "npm run _test:perf:shallow && npm run _test:perf:deep",
+    "_test:perf:shallow": "node performance-tests/shallow-state.mjs",
+    "_test:perf:deep": "node performance-tests/deep-state.mjs",
+    "_test:perf:shallow:avg": "node performance-tests/shallow-state.mjs --runs=5",
+    "_test:perf:deep:avg": "node performance-tests/deep-state.mjs --runs=5",
+    "test:perf:avg": "npm run _test:perf:shallow:avg && npm run _test:perf:deep:avg",
+    "test:isolation": "node scripts/check-isolation.js",
+    "test:coverage": "vitest --coverage && vitest --coverage --config vitest.integration.config.ts",
+    "test:watch": "vitest",
+    "integration:setup": "npm run _integration:setup:react && npm run _integration:setup:preact",
+    "_integration:setup:react": "cd integration-tests/react-vite && npm install",
+    "_integration:setup:preact": "cd integration-tests/preact-vite && npm install",
+    "dev:react": "cd integration-tests/react-vite && npm install && npm run dev",
+    "dev:preact": "cd integration-tests/preact-vite && npm install && npm run dev",
+    "reset": "node scripts/clear-all-dependencies.js && npm install && npm run integration:setup",
+    "refresh": "npm ci && npm run integration:setup",
+    "fix": "biome check --write src/ && biome format --write src/ && biome lint --write src/",
+    "pre": "npm run test && npm run build && npm publish --tag next",
+    "prod:publish": "npm run test && npm run build && npm publish",
+    "alpha:publish": "npm run test && npm run build && npm publish --tag alpha",
+    "beta:publish": "npm run test && npm run build && npm publish --tag beta"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TomSaporito/substate.git"
+    "url": "git+https://github.com/tamb/substate.git"
   },
   "keywords": [
     "state",
@@ -26,44 +86,65 @@
     "pubsub",
     "immutability",
     "modules",
-    "state management"
+    "state management",
+    "state management library",
+    "state management library for javascript",
+    "state management library for typescript",
+    "performance",
+    "memory management",
+    "memory",
+    "memory usage",
+    "memory management",
+    "memory usage"
   ],
   "author": "Tamb (Tom Saporito) <tsaporito@protonmail.com>",
   "license": "MIT",
-  "devDependencies": {
-    "@babel/preset-env": "^7.10.2",
-    "@types/clone-deep": "^4.0.4",
-    "@types/jest": "^29.5.12",
-    "husky": "^4.2.5",
-    "jest": "^29.7.0",
-    "prettier": "^2.0.5",
-    "pretty-quick": "^2.0.1",
-    "rimraf": "^3.0.2",
-    "rollup": "^2.11.2",
-    "rollup-plugin-terser": "^6.1.0",
-    "rollup-plugin-typescript2": "^0.27.1",
-    "stacktrace-js": "^2.0.2",
-    "ts-jest": "^29.1.2",
-    "typescript": "^5.3.3"
-  },
   "dependencies": {
-    "clone-deep": "^4.0.1",
-    "object-bystring": "^6.0.1"
+    "object-bystring": "^8.0.0",
+    "rfdc": "^1.4.1"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "pretty-quick --staged"
+  "peerDependencies": {
+    "preact": "10.27.1",
+    "preact-render-to-string": "6.5.1",
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    },
+    "preact": {
+      "optional": true
     }
   },
-  "jest": {
-    "transform": {
-      ".(ts|tsx)": "ts-jest"
-    },
-    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js"
-    ]
+  "devDependencies": {
+    "@biomejs/biome": "^2.2.0",
+    "@rollup/plugin-commonjs": "^28.0.6",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^12.1.1",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.8.0",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/react-hooks": "^8.0.1",
+    "@types/clone-deep": "^4.0.4",
+    "@types/node": "^24.3.0",
+    "@types/react": "^19.1.10",
+    "@vitest/coverage-v8": "^3.2.4",
+    "audit-ci": "^7.1.0",
+    "jsdom": "^26.1.0",
+    "preact": "^10.27.1",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "rimraf": "^6.0.1",
+    "rollup": "^4.47.1",
+    "rollup-plugin-strip-code": "^0.2.8",
+    "stacktrace-js": "^2.0.2",
+    "tslib": "^2.6.2",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
   }
 }

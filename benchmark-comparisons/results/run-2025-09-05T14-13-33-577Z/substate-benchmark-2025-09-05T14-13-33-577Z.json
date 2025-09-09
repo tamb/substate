@@ -1,0 +1,159 @@
+{
+  "library": "substate",
+  "timestamp": "2025-09-05T14:15:21.887Z",
+  "runId": "2025-09-05T14-13-33-577Z",
+  "environment": {
+    "platform": "win32",
+    "nodeVersion": "v22.18.0",
+    "isCI": false
+  },
+  "results": [
+    {
+      "testName": "Small State",
+      "stateSize": 10,
+      "iterations": 100000,
+      "averages": {
+        "creation": 0.003811550000000017,
+        "singleUpdate": 0.0031053500000000167,
+        "avgUpdate": 0.00029710993000000235,
+        "avgAccess": 0.00006303310319999996,
+        "memoryKB": 7
+      },
+      "stats": {
+        "creation": {
+          "mean": 0.003811550000000017,
+          "median": 0.0025,
+          "min": 0.0005,
+          "max": 0.2787,
+          "stdDev": 0.005342487023615513
+        },
+        "singleUpdate": {
+          "mean": 0.0031053500000000167,
+          "median": 0.0018,
+          "min": 0.0004,
+          "max": 0.21,
+          "stdDev": 0.005037761842078281
+        },
+        "batchUpdate": {
+          "mean": 0.29710993000000235,
+          "median": 0.2702,
+          "min": 0.2451,
+          "max": 1.4582,
+          "stdDev": 0.08256142601963154
+        },
+        "propertyAccess": {
+          "mean": 6.303310319999995,
+          "median": 6.2586,
+          "min": 5.561,
+          "max": 25.5325,
+          "stdDev": 0.41982208374440955
+        },
+        "memoryKB": {
+          "mean": 7,
+          "median": 7,
+          "min": 7,
+          "max": 7,
+          "stdDev": 0
+        }
+      }
+    },
+    {
+      "testName": "Medium State",
+      "stateSize": 100,
+      "iterations": 10000,
+      "averages": {
+        "creation": 0.001494979999999957,
+        "singleUpdate": 0.00809523999999998,
+        "avgUpdate": 0.00034825475999999977,
+        "avgAccess": 0.00007125665900000093,
+        "memoryKB": 70
+      },
+      "stats": {
+        "creation": {
+          "mean": 0.001494979999999957,
+          "median": 0.0015,
+          "min": 0.0003,
+          "max": 0.2126,
+          "stdDev": 0.003184866527752774
+        },
+        "singleUpdate": {
+          "mean": 0.00809523999999998,
+          "median": 0.0073,
+          "min": 0.0028,
+          "max": 0.2033,
+          "stdDev": 0.006179338908200444
+        },
+        "batchUpdate": {
+          "mean": 0.3482547599999998,
+          "median": 0.3288,
+          "min": 0.2957,
+          "max": 1.8227,
+          "stdDev": 0.06973483920783348
+        },
+        "propertyAccess": {
+          "mean": 0.7125665900000092,
+          "median": 0.6946,
+          "min": 0.6366,
+          "max": 9.0812,
+          "stdDev": 0.11672975152364495
+        },
+        "memoryKB": {
+          "mean": 70,
+          "median": 70,
+          "min": 70,
+          "max": 70,
+          "stdDev": 0
+        }
+      }
+    },
+    {
+      "testName": "Large State",
+      "stateSize": 1000,
+      "iterations": 1000,
+      "averages": {
+        "creation": 0.00174760999999979,
+        "singleUpdate": 0.22567241999999993,
+        "avgUpdate": 0.0005620074200000005,
+        "avgAccess": 0.00015188155999999695,
+        "memoryKB": 722.9878
+      },
+      "stats": {
+        "creation": {
+          "mean": 0.00174760999999979,
+          "median": 0.0017,
+          "min": 0.0007,
+          "max": 0.0706,
+          "stdDev": 0.00099304495764292
+        },
+        "singleUpdate": {
+          "mean": 0.22567241999999993,
+          "median": 0.1834,
+          "min": 0.16,
+          "max": 7.9062,
+          "stdDev": 0.14715430594903972
+        },
+        "batchUpdate": {
+          "mean": 0.5620074200000005,
+          "median": 0.5457,
+          "min": 0.4934,
+          "max": 5.0071,
+          "stdDev": 0.08457574900019275
+        },
+        "propertyAccess": {
+          "mean": 0.15188155999999695,
+          "median": 0.1482,
+          "min": 0.1383,
+          "max": 0.9309,
+          "stdDev": 0.02686466489585157
+        },
+        "memoryKB": {
+          "mean": 722.9878,
+          "median": 723,
+          "min": 722,
+          "max": 723,
+          "stdDev": 0.10977777552853828
+        }
+      }
+    }
+  ]
+}
