@@ -1,6 +1,6 @@
-import type { TUserState } from '../interfaces';
+import type { TState } from '../interfaces';
 
-function isDeep(action: Partial<TUserState>, defaultDeep: boolean) {
+function isDeep(action: Partial<TState>, defaultDeep: boolean) {
   return action.$deep !== undefined ? action.$deep : defaultDeep;
 }
 

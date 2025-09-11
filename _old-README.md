@@ -852,7 +852,7 @@ store.updateState({
 
 ---
 
-#### `batchUpdateState(actions: Array<Partial<TState> & IState>): void`
+#### `batchUpdateState(actions: Array<Partial<TSubstateState> & IState>): void`
 
 Updates multiple properties at once for better performance. This method is optimized for bulk operations and provides significant performance improvements over multiple individual `updateState()` calls.
 
@@ -1775,6 +1775,9 @@ type TStateKeywords = {
 
 // User-defined state with keyword support
 type TUserState = object & TStateKeywords;
+
+// Primary state type - represents any state object with optional keywords
+type TSubstateState = object & TStateKeywords;
 ```
 
 ## 📈 Migration Guide

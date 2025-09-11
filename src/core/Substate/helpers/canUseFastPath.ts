@@ -1,7 +1,7 @@
-import type { TUserState } from '../interfaces';
+import type { TState } from '../interfaces';
 import { requiresByString } from './requiresByString';
 
-function canUseFastPath(action: Partial<TUserState>) {
+function canUseFastPath(action: Partial<TState>) {
   let result = true;
   const keys = Object.keys(action);
   for (let i = 0; i < keys.length; i++) {

@@ -2,9 +2,9 @@
 // This shows how much cleaner and more intuitive the API is now!
 
 import { createStore } from './src';
-import type { TUpdateMiddleware, TUserState } from './src';
+import type { TUpdateMiddleware, TState } from './src';
 
-type TMyState = TUserState & {
+type TMyState = TState & {
   count: number;
   user: { name: string; age: number };
   todos: string[];

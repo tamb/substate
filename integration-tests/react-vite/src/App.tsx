@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { createStore, type TUserState } from 'substate'
+import { createStore, type TState } from 'substate'
 import Counter from './components/Counter'
 import TodoApp from './components/TodoApp'
 import './App.css'
 
 // Define state interfaces that extend IState
-interface CounterState extends TUserState {
+interface CounterState extends TState {
   count: number
   lastUpdated: number,
 }
@@ -17,7 +17,7 @@ interface Todo {
   createdAt: number
 }
 
-interface TodoState extends TUserState {
+interface TodoState extends TState {
   todos: Todo[]
   filter: 'all' | 'active' | 'completed'
   newTodoText: string

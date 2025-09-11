@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
-import type { TUserState } from '../../core/Substate/interfaces';
+import type { TState } from '../../core/Substate/interfaces';
 import type { ISubstate } from '../../core/Substate/Substate.interface';
 import type { SubstateActions } from './types';
 
 // Simple state type alias
-type State = TUserState;
+type State = TState;
 
 /**
  * React hook that returns all Substate store methods bound to the provided store
@@ -25,9 +25,9 @@ type State = TUserState;
  * updateState({ count: count + 1 });
  * jumpToTag('checkpoint-1');
  */
-export function useSubstateActions<TState extends State = State>(
-  store: ISubstate<TState>
-): SubstateActions<TState> {
+export function useSubstateActions<TSubstateState extends State = State>(
+  store: ISubstate<TSubstateState>
+): SubstateActions<TSubstateState> {
   return useMemo(
     () => ({
       // Core state methods

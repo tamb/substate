@@ -8,11 +8,11 @@ type TStateKeywords = {
   [key: string]: unknown;
 };
 
-type TUserState = object & TStateKeywords;
+type TState = object & TStateKeywords;
 // #endregion
 
 // #region Middleware Interfaces
-type TUpdateMiddleware = (store: ISubstate, action: Partial<TUserState>) => void;
+type TUpdateMiddleware = (store: ISubstate, action: Partial<TState>) => void;
 // #endregion
 
 // #region Sync Interfaces
@@ -33,4 +33,4 @@ interface ISyncContext {
 }
 // #endregion
 
-export type { TUserState, TUpdateMiddleware, TSyncMiddleware, TSyncConfig, ISyncContext };
+export type { TState, TUpdateMiddleware, TSyncMiddleware, TSyncConfig, ISyncContext };

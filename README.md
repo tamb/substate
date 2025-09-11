@@ -12,10 +12,12 @@
 Substate provides a simple yet powerful way to manage application state with built-in event handling, middleware support, and seamless synchronization capabilities. Perfect for applications that need reactive state management without the complexity of larger frameworks.
 ## 📑 Table of Contents
 
+- [📦 Installation](#-installation)
 - [✨ Features](#-features)
 - [🚀 Quick Start](#-quick-start)
-- [🏷️ Tagged States - Named Checkpoints](#-tagged-states---named-checkpoints)
+- [🏷️ Tagged States - Named Checkpoints](#-tagged-states---named-state-checkpoint-system)
 - [📚 Usage Examples](#-usage-examples)
+- [🎯 Framework Integrations](#-framework-integration)
 - [🔗 Sync - Unidirectional Data Binding](#-sync---unidirectional-data-binding)
 - [📖 API Reference](#-api-reference)
 - [🧠 Memory Management](#-memory-management)
@@ -23,6 +25,7 @@ Substate provides a simple yet powerful way to manage application state with bui
 - [🔄 Why Choose Substate?](#-why-choose-substate)
 - [📋 TypeScript Definitions](#-typescript-definitions)
 - [📈 Migration Guide](#-migration-guide)
+- [🔧 Troubleshooting](#-troubleshooting)
 - [🛠️ Development](#-development)
 - [🤝 Contributing](#-contributing)
 - [📄 License](#-license)
@@ -844,7 +847,7 @@ store.updateState({
 
 ---
 
-#### `batchUpdateState(actions: Array<Partial<TState> & IState>): void`
+#### `batchUpdateState(actions: Array<Partial<TSubstateState> & IState>): void`
 
 Updates multiple properties at once for better performance. This method is optimized for bulk operations and provides significant performance improvements over multiple individual `updateState()` calls.
 
@@ -1777,6 +1780,9 @@ type TStateKeywords = {
 
 // User-defined state with keyword support
 type TUserState = object & TStateKeywords;
+
+// Primary state type - represents any state object with optional keywords
+type TSubstateState = object & TStateKeywords;
 ```
 ## 📈 Migration Guide
 

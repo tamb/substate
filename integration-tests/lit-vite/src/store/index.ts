@@ -1,6 +1,6 @@
-import { createStore, type TUserState } from 'substate';
+import { createStore, type TState } from 'substate';
 
-interface ICounterState extends TUserState {
+interface ICounterState extends TState {
     count: number;
     multipliedCount: number;
     isMultiplierEven: boolean;

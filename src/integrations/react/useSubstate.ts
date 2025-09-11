@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { TUserState } from '../../core/Substate/interfaces';
+import type { TState } from '../../core/Substate/interfaces';
 import type { ISubstate } from '../../core/Substate/Substate.interface';
 import type { StateSelector, StringSelector } from './types';
 
 // Simple state type alias
-type State = TUserState;
+type State = TState;
 
 /**
  * Shallow equality comparison for objects and arrays
@@ -65,22 +65,24 @@ function shallowEqual(a: unknown, b: unknown): boolean {
  * // Get nested property with string selector
  * const userName = useSubstate(store, 'user.name'); // Returns unknown
  */
-function useSubstate<TState extends State = State>(store: ISubstate<TState>): TState;
-function useSubstate<TState extends State = State, TReturn = unknown>(
-  store: ISubstate<TState>,
-  selector: StateSelector<TState, TReturn>
+function useSubstate<TSubstateState extends State = State>(
+  store: ISubstate<TSubstateState>
+): TSubstateState;
+function useSubstate<TSubstateState extends State = State, TReturn = unknown>(
+  store: ISubstate<TSubstateState>,
+  selector: StateSelector<TSubstateState, TReturn>
 ): TReturn;
-function useSubstate<TState extends State = State>(
-  store: ISubstate<TState>,
+function useSubstate<TSubstateState extends State = State>(
+  store: ISubstate<TSubstateState>,
   selector: StringSelector
 ): unknown;
-function useSubstate<TState extends State = State, TReturn = unknown>(
-  store: ISubstate<TState>,
-  selector?: StateSelector<TState, TReturn> | StringSelector
-): TReturn | TState | unknown {
+function useSubstate<TSubstateState extends State = State, TReturn = unknown>(
+  store: ISubstate<TSubstateState>,
+  selector?: StateSelector<TSubstateState, TReturn> | StringSelector
+): TReturn | TSubstateState | unknown {
   // Memoize the selector function to prevent unnecessary re-subscriptions
   const memoizedSelector = useCallback(
-    (state: TState) => {
+    (state: TSubstateState) => {
       if (!selector) {
         return state;
       }
@@ -107,7 +109,7 @@ function useSubstate<TState extends State = State, TReturn = unknown>(
   useEffect(() => {
     // Update handler that only triggers re-render if selected value actually changed
     const handleStateUpdate = (newState: object) => {
-      const newSelectedValue = memoizedSelector(newState as TState);
+      const newSelectedValue = memoizedSelector(newState as TSubstateState);
 
       // Only update if the selected value has actually changed (shallow equality)
       if (!shallowEqual(lastValueRef.current, newSelectedValue)) {
