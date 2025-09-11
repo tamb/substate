@@ -3,7 +3,7 @@
 - [📦 Installation](#-installation)
 - [✨ Features](#-features)
 - [🚀 Quick Start](#-quick-start)
-- [🏷️ Tagged States - Named Checkpoints](#-tagged-states---named-state-checkpoint-system)
+- [🏷️ Tagged States](#-tagged-states)
 - [📚 Usage Examples](#-usage-examples)
 - [🎯 Framework Integrations](#-framework-integration)
 - [🔗 Sync - Unidirectional Data Binding](#-sync---unidirectional-data-binding)

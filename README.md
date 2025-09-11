@@ -15,7 +15,7 @@ Substate provides a simple yet powerful way to manage application state with bui
 - [📦 Installation](#-installation)
 - [✨ Features](#-features)
 - [🚀 Quick Start](#-quick-start)
-- [🏷️ Tagged States - Named Checkpoints](#-tagged-states---named-state-checkpoint-system)
+- [🏷️ Tagged States](#-tagged-states)
 - [📚 Usage Examples](#-usage-examples)
 - [🎯 Framework Integrations](#-framework-integration)
 - [🔗 Sync - Unidirectional Data Binding](#-sync---unidirectional-data-binding)
@@ -31,20 +31,228 @@ Substate provides a simple yet powerful way to manage application state with bui
 - [📄 License](#-license)
 ## ✨ Features
 
-- 🚀 **Lightweight** - Tiny bundle size at 10kb
-- 🔒 **Type-safe** - Full TypeScript support with comprehensive type definitions
-- 🔄 **Reactive** - Built-in Pub/Sub pattern for reactive state updates
-- 🕰️ **Time Travel** - Complete state history with ability to navigate between states
-- 🏷️ **Tagged States** - Named checkpoints for easy state restoration
-- 🎯 **Immutable** - Automatic deep cloning prevents accidental state mutations
-- 🔗 **Sync** - Unidirectional data binding with middleware transformations
-- 🎪 **Middleware** - Extensible with before/after update hooks
-- 🌳 **Nested Props** - Easy access to nested properties with optional dot notation or standard object spread
-- 📦 **Framework Agnostic** - Works with any JavaScript framework or vanilla JS
-## Installation
+### 🚀 **Lightweight** - Tiny bundle size at ~11KB
+Substate is designed to be minimal yet powerful. The core library weighs just ~11KB minified, making it perfect for applications where bundle size matters.
 
+```typescript
+import { createStore } from 'substate'; // Only ~11KB total
+```
+
+### 🔒 **Type-safe** - Full TypeScript support with comprehensive type definitions
+Complete TypeScript support with advanced type inference, ensuring type safety throughout your application.
+
+```typescript
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+const userStore = createStore({
+  name: 'UserStore',
+  state: { user: null as User | null, loading: false }
+});
+
+// TypeScript knows the exact shape of your state
+userStore.updateState({ user: { id: 1, name: 'John', email: 'john@example.com' } });
+```
+
+### 🔄 **Reactive** - Built-in Pub/Sub pattern for reactive state updates
+Event-driven architecture with built-in subscription system for reactive updates.
+
+```typescript
+const store = createStore({
+  name: 'ReactiveStore',
+  state: { count: 0 }
+});
+
+// Subscribe to state changes
+store.on('UPDATE_STATE', (newState) => {
+  console.log('State updated:', newState);
+  // React to changes automatically
+});
+```
+
+### 🕰️ **Time Travel** - Complete state history with ability to navigate between states
+Full state history with configurable memory management. Navigate through state changes like a debugger.
+
+```typescript
+const store = createStore({
+  name: 'TimeTravelStore',
+  state: { count: 0 }
+});
+
+// Make some changes
+store.updateState({ count: 1 });
+store.updateState({ count: 2 });
+store.updateState({ count: 3 });
+
+// Go back in time
+console.log(store.getState(0)); // { count: 0 } - initial state
+console.log(store.getState(1)); // { count: 1 } - first update
+console.log(store.getState(2)); // { count: 2 } - second update
+```
+
+### 🏷️ **Tagged States** - Named checkpoints for easy state restoration
+Create named checkpoints in your state history for easy navigation and debugging.
+
+```typescript
+const gameStore = createStore({
+  name: 'GameStore',
+  state: { level: 1, score: 0 }
+});
+
+// Create a checkpoint
+gameStore.updateState({ level: 5, score: 1250, $tag: 'level-5-start' });
+
+// Later, jump back to that checkpoint
+gameStore.jumpToTag('level-5-start');
+console.log(gameStore.getCurrentState()); // { level: 5, score: 1250 }
+```
+
+### 🎯 **Immutable** - Automatic deep cloning prevents accidental state mutations
+Automatic deep cloning ensures immutability by default, preventing accidental mutations.
+
+```typescript
+const store = createStore({
+  name: 'ImmutableStore',
+  state: { user: { name: 'John', settings: { theme: 'dark' } } }
+});
+
+// State is automatically deep cloned - original object is safe
+const originalState = store.getCurrentState();
+originalState.user.name = 'Jane'; // This won't affect the store
+
+console.log(store.getProp('user.name')); // Still 'John'
+```
+
+### 🔗 **Sync** - Unidirectional data binding with middleware transformations
+Connect your store to UI components or external systems with powerful sync capabilities.
+
+```typescript
+const store = createStore({
+  name: 'SyncStore',
+  state: { price: 29.99 }
+});
+
+// Sync to UI with formatting
+const uiModel = { formattedPrice: '' };
+const unsync = store.sync({
+  readerObj: uiModel,
+  stateField: 'price',
+  readField: 'formattedPrice',
+  beforeUpdate: [(price) => `$${price.toFixed(2)}`]
+});
+
+console.log(uiModel.formattedPrice); // '$29.99'
+```
+
+### 🎪 **Middleware** - Extensible with before/after update hooks
+Powerful middleware system for logging, validation, persistence, and custom logic.
+
+```typescript
+const store = createStore({
+  name: 'MiddlewareStore',
+  state: { count: 0 },
+  beforeUpdate: [
+    (store, action) => {
+      console.log('About to update:', action);
+      // Validation logic here
+    }
+  ],
+  afterUpdate: [
+    (store, action) => {
+      console.log('Updated to:', store.getCurrentState());
+      // Persistence logic here
+    }
+  ]
+});
+```
+
+### 🌳 **Nested Props** - Easy access to nested properties with optional dot notation or standard object spread
+Flexible nested property access with both dot notation convenience and object spread patterns.
+
+```typescript
+const store = createStore({
+  name: 'NestedStore',
+  state: {
+    user: {
+      profile: { name: 'John', email: 'john@example.com' }
+    }
+  }
+});
+
+// Dot notation (convenient)
+store.updateState({ 'user.profile.name': 'Jane' });
+
+// Object spread (explicit)
+store.updateState({
+  user: {
+    ...store.getProp('user'),
+    profile: {
+      ...store.getProp('user.profile'),
+      name: 'Jane'
+    }
+  }
+});
+
+// Both approaches work equally well
+```
+
+### 📦 **Framework Agnostic** - Works with any JavaScript framework or vanilla JS
+No framework dependencies - use with React, Vue, Angular, Svelte, or vanilla JavaScript.
+
+```typescript
+// Vanilla JavaScript
+const store = createStore({ name: 'VanillaStore', state: { count: 0 } });
+
+// React
+import { useEffect, useState } from 'react';
+function Counter() {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    store.on('UPDATE_STATE', (state) => setCount(state.count));
+  }, []);
+}
+
+// Vue, Angular, Svelte - works with all frameworks!
+```
+## 📦 Installation
+
+### npm
 ```bash
 npm install substate
+```
+
+### yarn
+```bash
+yarn add substate
+```
+
+### pnpm
+```bash
+pnpm add substate
+```
+
+### Requirements
+
+- **Node.js**: >= 16.0.0
+- **TypeScript**: >= 4.5.0 (for TypeScript support)
+- **Peer Dependencies**: `clone-deep`, `object-bystring`
+
+### Bundle Size
+- **Minified**: ~11KB
+- **Gzipped**: ~4KB
+
+### CDN
+```html
+<!-- UMD Build -->
+<script src="https://cdn.jsdelivr.net/npm/substate@latest/dist/index.umd.js"></script>
+
+<!-- ESM Build -->
+<script type="module">
+  import { createStore } from 'https://cdn.jsdelivr.net/npm/substate@latest/dist/index.esm.js';
+</script>
 ```
 ## 🚀 Quick Start
 
@@ -72,7 +280,95 @@ counterStore.on('UPDATE_STATE', (newState) => {
   console.log('Counter updated:', newState.count);
 });
 ```
-## 🏷️ Tagged States - Named State Checkpoint System
+
+### Next Steps
+
+1. **[📚 Usage Examples](#-usage-examples)** - Learn through practical examples
+2. **[🔗 Sync - Unidirectional Data Binding](#-sync---unidirectional-data-binding)** - Connect your store to UI components
+3. **[🏷️ Tagged States](#-tagged-states---named-state-checkpoint-system)** - Save and restore state checkpoints
+4. **[📖 API Reference](#-api-reference)** - Complete method documentation
+
+### Common Patterns
+
+#### Counter with Actions
+```typescript
+const counterStore = createStore({
+  name: 'Counter',
+  state: { count: 0 }
+});
+
+// Action functions (optional but recommended)
+function increment() {
+  counterStore.updateState({
+    count: counterStore.getProp('count') + 1
+  });
+}
+
+function decrement() {
+  counterStore.updateState({
+    count: counterStore.getProp('count') - 1
+  });
+}
+
+function reset() {
+  counterStore.resetState(); // Back to initial state
+}
+
+// Subscribe to changes
+counterStore.on('UPDATE_STATE', (state) => {
+  console.log('Count changed to:', state.count);
+});
+
+// Use the actions
+increment(); // count: 1
+increment(); // count: 2
+decrement(); // count: 1
+reset();     // count: 0
+```
+
+#### Form State Management
+```typescript
+const formStore = createStore({
+  name: 'ContactForm',
+  state: {
+    name: '',
+    email: '',
+    message: '',
+    isSubmitting: false,
+    errors: {}
+  }
+});
+
+// Update form fields
+function updateField(field: string, value: string) {
+  formStore.updateState({ [field]: value });
+}
+
+// Submit form
+async function submitForm() {
+  formStore.updateState({ isSubmitting: true, errors: {} });
+
+  try {
+    await submitToAPI(formStore.getCurrentState());
+    console.log('Form submitted successfully!');
+    formStore.resetState(); // Clear form
+  } catch (error) {
+    formStore.updateState({
+      isSubmitting: false,
+      errors: { submit: error.message }
+    });
+  }
+}
+
+// Listen for form changes
+formStore.on('UPDATE_STATE', (state) => {
+  if (state.isSubmitting) {
+    console.log('Submitting form...');
+  }
+});
+```
+## 🏷️ Tagged States
+**Named State Checkpoint System**
 
 Tagged states is a **Named State Checkpoint System** that allows you to create semantic, named checkpoints in your application's state history. Instead of navigating by numeric indices, you can jump to meaningful moments in your app's lifecycle.
 
@@ -1747,8 +2043,11 @@ interface ISyncConfig {
 ### Middleware Types
 
 ```typescript
+// Primary state type - represents any state object with optional keywords
+type TSubstateState = object & TStateKeywords;
+
 // Update middleware for state changes
-type TUpdateMiddleware = (store: ISubstate, action: Partial<TUserState>) => void;
+type TUpdateMiddleware = (store: ISubstate, action: Partial<TSubstateState>) => void;
 
 // Sync middleware for unidirectional data binding
 type TSyncMiddleware = (value: unknown, context: ISyncContext, store: ISubstate) => unknown;
@@ -1777,12 +2076,6 @@ type TStateKeywords = {
   $tag?: string;
   [key: string]: unknown;
 };
-
-// User-defined state with keyword support
-type TUserState = object & TStateKeywords;
-
-// Primary state type - represents any state object with optional keywords
-type TSubstateState = object & TStateKeywords;
 ```
 ## 📈 Migration Guide
 
