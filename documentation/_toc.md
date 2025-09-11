@@ -1,9 +1,11 @@
 ## 📑 Table of Contents
 
+- [📦 Installation](#-installation)
 - [✨ Features](#-features)
 - [🚀 Quick Start](#-quick-start)
-- [🏷️ Tagged States - Named Checkpoints](#-tagged-states---named-checkpoints)
+- [🏷️ Tagged States](#-tagged-states)
 - [📚 Usage Examples](#-usage-examples)
+- [🎯 Framework Integrations](#-framework-integration)
 - [🔗 Sync - Unidirectional Data Binding](#-sync---unidirectional-data-binding)
 - [📖 API Reference](#-api-reference)
 - [🧠 Memory Management](#-memory-management)
@@ -11,6 +13,7 @@
 - [🔄 Why Choose Substate?](#-why-choose-substate)
 - [📋 TypeScript Definitions](#-typescript-definitions)
 - [📈 Migration Guide](#-migration-guide)
+- [🔧 Troubleshooting](#-troubleshooting)
 - [🛠️ Development](#-development)
 - [🤝 Contributing](#-contributing)
 - [📄 License](#-license)

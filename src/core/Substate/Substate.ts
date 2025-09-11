@@ -8,28 +8,31 @@ import { isDeep } from './helpers/isDeep';
 import { requiresByString } from './helpers/requiresByString';
 import type {
   ISyncContext,
+  TState,
   TSyncConfig,
   TSyncMiddleware,
   TUpdateMiddleware,
-  TUserState,
 } from './interfaces';
 import type { ISubstate, ISubstateConfig, ISyncInstance } from './Substate.interface';
 
 const cloneDeep = rfdc();
 
-class Substate<TState extends TUserState = TUserState> extends PubSub implements ISubstate<TState> {
+class Substate<TSubstateState extends TState = TState>
+  extends PubSub
+  implements ISubstate<TSubstateState>
+{
   name?: string;
   afterUpdate: TUpdateMiddleware[] | [];
   beforeUpdate: TUpdateMiddleware[] | [];
   currentState: number;
-  stateStorage: TState[];
+  stateStorage: TSubstateState[];
   defaultDeep: boolean;
   maxHistorySize: number;
-  taggedStates: Map<string, { stateIndex: number; state: TState }>;
+  taggedStates: Map<string, { stateIndex: number; state: TSubstateState }>;
   private _hasMiddleware: boolean;
   private _hasTaggedStates: boolean;
 
-  constructor(conf: ISubstateConfig<TState> = {} as ISubstateConfig<TState>) {
+  constructor(conf: ISubstateConfig<TSubstateState> = {} as ISubstateConfig<TSubstateState>) {
     super();
 
     this.name = conf.name || 'SubStateInstance';
@@ -48,7 +51,7 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
     if (conf.state) this.stateStorage.push(conf.state);
 
     // Optimize event binding by using arrow function to avoid bind overhead
-    this.on(EVENTS.UPDATE_STATE, (action: object) => this.updateState(action as TState));
+    this.on(EVENTS.UPDATE_STATE, (action: object) => this.updateState(action as TSubstateState));
   }
 
   // #region Public API Methods
@@ -58,7 +61,7 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
    * @param index - The index of the state to get
    * @returns The state
    */
-  public getState(index: number): TState {
+  public getState(index: number): TSubstateState {
     return this.stateStorage[index];
   }
 
@@ -66,7 +69,7 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
    * Gets the current state
    * @returns The current state
    */
-  public getCurrentState(): TState {
+  public getCurrentState(): TSubstateState {
     return this.stateStorage[this.currentState];
   }
 
@@ -80,7 +83,7 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
 
     // Fast path for direct property access (most common case)
     if (!requiresByString(prop)) {
-      return currentState[prop as keyof TState];
+      return currentState[prop as keyof TSubstateState];
     }
 
     // Use byString for nested property access
@@ -100,7 +103,7 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
    * Updates the state with a new state object
    * @param action - The new state object
    */
-  public updateState(action: Partial<TState>): void {
+  public updateState(action: Partial<TSubstateState>): void {
     // Pre-compute keys and cache current state for performance
     const keys = Object.keys(action);
     const currentState = this.getCurrentState();
@@ -124,11 +127,11 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
 
     // Temp update with pre-computed keys
     newState = this.tempUpdateOptimized(
-      newState as TUserState,
-      action as TUserState,
+      newState as TState,
+      action as TState,
       keys,
       this.defaultDeep
-    ) as TState;
+    ) as TSubstateState;
 
     // Push state
     this.pushState(newState);
@@ -149,7 +152,7 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
    * Batch update multiple properties at once for better performance
    * @param actions - Array of update actions
    */
-  public batchUpdateState(actions: Array<Partial<TState>>): void {
+  public batchUpdateState(actions: Array<Partial<TSubstateState>>): void {
     if (actions.length === 0) return;
 
     // Fast path for batch updates without middleware, deep cloning, or tagging
@@ -304,7 +307,7 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
      */
     const syncHandler = (state: object) => {
       // Extract the value from the state using dot notation support (via byString)
-      const stateValue = byString(state as TState, stateField);
+      const stateValue = byString(state as TSubstateState, stateField);
 
       // Only proceed if the state field exists and has a value
       if (stateValue !== undefined) {
@@ -517,7 +520,7 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
    *
    * @since 10.0.0
    */
-  public getTaggedState(tag: string): TState | undefined {
+  public getTaggedState(tag: string): TSubstateState | undefined {
     const taggedEntry = this.taggedStates.get(tag);
     return taggedEntry ? cloneDeep(taggedEntry.state) : undefined;
   }
@@ -582,7 +585,7 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
     const restoredState = cloneDeep(taggedEntry.state);
 
     // Remove the $tag metadata to avoid re-tagging
-    delete (restoredState as TState).$tag;
+    delete (restoredState as TSubstateState).$tag;
 
     // Add it as a new state in history
     this.pushState(restoredState);
@@ -664,12 +667,12 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
 
   // #region Private Methods
 
-  private updateTaggedStates(action: Partial<TState>, newState: TState): void {
+  private updateTaggedStates(action: Partial<TSubstateState>, newState: TSubstateState): void {
     if (action.$tag) {
       this._hasTaggedStates = true;
       this.taggedStates.set(action.$tag, {
         stateIndex: this.currentState,
-        state: cloneDeep(newState) as TState, // Store a deep copy to prevent mutations
+        state: cloneDeep(newState) as TSubstateState, // Store a deep copy to prevent mutations
       });
     }
   }
@@ -679,7 +682,7 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
    * Uses immediate history trimming for optimal performance
    * @param newState - The new state object
    */
-  private pushState(newState: TState): void {
+  private pushState(newState: TSubstateState): void {
     this.stateStorage.push(newState);
 
     // Check if history needs trimming and do it immediately
@@ -723,10 +726,10 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
    * Fires the beforeUpdate middleware
    * @param action - The new state object
    */
-  private fireBeforeMiddleware(action: Partial<TState>): void {
+  private fireBeforeMiddleware(action: Partial<TSubstateState>): void {
     if (this.beforeUpdate.length > 0) {
       this.beforeUpdate.forEach((func) => {
-        func(this as unknown as ISubstate, action as TUserState);
+        func(this as unknown as ISubstate, action as TState);
       });
     }
   }
@@ -735,10 +738,10 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
    * Fires the afterUpdate middleware
    * @param action - The new state object
    */
-  private fireAfterMiddleware(action: Partial<TState>): void {
+  private fireAfterMiddleware(action: Partial<TSubstateState>): void {
     if (this.afterUpdate.length > 0) {
       this.afterUpdate.forEach((func) => {
-        func(this as unknown as ISubstate, action as TUserState);
+        func(this as unknown as ISubstate, action as TState);
       });
     }
   }
@@ -749,7 +752,7 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
    * @param keys - Pre-computed keys to avoid Object.keys() call
    * @returns true if fast path can be used
    */
-  private canUseFastPathOptimized(action: Partial<TState>, keys: string[]): boolean {
+  private canUseFastPathOptimized(action: Partial<TSubstateState>, keys: string[]): boolean {
     // Quick checks first - most likely to fail
     if (this._hasMiddleware || this._hasTaggedStates || action.$deep || action.$tag) {
       return false;
@@ -771,12 +774,12 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
    * @param currentState - Pre-fetched current state
    * @returns The cloned state
    */
-  private cloneStateOptimized(deep: boolean, currentState: TState): TState {
+  private cloneStateOptimized(deep: boolean, currentState: TSubstateState): TSubstateState {
     if (deep) {
       return cloneDeep(currentState);
     }
     // Optimized shallow clone using spread operator
-    return { ...currentState } as TState;
+    return { ...currentState } as TSubstateState;
   }
 
   /**
@@ -788,11 +791,11 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
    * @returns Updated state
    */
   private tempUpdateOptimized(
-    newState: TUserState,
-    action: Partial<TUserState>,
+    newState: TState,
+    action: Partial<TState>,
     keys: string[],
     defaultDeep: boolean
-  ): TUserState {
+  ): TState {
     // Fast path: if all keys are direct properties, skip array allocation
     let hasNestedKeys = false;
     for (let i = 0; i < keys.length; i++) {
@@ -836,8 +839,8 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
       }
     }
 
-    if (!defaultDeep) (newState as TUserState).$deep = false;
-    (newState as TUserState).$type = action.$type || EVENTS.UPDATE_STATE;
+    if (!defaultDeep) (newState as TState).$deep = false;
+    (newState as TState).$type = action.$type || EVENTS.UPDATE_STATE;
 
     return newState;
   }
@@ -849,12 +852,12 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
    * @param keys - Pre-computed keys for performance
    */
   private fastUpdateStateOptimized(
-    action: Partial<TState>,
-    currentState: TState,
+    action: Partial<TSubstateState>,
+    currentState: TSubstateState,
     keys: string[]
   ): void {
     // Use provided currentState instead of array access for better performance
-    const newState = { ...currentState } as TState;
+    const newState = { ...currentState } as TSubstateState;
 
     // Fast property assignment for direct properties
     // Use pre-computed keys to avoid Object.keys() call
@@ -865,7 +868,7 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
       }
     }
 
-    (newState as TState).$type = EVENTS.UPDATE_STATE;
+    (newState as TSubstateState).$type = EVENTS.UPDATE_STATE;
     this.pushState(newState);
     this.emit(EVENTS.STATE_UPDATED, newState);
   }
@@ -874,12 +877,12 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
    * Ultra-fast batch update for multiple properties at once
    * @param actions - Array of update actions
    */
-  private fastBatchUpdate(actions: Array<Partial<TState>>): void {
+  private fastBatchUpdate(actions: Array<Partial<TSubstateState>>): void {
     // Get current state for batch operations
     const currentState = this.getCurrentState();
 
     // Pre-allocate the new state object
-    const newState = { ...currentState } as TState;
+    const newState = { ...currentState } as TSubstateState;
 
     // Process all actions in a single pass
     for (let actionIndex = 0; actionIndex < actions.length; actionIndex++) {
@@ -894,7 +897,7 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
       }
     }
 
-    (newState as TState).$type = EVENTS.UPDATE_STATE;
+    (newState as TSubstateState).$type = EVENTS.UPDATE_STATE;
     this.pushState(newState);
     this.emit(EVENTS.STATE_UPDATED, newState);
   }

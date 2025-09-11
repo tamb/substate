@@ -1,7 +1,7 @@
-import type { TUserState, ISubstate } from 'substate'
+import type { TState, ISubstate } from 'substate'
 import { useSubstate, useSubstateActions } from 'substate/react'
 
-interface CounterState extends TUserState {
+interface CounterState extends TState {
   count: number
   lastUpdated: number
 }

@@ -1,14 +1,14 @@
-import type { TUserState } from '../../core/Substate/interfaces';
+import type { TState } from '../../core/Substate/interfaces';
 import type { ISubstate } from '../../core/Substate/Substate.interface';
 
 // Simple state type alias
-type State = TUserState;
+type State = TState;
 
 /**
  * Selector function that extracts a value from the store state
  */
-export type StateSelector<TState extends State = State, TReturn = unknown> = (
-  state: TState
+export type StateSelector<TSubstateState extends State = State, TReturn = unknown> = (
+  state: TSubstateState
 ) => TReturn;
 
 /**
@@ -19,38 +19,40 @@ export type StringSelector = string;
 /**
  * Union type for all supported selector types
  */
-export type Selector<TState extends State = State> = StateSelector<TState> | StringSelector;
+export type Selector<TSubstateState extends State = State> =
+  | StateSelector<TSubstateState>
+  | StringSelector;
 
 /**
  * Return type for useSubstateActions hook containing all bound store methods
  */
-export interface SubstateActions<TState extends State = State> {
+export interface SubstateActions<TSubstateState extends State = State> {
   // Core state methods
-  updateState: ISubstate<TState>['updateState'];
-  resetState: ISubstate<TState>['resetState'];
-  getCurrentState: ISubstate<TState>['getCurrentState'];
-  getState: ISubstate<TState>['getState'];
-  getProp: ISubstate<TState>['getProp'];
+  updateState: ISubstate<TSubstateState>['updateState'];
+  resetState: ISubstate<TSubstateState>['resetState'];
+  getCurrentState: ISubstate<TSubstateState>['getCurrentState'];
+  getState: ISubstate<TSubstateState>['getState'];
+  getProp: ISubstate<TSubstateState>['getProp'];
 
   // History management
-  clearHistory: ISubstate<TState>['clearHistory'];
-  limitHistory: ISubstate<TState>['limitHistory'];
-  getMemoryUsage: ISubstate<TState>['getMemoryUsage'];
+  clearHistory: ISubstate<TSubstateState>['clearHistory'];
+  limitHistory: ISubstate<TSubstateState>['limitHistory'];
+  getMemoryUsage: ISubstate<TSubstateState>['getMemoryUsage'];
 
   // Tagged states
-  jumpToTag: ISubstate<TState>['jumpToTag'];
-  getTaggedState: ISubstate<TState>['getTaggedState'];
-  getAvailableTags: ISubstate<TState>['getAvailableTags'];
-  removeTag: ISubstate<TState>['removeTag'];
-  clearTags: ISubstate<TState>['clearTags'];
+  jumpToTag: ISubstate<TSubstateState>['jumpToTag'];
+  getTaggedState: ISubstate<TSubstateState>['getTaggedState'];
+  getAvailableTags: ISubstate<TSubstateState>['getAvailableTags'];
+  removeTag: ISubstate<TSubstateState>['removeTag'];
+  clearTags: ISubstate<TSubstateState>['clearTags'];
 
   // Sync functionality
-  sync: ISubstate<TState>['sync'];
+  sync: ISubstate<TSubstateState>['sync'];
 
   // Event methods (from PubSub)
-  on: ISubstate<TState>['on'];
-  off: ISubstate<TState>['off'];
-  emit: ISubstate<TState>['emit'];
+  on: ISubstate<TSubstateState>['on'];
+  off: ISubstate<TSubstateState>['off'];
+  emit: ISubstate<TSubstateState>['emit'];
 }
 
 /**
@@ -58,14 +60,17 @@ export interface SubstateActions<TState extends State = State> {
  */
 export interface UseSubstateHook {
   // No selector - returns entire state
-  <TState extends State = State>(store: ISubstate<TState>): TState;
+  <TSubstateState extends State = State>(store: ISubstate<TSubstateState>): TSubstateState;
 
   // Function selector - returns selected value with type inference
-  <TState extends State = State, TReturn = unknown>(
-    store: ISubstate<TState>,
-    selector: StateSelector<TState, TReturn>
+  <TSubstateState extends State = State, TReturn = unknown>(
+    store: ISubstate<TSubstateState>,
+    selector: StateSelector<TSubstateState, TReturn>
   ): TReturn;
 
   // String selector - returns unknown (since we can't infer dot notation types)
-  <TState extends State = State>(store: ISubstate<TState>, selector: StringSelector): unknown;
+  <TSubstateState extends State = State>(
+    store: ISubstate<TSubstateState>,
+    selector: StringSelector
+  ): unknown;
 }
