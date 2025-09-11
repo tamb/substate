@@ -10,6 +10,7 @@
 - [📖 API Reference](#-api-reference)
 - [🧠 Memory Management](#-memory-management)
 - [⚡ Performance Benchmarks](#-performance-benchmarks)
+- [🏁 Performance Comparison Benchmarks](#-performance-comparison-benchmarks)
 - [🔄 Why Choose Substate?](#-why-choose-substate)
 - [📋 TypeScript Definitions](#-typescript-definitions)
 - [📈 Migration Guide](#-migration-guide)
