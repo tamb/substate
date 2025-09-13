@@ -1,6 +1,6 @@
 {
   "name": "substate",
-  "version": "10.0.0-beta.4",
+  "version": "10.0.0-beta.5",
   "description": "Pub/Sub pattern with State Management",
   "type": "module",
   "main": "dist/index.umd.js",
@@ -25,15 +25,7 @@
     "LICENSE",
     "README.md",
     "CHANGELOG.md",
-    "dist/index.esm.js",
-    "dist/index.umd.js",
-    "dist/index.d.ts",
-    "dist/index.esm.js.map",
-    "dist/index.umd.js.map",
-    "dist/index.d.ts.map",
-    "dist/core",
-    "dist/react",
-    "dist/preact"
+    "dist/"
   ],
   "scripts": {
     "benchmark": "cd benchmark-comparisons && npm run report",
