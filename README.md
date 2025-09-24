@@ -49,7 +49,7 @@ interface User {
   email: string;
 }
 
-const userStore = createStore({
+const userStore = createStore<User>({
   name: 'UserStore',
   state: { user: null as User | null, loading: false }
 });
@@ -830,7 +830,7 @@ console.log(userStore.getProp('profile.preferences')); // { theme: 'light', noti
 ### React/Preact
 ```jsx
 import { createStore, type TState } from "substate";
-import { useSubstate, useSubstateActions } from "substate/react"
+import { useSubstate, useSubstateActions } from "substate/react"; // or "substate/preact"
 
 type MyAppState = TState & {
   firstName: string;
@@ -1156,7 +1156,7 @@ function createStore(config: ICreateStoreConfig): ISubstate
 
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
-| `name` | `string` | ✅ | - | Unique identifier for the store |
+| `name` | `string` | ❌ | - | Unique identifier for the store |
 | `state` | `object` | ❌ | `{}` | Initial state object |
 | `defaultDeep` | `boolean` | ❌ | `false` | Enable deep cloning by default for all updates |
 | `beforeUpdate` | `UpdateMiddleware[]` | ❌ | `[]` | Functions called before each state update |
