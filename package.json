@@ -63,10 +63,11 @@
     "reset": "node scripts/clear-all-dependencies.js && npm install && npm run integration:setup",
     "refresh": "npm ci && npm run integration:setup",
     "fix": "biome check --write src/ && biome format --write src/ && biome lint --write src/",
-    "pre": "npm run test && npm run build && npm publish --tag next",
-    "prod:publish": "npm run test && npm run build && npm publish",
-    "alpha:publish": "npm run test && npm run build && npm publish --tag alpha",
-    "beta:publish": "npm run test && npm run build && npm publish --tag beta"
+    "pre": "npm run check && npm run test && npm run build && npm run docs && npm publish --tag next",
+    "prepublish": "npm run check && npm run test && npm run build && npm run docs",
+    "prod:publish": "npm run prepublish && npm publish",
+    "alpha:publish": "npm run prepublish && npm publish --tag alpha",
+    "beta:publish": "npm run prepublish && npm publish --tag beta"
   },
   "repository": {
     "type": "git",

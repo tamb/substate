@@ -12,8 +12,9 @@ interface CounterProps {
 
 export default function Counter({ store }: CounterProps) {
   // Test selector optimization - only re-renders when count changes
-  const count = useSubstate(store, (state) => state.count)
-  const lastUpdated = useSubstate(store, (state) => state.lastUpdated)
+  const count1 = useSubstate(store, (state) => state.count)
+  const lastUpdated1 = useSubstate(store, (state) => state.lastUpdated)
+  const { count, lastUpdated } = useSubstate(store);
   
   // Test comprehensive actions hook
   const { 

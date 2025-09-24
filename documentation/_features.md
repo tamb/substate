@@ -17,7 +17,7 @@ interface User {
   email: string;
 }
 
-const userStore = createStore({
+const userStore = createStore<User>({
   name: 'UserStore',
   state: { user: null as User | null, loading: false }
 });

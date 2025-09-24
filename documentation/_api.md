@@ -12,7 +12,7 @@ function createStore(config: ICreateStoreConfig): ISubstate
 
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
-| `name` | `string` | ✅ | - | Unique identifier for the store |
+| `name` | `string` | ❌ | - | Unique identifier for the store |
 | `state` | `object` | ❌ | `{}` | Initial state object |
 | `defaultDeep` | `boolean` | ❌ | `false` | Enable deep cloning by default for all updates |
 | `beforeUpdate` | `UpdateMiddleware[]` | ❌ | `[]` | Functions called before each state update |

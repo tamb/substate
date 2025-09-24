@@ -3,7 +3,7 @@
 ### React/Preact
 ```jsx
 import { createStore, type TState } from "substate";
-import { useSubstate, useSubstateActions } from "substate/react"
+import { useSubstate, useSubstateActions } from "substate/react"; // or "substate/preact"
 
 type MyAppState = TState & {
   firstName: string;
