@@ -87,6 +87,10 @@ export default function Counter({ store }: CounterProps) {
           </div>
         </div>
       )}
+
+      <div style={{ marginBottom: '1rem' }}>
+        {count1} - {lastUpdated1} | {count} - {lastUpdated}
+      </div>
       
       <div style={{ fontSize: '0.8rem', color: '#666', marginTop: '1rem' }}>
         <p>Last updated: {new Date(lastUpdated).toLocaleTimeString()}</p>
