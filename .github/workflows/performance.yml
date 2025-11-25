@@ -36,7 +36,7 @@ jobs:
       - name: Run performance benchmarks
         run: |
           echo "🏃‍♂️ Running performance benchmarks..."
-          npm run test:performance:avg > performance-results.txt 2>&1
+          npm run test:perf:avg > performance-results.txt 2>&1
           
       - name: Extract performance metrics
         id: metrics
