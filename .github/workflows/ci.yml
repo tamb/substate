@@ -122,7 +122,7 @@ jobs:
         run: npm run build
         
       - name: Run performance tests
-        run: npm run test:performance
+        run: npm run test:perf:avg
         
       - name: Upload performance results
         uses: actions/upload-artifact@v4
