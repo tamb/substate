@@ -1,5 +1,6 @@
 import type { IPubSub } from '../PubSub/PubSub.interface';
-import type { TSyncConfig, TUpdateMiddleware, TUserState } from './interfaces';
+import type { TProxySyncConfig, TSyncConfig, TUpdateMiddleware, TUserState } from './interfaces';
+import type { TSubstateSyncProxy } from './helpers/createSliceProxy';
 
 interface ISyncInstance {
   unsync: () => void;
@@ -29,7 +30,10 @@ interface ISubstate<TState extends TUserState = TUserState> extends IPubSub {
   getProp(prop: string): unknown;
   resetState(): void;
   updateState(action: Partial<TState>): void;
+  // v10 legacy overload
   sync(config: TSyncConfig): ISyncInstance;
+  // v11+ proxy overload
+  sync<T = unknown>(path?: string, config?: TProxySyncConfig): TSubstateSyncProxy<T>;
   clearHistory(): void;
   limitHistory(maxSize: number): void;
   getMemoryUsage(): { stateCount: number; taggedCount: number; estimatedSizeKB: number | null };

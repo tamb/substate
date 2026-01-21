@@ -18,6 +18,33 @@ type TUpdateMiddleware = (store: ISubstate, action: Partial<TUserState>) => void
 // #region Sync Interfaces
 type TSyncMiddleware = (value: unknown, context: ISyncContext, store: ISubstate) => unknown;
 
+/**
+ * New v11+ proxy sync config (scoped to a single proxy instance)
+ */
+type TProxySyncConfig = {
+  /**
+   * Runs before `updateState` for writes performed via the proxy.
+   * Signature matches store middleware: (store, action) => void
+   */
+  beforeUpdate?: TUpdateMiddleware[];
+  /**
+   * Runs after `updateState` for writes performed via the proxy.
+   * Signature matches store middleware: (store, action) => void
+   */
+  afterUpdate?: TUpdateMiddleware[];
+};
+
+/**
+ * Attributes applied to the next write(s) (or a batch commit).
+ */
+type TProxyAttributesConfig = {
+  $tag?: string;
+  $deep?: boolean;
+  $type?: string;
+  before?: TUpdateMiddleware[];
+  after?: TUpdateMiddleware[];
+};
+
 type TSyncConfig = {
   readerObj: Record<string, unknown> | object;
   stateField: string;
@@ -41,4 +68,12 @@ interface ISyncContext {
 }
 // #endregion
 
-export type { TUserState, TUpdateMiddleware, TSyncMiddleware, TSyncConfig, ISyncContext };
+export type {
+  TUserState,
+  TUpdateMiddleware,
+  TSyncMiddleware,
+  TSyncConfig,
+  ISyncContext,
+  TProxySyncConfig,
+  TProxyAttributesConfig,
+};

@@ -8,8 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- v11+ `sync(path?, config?)` proxy mode for mutable-like reads/writes (e.g. `user.name = 'Thomas'`)
+- Proxy helpers: `.batch()/.commit()/.cancel()` and `.with()` for tagging and scoped middleware
 
 ### Changed
+- `sync()` now supports two modes:
+  - `sync(path?, config?)` returns a reactive proxy by default (recommended)
+  - `sync(configObject)` remains supported for v10 unidirectional binding (legacy; warns once per store instance)
 
 ### Fixed
 
