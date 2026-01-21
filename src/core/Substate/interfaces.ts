@@ -22,6 +22,14 @@ type TSyncConfig = {
   readerObj: Record<string, unknown> | object;
   stateField: string;
   readField?: string;
+  /**
+   * @deprecated `syncEvents` is deprecated and will be removed in a future major version.
+   * Substate emits `STATE_UPDATED` by default. If you pass a custom `$type` to `updateState`,
+   * Substate emits that event name instead of `STATE_UPDATED`.
+   *
+   * This option lets you choose which event(s) the sync should subscribe to.
+   */
+  syncEvents?: string | string[];
   beforeUpdate?: TSyncMiddleware[];
   afterUpdate?: TSyncMiddleware[];
 };

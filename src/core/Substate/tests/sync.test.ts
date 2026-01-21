@@ -15,10 +15,12 @@ import { Substate } from '../Substate';
 describe('Substate sync method', () => {
   let store: Substate;
   let uiModel: Record<string, unknown>;
+  let warnSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
     store = new Substate({ state: { userName: 'John', age: 25, nested: { value: 'test' } } });
     uiModel = { name: '', userAge: 0, nestedValue: '' };
+    warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
   // Test basic unidirectional sync functionality
@@ -31,6 +33,7 @@ describe('Substate sync method', () => {
 
     // Initial sync should happen immediately
     expect(uiModel.name).toBe('John');
+    expect(warnSpy).not.toHaveBeenCalled();
 
     // Update state and verify sync
     store.updateState({ userName: 'Alice' });
@@ -163,15 +166,17 @@ describe('Substate sync method', () => {
     synced.unsync();
   });
 
-  test.skip('should sync when syncEvents is provided', () => {
+  test('should sync when syncEvents is provided', () => {
     const synced = store.sync({
       readerObj: uiModel,
       stateField: 'userName',
       readField: 'name',
-      // syncEvents: 'STATE_UPDATED',
+      syncEvents: 'STATE_UPDATED',
     });
 
     expect(uiModel.name).toBe('John');
+    // Deprecation warning should fire once per process
+    expect(warnSpy).toHaveBeenCalledTimes(1);
 
     store.updateState({ userName: 'Alice' });
     expect(uiModel.name).toBe('Alice');
@@ -179,15 +184,17 @@ describe('Substate sync method', () => {
     synced.unsync();
   });
 
-  test.skip('should sync when syncEvents is an array of events', () => {
+  test('should sync when syncEvents is an array of events', () => {
     const synced = store.sync({
       readerObj: uiModel,
       stateField: 'userName',
       readField: 'name',
-      // syncEvents: ['STATE_UPDATED', 'SUBSTATE_UPDATED'],
+      syncEvents: ['STATE_UPDATED', 'SUBSTATE_UPDATED'],
     });
 
     expect(uiModel.name).toBe('John');
+    // Warning is once per process; if it already fired in a prior test, it won't fire again.
+    expect(warnSpy).toHaveBeenCalledTimes(0);
 
     store.updateState({ userName: 'Alice' });
     expect(uiModel.name).toBe('Alice');
@@ -198,15 +205,17 @@ describe('Substate sync method', () => {
     synced.unsync();
   });
 
-  test.skip('should sync when syncEvents is a single event', () => {
+  test('should sync when syncEvents is a single event', () => {
     const synced = store.sync({
       readerObj: uiModel,
       stateField: 'userName',
       readField: 'name',
-      // syncEvents: 'MY_EVENT',
+      syncEvents: 'MY_EVENT',
     });
 
     expect(uiModel.name).toBe('John');
+    // Warning is once per process; if it already fired in a prior test, it won't fire again.
+    expect(warnSpy).toHaveBeenCalledTimes(0);
 
     store.updateState({ userName: 'Alice' });
     expect(uiModel.name).toBe('John');

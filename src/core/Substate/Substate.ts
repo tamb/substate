@@ -17,6 +17,8 @@ import type { ISubstate, ISubstateConfig, ISyncInstance } from './Substate.inter
 
 const cloneDeep = rfdc();
 
+let hasWarnedSyncEventsDeprecation = false;
+
 class Substate<TState extends TUserState = TUserState> extends PubSub implements ISubstate<TState> {
   name?: string;
   afterUpdate: TUpdateMiddleware[] | [];
@@ -252,9 +254,19 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
       readerObj,
       stateField,
       readField = stateField, // Default to stateField if readField not provided
+      syncEvents,
       beforeUpdate = [], // Default to empty array if no middleware
       afterUpdate = [], // Default to empty array if no middleware
     } = config;
+
+    if (syncEvents !== undefined && !hasWarnedSyncEventsDeprecation) {
+      hasWarnedSyncEventsDeprecation = true;
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[substate] Deprecation: "syncEvents" is deprecated and will be removed in a future major version. ` +
+          `Prefer default syncing (STATE_UPDATED). If you rely on custom $type events, subscribe manually via store.on(...)`
+      );
+    }
 
     // Check if the fields exist using byString to support dot notation
     this.validateSyncFields(stateField);
@@ -328,16 +340,27 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
       applyAfterUpdate(transformedValue);
     }
 
-    // SUBSCRIPTION: Register the sync handler to listen for state updates
-    // Uses the existing pub/sub system - when updateState is called, it emits STATE_UPDATED
-    this.on(EVENTS.STATE_UPDATED, syncHandler);
+    const eventsToSync =
+      syncEvents === undefined
+        ? [EVENTS.STATE_UPDATED]
+        : Array.isArray(syncEvents)
+          ? syncEvents
+          : [syncEvents];
+
+    // SUBSCRIPTION: Register the sync handler to listen for configured events
+    // Note: updateState emits `action.$type` if provided, otherwise `STATE_UPDATED`.
+    for (let i = 0; i < eventsToSync.length; i++) {
+      this.on(eventsToSync[i], syncHandler);
+    }
 
     // CLEANUP: Return the unsync function for memory management
     // This removes the event listener to prevent memory leaks
     // Important for component unmounting in React, Vue, etc.
     return {
       unsync: () => {
-        this.off(EVENTS.STATE_UPDATED, syncHandler);
+        for (let i = 0; i < eventsToSync.length; i++) {
+          this.off(eventsToSync[i], syncHandler);
+        }
       },
     };
   }
