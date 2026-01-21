@@ -33,7 +33,8 @@ describe('Substate sync method', () => {
 
     // Initial sync should happen immediately
     expect(uiModel.name).toBe('John');
-    expect(warnSpy).not.toHaveBeenCalled();
+    // v11+: legacy sync(configObject) warns once per store instance
+    expect(warnSpy).toHaveBeenCalledTimes(1);
 
     // Update state and verify sync
     store.updateState({ userName: 'Alice' });
@@ -175,8 +176,8 @@ describe('Substate sync method', () => {
     });
 
     expect(uiModel.name).toBe('John');
-    // Deprecation warning should fire once per process
-    expect(warnSpy).toHaveBeenCalledTimes(1);
+    // v11+: legacy sync warning + syncEvents deprecation warning
+    expect(warnSpy).toHaveBeenCalledTimes(2);
 
     store.updateState({ userName: 'Alice' });
     expect(uiModel.name).toBe('Alice');
@@ -193,8 +194,8 @@ describe('Substate sync method', () => {
     });
 
     expect(uiModel.name).toBe('John');
-    // Warning is once per process; if it already fired in a prior test, it won't fire again.
-    expect(warnSpy).toHaveBeenCalledTimes(0);
+    // v11+: legacy sync warning is per store instance; syncEvents warning is once per process
+    expect(warnSpy).toHaveBeenCalledTimes(1);
 
     store.updateState({ userName: 'Alice' });
     expect(uiModel.name).toBe('Alice');
@@ -214,8 +215,8 @@ describe('Substate sync method', () => {
     });
 
     expect(uiModel.name).toBe('John');
-    // Warning is once per process; if it already fired in a prior test, it won't fire again.
-    expect(warnSpy).toHaveBeenCalledTimes(0);
+    // v11+: legacy sync warning is per store instance; syncEvents warning is once per process
+    expect(warnSpy).toHaveBeenCalledTimes(1);
 
     store.updateState({ userName: 'Alice' });
     expect(uiModel.name).toBe('John');

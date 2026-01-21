@@ -1,7 +1,107 @@
 <a id="sync---unidirectional-data-binding"></a>
 ## 🔗 Sync - Unidirectional Data Binding
 
-One of Substate's most powerful features is the `sync` method, which provides unidirectional data binding between your store and any target object (like UI models, form objects, or API payloads).
+Substate supports two `sync()` modes:
+
+- **Proxy mode (v11+, recommended)**: `sync(path?, config?)` returns a reactive proxy for a state slice. Reads always reflect the latest store state, and writes auto-commit via `updateState()`.
+- **Legacy binding mode (v10 compatible)**: `sync(configObject)` keeps the unidirectional binding behavior. It remains supported, but logs a one-time `console.warn` per store instance to encourage migration.
+
+### Proxy Sync (v11+): Reactive Proxy
+
+```typescript
+import { createStore } from 'substate';
+
+const store = createStore({
+  name: 'UserStore',
+  state: { user: { name: 'John', settings: { theme: 'light' } } }
+});
+
+const user = store.sync('user'); // reactive proxy
+
+console.log(user.name);     // 'John'
+user.name = 'Thomas';       // updateState({ 'user.name': 'Thomas' })
+
+// Nested writes work
+user.settings.theme = 'dark';
+
+// Batch multiple writes
+const batch = user.batch();
+batch.name = 'Thomas R.';
+batch.settings.theme = 'light';
+batch.commit(); // one updateState call
+
+// Tag/type/deep and scoped middleware for next write(s)
+user.with({ $tag: 'profile-save', $type: 'USER_EDIT', $deep: true }).name = 'Tom';
+
+// Or callback form (auto-batch + auto-commit once)
+user.with({ $tag: 'profile-save' }, (draft) => {
+  draft.name = 'Tom';
+});
+
+### Primitive Sync (v11+): `.value`
+
+For single primitive fields, use `.value` on the proxy returned by `sync()`:
+
+```typescript
+const age = store.sync<number>('age');
+console.log(age.value); // 25
+age.value = 30;
+```
+
+### Proxy Sync Config
+
+```typescript
+type TProxySyncConfig = {
+  beforeUpdate?: UpdateMiddleware[];
+  afterUpdate?: UpdateMiddleware[];
+};
+```
+
+### Root Sync (v11+): `sync()` with no args
+
+Calling `sync()` without a path returns a proxy for the **entire state**.
+
+```typescript
+const state = store.sync();       // root proxy
+console.log(state.value);         // full current state snapshot
+console.log(state.user.name);     // nested read
+state.user.name = 'Thomas';       // nested write
+```
+
+### `with()` semantics (v11+)
+
+`with()` applies **tags/metadata + scoped middleware** to the **next write** (one assignment) or to the single commit produced by the callback form.
+
+```typescript
+// Applies to this one write only
+store
+  .sync('user')
+  .with(
+    {
+      $tag: 'profile-save',
+      before: [(store, action) => {}],
+      after: [(store, action) => {}],
+    }
+  )
+  .name = 'Tom';
+
+// Callback form: auto-batch and apply once at commit
+store.sync('user').with({ $tag: 'profile-save' }, (draft) => {
+  draft.name = 'Tom';
+  draft.settings.theme = 'dark';
+});
+```
+
+### `batch()` + `with()` (v11+)
+
+- If you call `with(...)` and then do **one immediate assignment**, it applies to that assignment and is cleared.
+- If you call `batch()` and then `with(...)`, the attributes apply to the **commit** (the grouped update).
+
+---
+
+### Legacy Sync Example (v10): Unidirectional Data Binding
+
+This is the classic sync API that binds store state to a target object (unidirectional). It remains supported.
 
 ### Basic Sync Example
 

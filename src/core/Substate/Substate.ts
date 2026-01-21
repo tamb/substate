@@ -6,8 +6,11 @@ import { EVENTS } from '../consts';
 import { PubSub } from '../PubSub/PubSub';
 import { isDeep } from './helpers/isDeep';
 import { requiresByString } from './helpers/requiresByString';
+import type { TSubstateSyncProxy } from './helpers/createSliceProxy';
+import { createSliceProxy } from './helpers/createSliceProxy';
 import type {
   ISyncContext,
+  TProxySyncConfig,
   TSyncConfig,
   TSyncMiddleware,
   TUpdateMiddleware,
@@ -30,6 +33,7 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
   taggedStates: Map<string, { stateIndex: number; state: TState }>;
   private _hasMiddleware: boolean;
   private _hasTaggedStates: boolean;
+  private _hasWarnedLegacySync: boolean;
 
   constructor(conf: ISubstateConfig<TState> = {} as ISubstateConfig<TState>) {
     super();
@@ -46,6 +50,7 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
     // Pre-compute middleware flags for performance
     this._hasMiddleware = this.beforeUpdate.length > 0 || this.afterUpdate.length > 0;
     this._hasTaggedStates = false;
+    this._hasWarnedLegacySync = false;
 
     if (conf.state) this.stateStorage.push(conf.state);
 
@@ -248,7 +253,33 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
    *
    * @since 10.0.0
    */
-  public sync(config: TSyncConfig): ISyncInstance {
+  public sync<T = unknown>(path?: string, config?: TProxySyncConfig): TSubstateSyncProxy<T>;
+  public sync(config: TSyncConfig): ISyncInstance;
+  public sync<T = unknown>(
+    pathOrConfig?: string | TSyncConfig,
+    config?: TProxySyncConfig
+  ): TSubstateSyncProxy<T> | ISyncInstance {
+    // Backward compatibility: if first argument is an object, use legacy sync implementation
+    if (pathOrConfig && typeof pathOrConfig === 'object') {
+      // Warn once per store instance to encourage migration
+      if (!this._hasWarnedLegacySync) {
+        this._hasWarnedLegacySync = true;
+        // eslint-disable-next-line no-console
+        console.warn(
+          `[Substate v11+] Detected legacy sync(configObject) usage. ` +
+            `This remains supported, but the recommended API is sync(path?, config?) which returns a reactive proxy.`
+        );
+      }
+      return this.syncLegacy(pathOrConfig as TSyncConfig);
+    }
+
+    const path = typeof pathOrConfig === 'string' ? pathOrConfig : undefined;
+    const proxyConfig = config ?? {};
+
+    return createSliceProxy<T>(this as unknown as ISubstate, path, proxyConfig);
+  }
+
+  private syncLegacy(config: TSyncConfig): ISyncInstance {
     // Destructure configuration with defaults
     const {
       readerObj,
