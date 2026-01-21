@@ -549,8 +549,8 @@ const store = createStore({
 
 const user = store.sync('user'); // reactive proxy
 
-console.log(user.name); // 'John'
-user.name = 'Thomas';   // updateState({ 'user.name': 'Thomas' })
+console.log(user.name);     // 'John'
+user.name = 'Thomas';       // updateState({ 'user.name': 'Thomas' })
 
 // Nested writes work
 user.settings.theme = 'dark';
@@ -568,7 +568,6 @@ user.with({ $tag: 'profile-save', $type: 'USER_EDIT', $deep: true }).name = 'Tom
 user.with({ $tag: 'profile-save' }, (draft) => {
   draft.name = 'Tom';
 });
-```
 
 ### Primitive Sync (v11+): `.value`
 
@@ -578,6 +577,15 @@ For single primitive fields, use `.value` on the proxy returned by `sync()`:
 const age = store.sync<number>('age');
 console.log(age.value); // 25
 age.value = 30;
+```
+
+### Proxy Sync Config
+
+```typescript
+type TProxySyncConfig = {
+  beforeUpdate?: UpdateMiddleware[];
+  afterUpdate?: UpdateMiddleware[];
+};
 ```
 
 ### Root Sync (v11+): `sync()` with no args
@@ -620,7 +628,9 @@ store.sync('user').with({ $tag: 'profile-save' }, (draft) => {
 - If you call `with(...)` and then do **one immediate assignment**, it applies to that assignment and is cleared.
 - If you call `batch()` and then `with(...)`, the attributes apply to the **commit** (the grouped update).
 
-### Legacy Sync (v10): Unidirectional Data Binding
+---
+
+### Legacy Sync Example (v10): Unidirectional Data Binding
 
 This is the classic sync API that binds store state to a target object (unidirectional). It remains supported.
 
