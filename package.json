@@ -1,6 +1,6 @@
 {
   "name": "substate",
-  "version": "10.0.1",
+  "version": "10.0.3",
   "description": "Pub/Sub pattern with State Management",
   "type": "module",
   "main": "dist/index.umd.js",
@@ -64,9 +64,9 @@
     "refresh": "npm ci && npm run integration:setup",
     "fix": "biome check --write src/ && biome format --write src/ && biome lint --write src/",
     "pre": "npm run test && npm run build && npm publish --tag next",
-    "prod:safe-publish": "npm run test && npm run build && npm publish",
-    "alpha:safe-publish": "npm run test && npm run build && npm publish --tag alpha",
-    "beta:safe-publish": "npm run test && npm run build && npm publish --tag beta"
+    "prod:safe-publish": "npm run test:all && npm run build && npm run docs && npm publish",
+    "alpha:safe-publish": "npm run test:all && npm run build && npm run docs && npm publish --tag alpha",
+    "beta:safe-publish": "npm run test:all && npm run build && npm run docs && npm publish --tag beta"
   },
   "repository": {
     "type": "git",
