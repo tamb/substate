@@ -1,4 +1,4 @@
-<a id="sync---unidirectional-data-binding"></a>
+<a id="sync---data-binding"></a>
 ## 🔗 Sync - Unidirectional Data Binding
 
 Substate supports two `sync()` modes:

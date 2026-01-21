@@ -16,7 +16,7 @@ Substate provides a simple yet powerful way to manage application state with bui
 - [🚀 Quick Start](#quick-start)
 - [🏷️ Tagged States - Named State Checkpoint System](#tagged-states---named-state-checkpoint-system)
 - [📚 Usage Examples](#usage-examples)
-- [🔗 Sync - Unidirectional Data Binding](#sync---unidirectional-data-binding)
+- [🔗 Sync - Data Binding](#sync---data-binding)
 - [📖 API Reference](#api-reference)
 - [🧠 Memory Management](#memory-management)
 - [⚡ Performance Benchmarks](#performance-benchmarks)
@@ -529,7 +529,7 @@ userStore.updateState({
 console.log(userStore.getProp('profile.personal.name')); // 'Jane Doe'
 console.log(userStore.getProp('profile.preferences')); // { theme: 'light', notifications: true }
 ```
-<a id="sync---unidirectional-data-binding"></a>
+<a id="sync---data-binding"></a>
 ## 🔗 Sync - Unidirectional Data Binding
 
 Substate supports two `sync()` modes:

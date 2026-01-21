@@ -4,7 +4,7 @@
 - [🚀 Quick Start](#quick-start)
 - [🏷️ Tagged States - Named State Checkpoint System](#tagged-states---named-state-checkpoint-system)
 - [📚 Usage Examples](#usage-examples)
-- [🔗 Sync - Unidirectional Data Binding](#sync---unidirectional-data-binding)
+- [🔗 Sync - Data Binding](#sync---data-binding)
 - [📖 API Reference](#api-reference)
 - [🧠 Memory Management](#memory-management)
 - [⚡ Performance Benchmarks](#performance-benchmarks)
