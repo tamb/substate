@@ -12,7 +12,7 @@ const files = [
     'documentation/_api.md',
     'documentation/_memory-management.md',
     'documentation/_performance-benchmarks.md',
-    'documentation/_performance-comparison-benchmarks.md',
+    // 'documentation/_performance-comparison-benchmarks.md',
     'documentation/_why-choose-substate.md',
     'documentation/_typescript-definitions.md',
     'documentation/_migration-guide.md',

@@ -12,20 +12,21 @@
 Substate provides a simple yet powerful way to manage application state with built-in event handling, middleware support, and seamless synchronization capabilities. Perfect for applications that need reactive state management without the complexity of larger frameworks.
 ## 📑 Table of Contents
 
-- [✨ Features](#-features)
-- [🚀 Quick Start](#-quick-start)
-- [🏷️ Tagged States - Named Checkpoints](#-tagged-states---named-checkpoints)
-- [📚 Usage Examples](#-usage-examples)
-- [🔗 Sync - Unidirectional Data Binding](#-sync---unidirectional-data-binding)
-- [📖 API Reference](#-api-reference)
-- [🧠 Memory Management](#-memory-management)
-- [⚡ Performance Benchmarks](#-performance-benchmarks)
-- [🔄 Why Choose Substate?](#-why-choose-substate)
-- [📋 TypeScript Definitions](#-typescript-definitions)
-- [📈 Migration Guide](#-migration-guide)
-- [🛠️ Development](#-development)
-- [🤝 Contributing](#-contributing)
-- [📄 License](#-license)
+- [✨ Features](#features)
+- [🚀 Quick Start](#quick-start)
+- [🏷️ Tagged States - Named State Checkpoint System](#tagged-states---named-state-checkpoint-system)
+- [📚 Usage Examples](#usage-examples)
+- [🔗 Sync - Unidirectional Data Binding](#sync---unidirectional-data-binding)
+- [📖 API Reference](#api-reference)
+- [🧠 Memory Management](#memory-management)
+- [⚡ Performance Benchmarks](#performance-benchmarks)
+- [🔄 Why Choose Substate?](#why-choose-substate)
+- [📋 TypeScript Definitions](#typescript-definitions)
+- [📈 Migration Guide](#migration-guide)
+- [🛠️ Development](#development)
+- [🤝 Contributing](#contributing)
+- [📄 License](#license)
+<a id="features"></a>
 ## ✨ Features
 
 - 🚀 **Lightweight** - Tiny bundle size at 10kb
@@ -43,6 +44,7 @@ Substate provides a simple yet powerful way to manage application state with bui
 ```bash
 npm install substate
 ```
+<a id="quick-start"></a>
 ## 🚀 Quick Start
 
 ### Installation & Basic Usage
@@ -69,6 +71,7 @@ counterStore.on('UPDATE_STATE', (newState) => {
   console.log('Counter updated:', newState.count);
 });
 ```
+<a id="tagged-states---named-state-checkpoint-system"></a>
 ## 🏷️ Tagged States - Named State Checkpoint System
 
 Tagged states is a **Named State Checkpoint System** that allows you to create semantic, named checkpoints in your application's state history. Instead of navigating by numeric indices, you can jump to meaningful moments in your app's lifecycle.
@@ -316,6 +319,7 @@ workflowStore.updateState({ status: "approved", $tag: "workflow-approved" });
 // User session states
 sessionStore.updateState({ user: userData, $tag: "user-logged-in" });
 ```
+<a id="usage-examples"></a>
 ## 📚 Usage Examples
 
 ### 1. Todo List Management
@@ -525,6 +529,7 @@ userStore.updateState({
 console.log(userStore.getProp('profile.personal.name')); // 'Jane Doe'
 console.log(userStore.getProp('profile.preferences')); // { theme: 'light', notifications: true }
 ```
+<a id="sync---unidirectional-data-binding"></a>
 ## 🔗 Sync - Unidirectional Data Binding
 
 One of Substate's most powerful features is the `sync` method, which provides unidirectional data binding between your store and any target object (like UI models, form objects, or API payloads).
@@ -756,6 +761,7 @@ const config: ICreateStoreConfig = {
 
 const store: ISubstate = createStore(config);
 ```
+<a id="api-reference"></a>
 ## 📖 API Reference
 
 ### createStore(config)
@@ -1306,6 +1312,7 @@ updateState(action)
 ├── store.afterUpdate[] (store-wide)
 └── emit STATE_UPDATED or `$type` event
 
+<a id="memory-management"></a>
 ## 🧠 Memory Management
 
 Substate automatically manages memory through configurable history limits and provides tools for monitoring and optimization.
@@ -1428,6 +1435,7 @@ The default settings are optimized for most use cases:
 - **Automatic cleanup**: No manual intervention required
 
 > **💡 Note**: The 50-state default is designed for smaller applications. For enterprise applications with large state objects or high-frequency updates, consider customizing `maxHistorySize` based on your specific memory constraints.
+<a id="performance-benchmarks"></a>
 ## ⚡ Performance Benchmarks
 
 Substate delivers excellent performance across different use cases. Here are real benchmark results from our test suite (averaged over 5 runs for statistical accuracy):
@@ -1479,15 +1487,6 @@ const complexStore = createStore({
 const value = store.getProp('deeply.nested.property'); // ~1μs
 ```
 
-### 🆚 Performance Comparison
-
-| Operation | Substate | Native Object | Redux | Zustand |
-|-----------|----------|---------------|-------|---------|
-| Property Access | **0.15μs** | ~0.1μs | ~2-5μs | ~1-3μs |
-| Shallow Update | **1.41μs** | ~1μs | ~50-100μs | ~20-50μs |
-| Memory Management | **Automatic** | Manual | Manual | Manual |
-| History/Time Travel | **Built-in** | None | DevTools | None |
-
 > **🔬 Benchmark Environment**: 
 > - **Hardware**: 13th Gen Intel(R) Core(TM) i7-13650HX (14 cores), 16 GB RAM
 > - **OS**: Windows 10 Home (Version 2009)
@@ -1495,113 +1494,7 @@ const value = store.getProp('deeply.nested.property'); // ~1μs
 > - **Method**: Averaged over 5 runs for statistical accuracy
 > 
 > Your results may vary based on hardware and usage patterns.
-## 🔬 Performance Comparison Benchmarks
-
-Substate includes comprehensive performance benchmarks comparing it with other popular state management libraries. These benchmarks provide **scientifically accurate** performance data based on real measurements, not estimates.
-
-### 📊 What We Compare
-
-- **Substate** - Our lightweight state management library
-- **Redux** - Industry standard state management
-- **Zustand** - Modern lightweight alternative  
-- **Native JavaScript Objects** - Baseline performance
-
-### 🎯 Measured Metrics
-
-- **Store Creation** - Time to initialize a new store/state
-- **Single Update** - Time for individual state updates
-- **Batch Updates** - Time for multiple updates in sequence
-- **Property Access** - Time to read state properties
-- **Memory Usage** - Estimated memory consumption
-
-### 🚀 Running Comparison Benchmarks
-
-```bash
-# Run all comparison benchmarks
-npm run test:comparison
-
-# Generate comparison report
-npm run test:comparison:report
-
-# Run individual benchmarks
-cd benchmark-comparisons
-npm run benchmark:substate
-npm run benchmark:redux
-npm run benchmark:zustand
-npm run benchmark:native
-```
-
-### 📈 Sample Results
-
-Here's a sample comparison from our benchmark suite:
-
-| Library | Property Access | Update Performance | Store Creation | Memory (Small State) |
-|---------|----------------|-------------------|----------------|---------------------|
-| **Native JS** | 47.90ns | **75.19ns** | **525.13ns** | **1KB** |
-| **Redux** | **47.76ns** | 78.20ns | 2.23μs | 61KB |
-| **Zustand** | 48.07ns | 78.62ns | 3.29μs | 61KB |
-| **Substate** | 61.42ns | 285.69ns | 5.45μs | 7KB |
-
-### 🔬 Benchmark Methodology
-
-**✅ Fair Comparison:**
-- **Identical test data** across all libraries
-- **Same operations** (store creation, updates, property access)
-- **Statistical rigor** (5 runs per test with mean/median/min/max/std)
-- **Multiple state sizes** (small: 10 props, medium: 100 props, large: 1000 props)
-
-**✅ Scientific Accuracy:**
-- **Real measurements**, not estimates
-- **Reproducible** - anyone can run the same tests
-- **Comprehensive** - tests multiple scenarios and metrics
-- **Transparent** - full statistical analysis provided
-
-### 📁 Results Storage
-
-Benchmark results are automatically saved as JSON files in `benchmark-comparisons/results/` with:
-- **Timestamped filenames** for version tracking
-- **Complete statistical data** (mean, median, min, max, standard deviation)
-- **Environment information** (platform, Node.js version, CI status)
-- **Detailed breakdowns** for each test scenario
-
-### 📊 Report Generation
-
-The report generator creates multiple output formats:
-
-**JSON Summary** (`performance-summary-latest.json`):
-- **Consolidated averages** from all libraries
-- **Structured data** for programmatic analysis
-- **Environment metadata** for reproducibility
-
-**Markdown Tables** (`performance-tables-latest.md`):
-- **Ready-to-use markdown tables** for documentation
-- **Formatted performance comparisons** with proper units
-- **Best performance highlighted in bold** for easy identification
-- **Performance insights** and recommendations
-- **Can be directly included** in README files or documentation
-
-**Console Output**:
-- **Real-time display** of comparison results
-- **Detailed statistical breakdowns** for each library
-- **Performance insights** and fastest metrics identification
-
-### 🎯 Key Insights
-
-- **Native JavaScript**: Fastest raw performance, no overhead
-- **Substate**: Optimized for reactive state with minimal overhead (~5x slower than native)
-- **Zustand**: Good balance of features and performance
-- **Redux**: More overhead due to action/reducer pattern
-
-### 📊 Use Case Recommendations
-
-- **High-frequency updates**: Consider Native JS or Substate
-- **Complex state logic**: Redux provides predictable patterns
-- **Simple state management**: Zustand offers good balance
-- **Reactive features needed**: Substate provides built-in Pub/Sub
-
-> **💡 Note**: Performance varies by use case. Choose based on your specific requirements, not just raw speed. The comparison benchmarks help you make informed decisions based on real data.
-> 
-> **📊 Latest Results**: The most recent benchmark results are available in `benchmark-comparisons/results/performance-tables-latest.md` and can be included directly in documentation.
+<a id="why-choose-substate"></a>
 ## 🔄 Why Choose Substate?
 
 ### Comparison with Other State Management Solutions
@@ -1697,6 +1590,7 @@ Substate is **one of the few state management libraries** that combines all thes
 7. **⚡ Production Ready** - Optimized defaults that scale from prototype to enterprise
 
 > **💡 Key Insight**: Most libraries make you choose between features and simplicity. Substate gives you enterprise-grade capabilities with a learning curve measured in minutes, not weeks.
+<a id="typescript-definitions"></a>
 ## 📋 TypeScript Definitions
 
 ### Core Interfaces
@@ -1778,6 +1672,7 @@ type TStateKeywords = {
 // User-defined state with keyword support
 type TUserState = object & TStateKeywords;
 ```
+<a id="migration-guide"></a>
 ## 📈 Migration Guide
 
 ### Version 10.x Migration
@@ -1879,6 +1774,7 @@ const increment = () => store.updateState({
   count: store.getProp('count') + 1 
 });
 ```
+<a id="development"></a>
 ## 🛠️ Development
 
 ### Project Structure
@@ -2015,10 +1911,11 @@ npm run benchmark   # Run performance comparisons vs other libraries
 npm run pre         # Pre-publish checks (test + build) - publishes to 'next' tag
 npm run safe-publish # Full publish pipeline (test + build + publish)
 ```
+<a id="contributing"></a>
 ## 🤝 Contributing
 
 Contributions are welcome! Please read our contributing guidelines and submit pull requests to help improve Substate.
-
+<a id="license"></a>
 ## 📄 License
 
 MIT © [Tom Saporito "Tamb"](https://github.com/tamb)

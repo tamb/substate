@@ -1,3 +1,4 @@
+<a id="tagged-states---named-state-checkpoint-system"></a>
 ## 🏷️ Tagged States - Named State Checkpoint System
 
 Tagged states is a **Named State Checkpoint System** that allows you to create semantic, named checkpoints in your application's state history. Instead of navigating by numeric indices, you can jump to meaningful moments in your app's lifecycle.

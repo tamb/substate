@@ -1,3 +1,4 @@
+<a id="memory-management"></a>
 ## 🧠 Memory Management
 
 Substate automatically manages memory through configurable history limits and provides tools for monitoring and optimization.

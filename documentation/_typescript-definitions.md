@@ -1,3 +1,4 @@
+<a id="typescript-definitions"></a>
 ## 📋 TypeScript Definitions
 
 ### Core Interfaces

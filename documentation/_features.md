@@ -1,3 +1,4 @@
+<a id="features"></a>
 ## ✨ Features
 
 - 🚀 **Lightweight** - Tiny bundle size at 10kb

@@ -1,3 +1,4 @@
+<a id="sync---unidirectional-data-binding"></a>
 ## 🔗 Sync - Unidirectional Data Binding
 
 One of Substate's most powerful features is the `sync` method, which provides unidirectional data binding between your store and any target object (like UI models, form objects, or API payloads).
