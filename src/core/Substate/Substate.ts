@@ -4,10 +4,10 @@ import rfdc from 'rfdc';
 
 import { EVENTS } from '../consts';
 import { PubSub } from '../PubSub/PubSub';
-import { isDeep } from './helpers/isDeep';
-import { requiresByString } from './helpers/requiresByString';
 import type { TSubstateSyncProxy } from './helpers/createSliceProxy';
 import { createSliceProxy } from './helpers/createSliceProxy';
+import { isDeep } from './helpers/isDeep';
+import { requiresByString } from './helpers/requiresByString';
 import type {
   ISyncContext,
   TProxySyncConfig,
