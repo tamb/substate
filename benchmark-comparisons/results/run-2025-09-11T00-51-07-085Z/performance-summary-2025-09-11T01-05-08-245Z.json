@@ -1,0 +1,181 @@
+{
+  "timestamp": "2025-09-11T01:05:08.217Z",
+  "environment": {
+    "platform": "linux",
+    "nodeVersion": "v22.19.0"
+  },
+  "libraries": {
+    "native": {
+      "timestamp": "2025-09-11T01:05:08.151Z",
+      "environment": {
+        "platform": "linux",
+        "nodeVersion": "v22.19.0",
+        "isCI": false
+      },
+      "results": {
+        "small-state": {
+          "stateSize": 10,
+          "iterations": 100000,
+          "averages": {
+            "creation": 0.0016903295999999958,
+            "singleUpdate": 0.0012072994000000036,
+            "avgUpdate": 0.00022052263780000044,
+            "avgAccess": 0.00011368722284300033,
+            "memoryKB": 1.2242982421875
+          }
+        },
+        "medium-state": {
+          "stateSize": 100,
+          "iterations": 10000,
+          "averages": {
+            "creation": 0.016858017799999958,
+            "singleUpdate": 0.0024229963999999986,
+            "avgUpdate": 0.00037698564679999934,
+            "avgAccess": 0.0001875417516099996,
+            "memoryKB": 12.45388349609375
+          }
+        },
+        "large-state": {
+          "stateSize": 1000,
+          "iterations": 1000,
+          "averages": {
+            "creation": 0.5287528576999998,
+            "singleUpdate": 0.02394126489999999,
+            "avgUpdate": 0.0012819844542999942,
+            "avgAccess": 0.0004339597624000001,
+            "memoryKB": 128.2670943359375
+          }
+        }
+      }
+    },
+    "redux": {
+      "timestamp": "2025-09-11T00:58:39.336Z",
+      "environment": {
+        "platform": "linux",
+        "nodeVersion": "v22.19.0",
+        "isCI": false
+      },
+      "results": {
+        "small-state": {
+          "stateSize": 10,
+          "iterations": 100000,
+          "averages": {
+            "creation": 0.005925047999999986,
+            "singleUpdate": 0.008657293499999988,
+            "avgUpdate": 0.0002236792459000005,
+            "avgAccess": 0.00011490319150499976,
+            "memoryKB": 61.21671875
+          }
+        },
+        "medium-state": {
+          "stateSize": 100,
+          "iterations": 10000,
+          "averages": {
+            "creation": 0.0022095039000000023,
+            "singleUpdate": 0.024581690200000086,
+            "avgUpdate": 0.00037544427330000194,
+            "avgAccess": 0.0001861280234200002,
+            "memoryKB": 622.70525390625
+          }
+        },
+        "large-state": {
+          "stateSize": 1000,
+          "iterations": 1000,
+          "averages": {
+            "creation": 0.003069688999999995,
+            "singleUpdate": 0.5383029655999996,
+            "avgUpdate": 0.0012813982190000024,
+            "avgAccess": 0.0004390105723000004,
+            "memoryKB": 6413.359150390625
+          }
+        }
+      }
+    },
+    "substate": {
+      "timestamp": "2025-09-11T00:55:33.023Z",
+      "environment": {
+        "platform": "linux",
+        "nodeVersion": "v22.19.0",
+        "isCI": false
+      },
+      "results": {
+        "small-state": {
+          "stateSize": 10,
+          "iterations": 100000,
+          "averages": {
+            "creation": 0.010316919999999964,
+            "singleUpdate": 0.006845769300000025,
+            "avgUpdate": 0.0007770655192999989,
+            "avgAccess": 0.00015760500928799982,
+            "memoryKB": 7
+          }
+        },
+        "medium-state": {
+          "stateSize": 100,
+          "iterations": 10000,
+          "averages": {
+            "creation": 0.006913194600000019,
+            "singleUpdate": 0.02382090360000003,
+            "avgUpdate": 0.000980770492600001,
+            "avgAccess": 0.00023065742967999975,
+            "memoryKB": 70
+          }
+        },
+        "large-state": {
+          "stateSize": 1000,
+          "iterations": 1000,
+          "averages": {
+            "creation": 0.008539616399999972,
+            "singleUpdate": 0.5548767237000002,
+            "avgUpdate": 0.001703046423200002,
+            "avgAccess": 0.00044159684790000004,
+            "memoryKB": 722.9896
+          }
+        }
+      }
+    },
+    "zustand": {
+      "timestamp": "2025-09-11T01:02:02.487Z",
+      "environment": {
+        "platform": "linux",
+        "nodeVersion": "v22.19.0",
+        "isCI": false
+      },
+      "results": {
+        "small-state": {
+          "stateSize": 10,
+          "iterations": 100000,
+          "averages": {
+            "creation": 0.010965695399999968,
+            "singleUpdate": 0.011411371199999965,
+            "avgUpdate": 0.00022520013589999915,
+            "avgAccess": 0.00011470818254499983,
+            "memoryKB": 61.2185302734375
+          }
+        },
+        "medium-state": {
+          "stateSize": 100,
+          "iterations": 10000,
+          "averages": {
+            "creation": 0.022953164499999977,
+            "singleUpdate": 0.03595646739999998,
+            "avgUpdate": 0.00039857346030000123,
+            "avgAccess": 0.00018356567526000076,
+            "memoryKB": 622.7041650390624
+          }
+        },
+        "large-state": {
+          "stateSize": 1000,
+          "iterations": 1000,
+          "averages": {
+            "creation": 0.5318194655999999,
+            "singleUpdate": 0.7230656061000025,
+            "avgUpdate": 0.002092338329000003,
+            "avgAccess": 0.0005009357671000019,
+            "memoryKB": 6413.39001953125
+          }
+        }
+      }
+    }
+  }
+}
