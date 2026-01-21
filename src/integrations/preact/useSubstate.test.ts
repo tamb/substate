@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { createStore, type TState } from '../../index';
+import { createStore, type TUserState } from '../../index';
 
 // Test state interfaces
-interface TestState extends TState {
+interface TestState extends TUserState {
   count: number;
   user: {
     name: string;
@@ -14,7 +14,7 @@ interface TestState extends TState {
   lastUpdated: number;
 }
 
-interface NestedState extends TState {
+interface NestedState extends TUserState {
   deep: {
     nested: {
       value: string;

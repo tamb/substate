@@ -1,4 +1,4 @@
-import type { TState } from '../Substate/interfaces';
+import type { TUserState } from '../Substate/interfaces';
 import { Substate } from '../Substate/Substate';
 import type { ISubstateConfig } from '../Substate/Substate.interface';
 
@@ -22,10 +22,10 @@ import type { ISubstateConfig } from '../Substate/Substate.interface';
  *   afterUpdate: [(store, action) => console.log("After:", action)]
  * });
  */
-function createStore<TSubstateState extends TState = TState>(
-  config: ISubstateConfig<TSubstateState> = {} as ISubstateConfig<TSubstateState>
-): Substate<TSubstateState> {
-  return new Substate<TSubstateState>({
+function createStore<TState extends TUserState = TUserState>(
+  config: ISubstateConfig<TState> = {} as ISubstateConfig<TState>
+): Substate<TState> {
+  return new Substate<TState>({
     name: config.name,
     state: config.state,
     defaultDeep: config.defaultDeep ?? false,

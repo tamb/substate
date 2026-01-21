@@ -1,3 +1,4 @@
+<a id="typescript-definitions"></a>
 ## 📋 TypeScript Definitions
 
 ### Core Interfaces
@@ -45,11 +46,8 @@ interface ISyncConfig {
 ### Middleware Types
 
 ```typescript
-// Primary state type - represents any state object with optional keywords
-type TSubstateState = object & TStateKeywords;
-
 // Update middleware for state changes
-type TUpdateMiddleware = (store: ISubstate, action: Partial<TSubstateState>) => void;
+type TUpdateMiddleware = (store: ISubstate, action: Partial<TUserState>) => void;
 
 // Sync middleware for unidirectional data binding
 type TSyncMiddleware = (value: unknown, context: ISyncContext, store: ISubstate) => unknown;
@@ -78,4 +76,7 @@ type TStateKeywords = {
   $tag?: string;
   [key: string]: unknown;
 };
+
+// User-defined state with keyword support
+type TUserState = object & TStateKeywords;
 ```

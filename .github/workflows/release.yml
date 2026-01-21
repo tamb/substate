@@ -36,7 +36,7 @@ jobs:
           npm run check
           npm test
           npm run test:builds
-          npm run test:perf:avg
+          npm run test:performance
           
       - name: Build package
         run: npm run build

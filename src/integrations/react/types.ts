@@ -1,16 +1,16 @@
-import type { TState } from '../../core/Substate/interfaces';
+import type { TUserState } from '../../core/Substate/interfaces';
 import type { ISubstate } from '../../core/Substate/Substate.interface';
 
 // Simple state type alias
-type State = TState;
+type State = TUserState;
 
 /**
  * Selector function that extracts a value from the store state
- * @template TSubstateState - Your state type
+ * @template TState - Your state type
  * @template TReturn - The type this selector returns
  */
-export type StateSelector<TSubstateState extends State = State, TReturn = unknown> = (
-  state: TSubstateState
+export type StateSelector<TState extends State = State, TReturn = unknown> = (
+  state: TState
 ) => TReturn;
 
 /**
@@ -21,41 +21,39 @@ export type StringSelector = string;
 /**
  * All supported selector types
  */
-export type Selector<TSubstateState extends State = State> =
-  | StateSelector<TSubstateState>
-  | StringSelector;
+export type Selector<TState extends State = State> = StateSelector<TState> | StringSelector;
 
 /**
  * Actions available on the store (for useSubstateActions hook)
- * @template TSubstateState - Your state type
+ * @template TState - Your state type
  */
-export interface SubstateActions<TSubstateState extends State = State> {
+export interface SubstateActions<TState extends State = State> {
   // Core state methods
-  updateState: ISubstate<TSubstateState>['updateState'];
-  resetState: ISubstate<TSubstateState>['resetState'];
-  getCurrentState: ISubstate<TSubstateState>['getCurrentState'];
-  getState: ISubstate<TSubstateState>['getState'];
-  getProp: ISubstate<TSubstateState>['getProp'];
+  updateState: ISubstate<TState>['updateState'];
+  resetState: ISubstate<TState>['resetState'];
+  getCurrentState: ISubstate<TState>['getCurrentState'];
+  getState: ISubstate<TState>['getState'];
+  getProp: ISubstate<TState>['getProp'];
 
   // History management
-  clearHistory: ISubstate<TSubstateState>['clearHistory'];
-  limitHistory: ISubstate<TSubstateState>['limitHistory'];
-  getMemoryUsage: ISubstate<TSubstateState>['getMemoryUsage'];
+  clearHistory: ISubstate<TState>['clearHistory'];
+  limitHistory: ISubstate<TState>['limitHistory'];
+  getMemoryUsage: ISubstate<TState>['getMemoryUsage'];
 
   // Tagged states
-  jumpToTag: ISubstate<TSubstateState>['jumpToTag'];
-  getTaggedState: ISubstate<TSubstateState>['getTaggedState'];
-  getAvailableTags: ISubstate<TSubstateState>['getAvailableTags'];
-  removeTag: ISubstate<TSubstateState>['removeTag'];
-  clearTags: ISubstate<TSubstateState>['clearTags'];
+  jumpToTag: ISubstate<TState>['jumpToTag'];
+  getTaggedState: ISubstate<TState>['getTaggedState'];
+  getAvailableTags: ISubstate<TState>['getAvailableTags'];
+  removeTag: ISubstate<TState>['removeTag'];
+  clearTags: ISubstate<TState>['clearTags'];
 
   // Sync functionality
-  sync: ISubstate<TSubstateState>['sync'];
+  sync: ISubstate<TState>['sync'];
 
   // Event methods (from PubSub)
-  on: ISubstate<TSubstateState>['on'];
-  off: ISubstate<TSubstateState>['off'];
-  emit: ISubstate<TSubstateState>['emit'];
+  on: ISubstate<TState>['on'];
+  off: ISubstate<TState>['off'];
+  emit: ISubstate<TState>['emit'];
 }
 
 /**
@@ -79,17 +77,14 @@ export interface SubstateActions<TSubstateState extends State = State> {
  */
 export interface UseSubstateHook {
   // No selector - returns entire state
-  <TSubstateState extends State = State>(store: ISubstate<TSubstateState>): TSubstateState;
+  <TState extends State = State>(store: ISubstate<TState>): TState;
 
   // Function selector - returns selected value with type inference
-  <TSubstateState extends State = State, TReturn = unknown>(
-    store: ISubstate<TSubstateState>,
-    selector: StateSelector<TSubstateState, TReturn>
+  <TState extends State = State, TReturn = unknown>(
+    store: ISubstate<TState>,
+    selector: StateSelector<TState, TReturn>
   ): TReturn;
 
   // String selector - returns unknown (since we can't infer dot notation types)
-  <TSubstateState extends State = State>(
-    store: ISubstate<TSubstateState>,
-    selector: StringSelector
-  ): unknown;
+  <TState extends State = State>(store: ISubstate<TState>, selector: StringSelector): unknown;
 }

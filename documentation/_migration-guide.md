@@ -1,3 +1,4 @@
+<a id="migration-guide"></a>
 ## 📈 Migration Guide
 
 ### Version 10.x Migration

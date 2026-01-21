@@ -1,5 +1,5 @@
 import React, { useRef } from 'react'
-import type { TState, ISubstate } from 'substate'
+import type { TUserState, ISubstate } from 'substate'
 import { useSubstate, useSubstateActions } from 'substate/react'
 
 import { type CounterState } from '../App'
@@ -11,7 +11,7 @@ interface Todo {
   createdAt: number
 }
 
-interface TodoState extends TState {
+interface TodoState extends TUserState {
   todos: Todo[]
   filter: 'all' | 'active' | 'completed'
   newTodoText: string

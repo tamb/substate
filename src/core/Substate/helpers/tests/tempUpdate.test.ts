@@ -1,38 +1,38 @@
 import { describe, expect, it } from 'vitest';
 import { EVENTS } from '../../../consts';
-import type { TState } from '../../interfaces';
+import type { TUserState } from '../../interfaces';
 import { tempUpdate } from '../tempUpdate';
 
-type TTestAction = TState & {
+type TTestAction = TUserState & {
   [key: string]: unknown;
 };
 
 describe('tempUpdate', () => {
   describe('basic functionality', () => {
     it('should update the state with direct keys', () => {
-      const state = { a: 1, b: 2 } as TState;
-      const action = { a: 3, b: 4 } as TTestAction;
+      const state = { a: 1, b: 2 } as TUserState;
+      const action = { a: 3, b: 4 } as TUserState;
       const result = tempUpdate(state, action, true);
       expect(result).toEqual({ a: 3, b: 4, $type: EVENTS.UPDATE_STATE });
     });
 
     it('should update the state with mixed direct and nested keys', () => {
-      const state = { a: 1, nested: { b: 2 } } as TState;
-      const action = { a: 3, 'nested.b': 4 } as TTestAction;
+      const state = { a: 1, nested: { b: 2 } } as TUserState;
+      const action = { a: 3, 'nested.b': 4 } as TUserState;
       const result = tempUpdate(state, action, true);
       expect(result).toEqual({ a: 3, nested: { b: 4 }, $type: EVENTS.UPDATE_STATE });
     });
 
     it('should handle array notation for nested keys', () => {
-      const state = { items: [1, 2, 3] } as TState;
-      const action = { 'items[1]': 5 } as TTestAction;
+      const state = { items: [1, 2, 3] } as TUserState;
+      const action = { 'items[1]': 5 } as TUserState;
       const result = tempUpdate(state, action, true);
       expect(result).toEqual({ items: [1, 5, 3], $type: EVENTS.UPDATE_STATE });
     });
 
     it('should handle deep nested paths with dots', () => {
-      const state = { user: { profile: { name: 'John', age: 30 } } } as TState;
-      const action = { 'user.profile.name': 'Jane', 'user.profile.age': 25 } as TTestAction;
+      const state = { user: { profile: { name: 'John', age: 30 } } } as TUserState;
+      const action = { 'user.profile.name': 'Jane', 'user.profile.age': 25 } as TUserState;
       const result = tempUpdate(state, action, true);
       expect(result).toEqual({
         user: { profile: { name: 'Jane', age: 25 } },
@@ -41,8 +41,8 @@ describe('tempUpdate', () => {
     });
 
     it('should handle mixed array and object notation', () => {
-      const state = { users: [{ name: 'John' }, { name: 'Jane' }] } as TState;
-      const action = { 'users[0].name': 'Bob' } as TTestAction;
+      const state = { users: [{ name: 'John' }, { name: 'Jane' }] } as TUserState;
+      const action = { 'users[0].name': 'Bob' } as TUserState;
       const result = tempUpdate(state, action, true);
       expect(result).toEqual({
         users: [{ name: 'Bob' }, { name: 'Jane' }],
@@ -53,22 +53,22 @@ describe('tempUpdate', () => {
 
   describe('$deep keyword handling', () => {
     it('should set $deep to false when defaultDeep is false', () => {
-      const state = { a: 1, b: 2 } as TState;
-      const action = { a: 3 } as TTestAction;
+      const state = { a: 1, b: 2 } as TUserState;
+      const action = { a: 3 } as TUserState;
       const result = tempUpdate(state, action, false);
       expect(result.$deep).toBe(false);
     });
 
     it('should not set $deep when defaultDeep is true', () => {
-      const state = { a: 1, b: 2 } as TState;
-      const action = { a: 3 } as TTestAction;
+      const state = { a: 1, b: 2 } as TUserState;
+      const action = { a: 3 } as TUserState;
       const result = tempUpdate(state, action, true);
       expect(result.$deep).toBeUndefined();
     });
 
     it('should preserve existing $deep value when defaultDeep is true', () => {
-      const state = { a: 1, b: 2, $deep: true } as TState;
-      const action = { a: 3 } as TTestAction;
+      const state = { a: 1, b: 2, $deep: true } as TUserState;
+      const action = { a: 3 } as TUserState;
       const result = tempUpdate(state, action, true);
       expect(result.$deep).toBe(true);
     });
@@ -76,22 +76,22 @@ describe('tempUpdate', () => {
 
   describe('$type keyword handling', () => {
     it('should set $type to UPDATE_STATE when not provided in action', () => {
-      const state = { a: 1 } as TState;
-      const action = { a: 2 } as TTestAction;
+      const state = { a: 1 } as TUserState;
+      const action = { a: 2 } as TUserState;
       const result = tempUpdate(state, action, true);
       expect(result.$type).toBe(EVENTS.UPDATE_STATE);
     });
 
     it('should use $type from action when provided', () => {
-      const state = { a: 1 } as TState;
-      const action = { a: 2, $type: EVENTS.STATE_RESET } as TTestAction;
+      const state = { a: 1 } as TUserState;
+      const action = { a: 2, $type: EVENTS.STATE_RESET } as TUserState;
       const result = tempUpdate(state, action, true);
       expect(result.$type).toBe(EVENTS.STATE_RESET);
     });
 
     it('should preserve existing $type when updating', () => {
-      const state = { a: 1, $type: EVENTS.STATE_UPDATED } as TState;
-      const action = { a: 2 } as TTestAction;
+      const state = { a: 1, $type: EVENTS.STATE_UPDATED } as TUserState;
+      const action = { a: 2 } as TUserState;
       const result = tempUpdate(state, action, true);
       expect(result.$type).toBe(EVENTS.UPDATE_STATE); // action overrides existing
     });
@@ -99,28 +99,28 @@ describe('tempUpdate', () => {
 
   describe('edge cases', () => {
     it('should handle empty action object', () => {
-      const state = { a: 1, b: 2 } as TState;
-      const action = {} as TTestAction;
+      const state = { a: 1, b: 2 } as TUserState;
+      const action = {} as TUserState;
       const result = tempUpdate(state, action, true);
       expect(result).toEqual({ a: 1, b: 2, $type: EVENTS.UPDATE_STATE });
     });
 
     it('should handle undefined values', () => {
-      const state = { a: 1, b: 2 } as TState;
-      const action = { a: undefined } as TTestAction;
+      const state = { a: 1, b: 2 } as TUserState;
+      const action = { a: undefined } as TUserState;
       const result = tempUpdate(state, action, true);
       expect(result).toEqual({ a: undefined, b: 2, $type: EVENTS.UPDATE_STATE });
     });
 
     it('should handle null values', () => {
-      const state = { a: 1, b: 2 } as TState;
-      const action = { a: null } as TTestAction;
+      const state = { a: 1, b: 2 } as TUserState;
+      const action = { a: null } as TUserState;
       const result = tempUpdate(state, action, true);
       expect(result).toEqual({ a: null, b: 2, $type: EVENTS.UPDATE_STATE });
     });
 
     it('should handle complex nested structures', () => {
-      type TTestState = TState & {
+      type TTestState = TUserState & {
         users: { id: number; profile: { name: string; settings: { theme: string } } }[];
       };
 
@@ -134,7 +134,7 @@ describe('tempUpdate', () => {
       const action = {
         'users[0].profile.name': 'Bob',
         'users[1].profile.settings.theme': 'blue',
-      } as TState;
+      } as TUserState;
 
       const result = tempUpdate(state, action, true);
       const resultAny = result as unknown as TTestState;
@@ -145,15 +145,15 @@ describe('tempUpdate', () => {
 
   describe('keyword preservation', () => {
     it('should preserve $tag keyword from original state', () => {
-      const state = { a: 1, $tag: 'my-tag' } as TState;
-      const action = { a: 2 } as TTestAction;
+      const state = { a: 1, $tag: 'my-tag' } as TUserState;
+      const action = { a: 2 } as TUserState;
       const result = tempUpdate(state, action, true);
       expect(result.$tag).toBe('my-tag');
     });
 
     it('should handle action with multiple keywords', () => {
-      const state = { a: 1 } as TState;
-      const action = { a: 2, $type: EVENTS.STATE_RESET, $deep: true, $tag: 'test' } as TTestAction;
+      const state = { a: 1 } as TUserState;
+      const action = { a: 2, $type: EVENTS.STATE_RESET, $deep: true, $tag: 'test' } as TUserState;
       const result = tempUpdate(state, action, false);
       expect(result.$type).toBe(EVENTS.STATE_RESET);
       expect(result.$deep).toBe(false); // defaultDeep is false, so $deep is set to false regardless of action
@@ -163,7 +163,7 @@ describe('tempUpdate', () => {
 
   describe('mixed key types', () => {
     it('should handle combination of direct, dot notation, and bracket notation', () => {
-      type TTestState = TState & {
+      type TTestState = TUserState & {
         direct: string;
         nested: { prop: string };
         array: number[];
@@ -190,8 +190,8 @@ describe('tempUpdate', () => {
     });
 
     it('should handle empty keys array (no updates)', () => {
-      const state = { a: 1, b: 2 } as TState;
-      const action = {} as TTestAction;
+      const state = { a: 1, b: 2 } as TUserState;
+      const action = {} as TUserState;
       const result = tempUpdate(state, action, true);
       expect(result).toEqual({ a: 1, b: 2, $type: EVENTS.UPDATE_STATE });
     });
@@ -199,17 +199,17 @@ describe('tempUpdate', () => {
 
   describe('type safety and mutation', () => {
     it('should mutate the original state object', () => {
-      const state = { a: 1, b: 2 } as TState;
+      const state = { a: 1, b: 2 } as TUserState;
       const originalState = state;
-      const action = { a: 3 } as TTestAction;
+      const action = { a: 3 } as TUserState;
       const result = tempUpdate(state, action, true);
 
       expect(result).toBe(originalState); // same reference
-      expect((result as unknown as TTestAction).a).toBe(3);
+      expect((result as unknown as TUserState).a).toBe(3);
     });
 
     it('should handle state with various value types', () => {
-      type TTestState = TState & {
+      type TTestState = TUserState & {
         string: string;
         number: number;
         boolean: boolean;

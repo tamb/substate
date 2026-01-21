@@ -8,11 +8,11 @@ type TStateKeywords = {
   [key: string]: unknown;
 };
 
-type TState = object & TStateKeywords;
+type TUserState = object & TStateKeywords;
 // #endregion
 
 // #region Middleware Interfaces
-type TUpdateMiddleware = (store: ISubstate, action: Partial<TState>) => void;
+type TUpdateMiddleware = (store: ISubstate, action: Partial<TUserState>) => void;
 // #endregion
 
 // #region Sync Interfaces
@@ -22,6 +22,14 @@ type TSyncConfig = {
   readerObj: Record<string, unknown> | object;
   stateField: string;
   readField?: string;
+  /**
+   * @deprecated `syncEvents` is deprecated and will be removed in a future major version.
+   * Substate emits `STATE_UPDATED` by default. If you pass a custom `$type` to `updateState`,
+   * Substate emits that event name instead of `STATE_UPDATED`.
+   *
+   * This option lets you choose which event(s) the sync should subscribe to.
+   */
+  syncEvents?: string | string[];
   beforeUpdate?: TSyncMiddleware[];
   afterUpdate?: TSyncMiddleware[];
 };
@@ -33,4 +41,4 @@ interface ISyncContext {
 }
 // #endregion
 
-export type { TState, TUpdateMiddleware, TSyncMiddleware, TSyncConfig, ISyncContext };
+export type { TUserState, TUpdateMiddleware, TSyncMiddleware, TSyncConfig, ISyncContext };

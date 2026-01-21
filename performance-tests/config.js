@@ -10,72 +10,72 @@ const isMacOS = process.platform === 'darwin';
 const CI_MULTIPLIERS = {
   // GitHub Actions runners typically have different performance characteristics
   // These multipliers account for CI environment overhead
-  time: isCI ? 3.0 : 1.0,      // CI operations are typically 3x slower (reduced from 4x)
-  memory: isCI ? 2.5 : 1.0,    // CI memory usage can be 2.5x higher due to overhead (reduced from 4x)
-  cpu: isCI ? 2.5 : 1.0        // CI CPU operations are typically 2.5x slower (reduced from 4x)
+  time: isCI ? 4.0 : 1.0,      // CI operations are typically 3x slower
+  memory: isCI ? 4.0 : 1.0,    // CI memory usage can be 2x higher due to overhead
+  cpu: isCI ? 4.0 : 1.0        // CI CPU operations are typically 2.5x slower
 };
 
 // Base performance thresholds (optimized for local development)
 const BASE_THRESHOLDS = {
   shallow: {
     small: {
-      creation: 1.0,         // 1ms (doubled)
-      singleUpdate: 1.0,     // 1ms (doubled)
-      avgUpdate: 0.02,       // 20μs (doubled)
-      avgAccess: 0.004,      // 4μs (doubled)
-      avgNestedAccess: 0.04, // 40μs (doubled)
-      avgEvent: 0.4,         // 400μs (doubled)
-      memoryKB: 600          // 600KB (doubled)
+      creation: 0.15,        // 150μs
+      singleUpdate: 0.2,     // 200μs
+      avgUpdate: 0.005,      // 5μs
+      avgAccess: 0.001,      // 1μs
+      avgNestedAccess: 0.01, // 10μs
+      avgEvent: 0.1,         // 100μs
+      memoryKB: 150          // 150KB
     },
     medium: {
-      creation: 1.2,         // 1.2ms (doubled)
-      singleUpdate: 2.0,     // 2ms (doubled)
-      avgUpdate: 0.2,        // 200μs (doubled)
-      avgAccess: 0.004,      // 4μs (doubled)
-      avgNestedAccess: 0.08, // 80μs (doubled)
-      avgEvent: 0.8,         // 800μs (doubled)
-      memoryKB: 6000         // 6MB (doubled)
+      creation: 0.3,         // 300μs (adjusted based on observed 260μs)
+      singleUpdate: 0.5,     // 500μs (adjusted based on observed 432μs)
+      avgUpdate: 0.05,       // 50μs
+      avgAccess: 0.001,      // 1μs
+      avgNestedAccess: 0.02, // 20μs
+      avgEvent: 0.2,         // 200μs
+      memoryKB: 1500         // 1.5MB
     },
     large: {
-      creation: 0.5,         // 500μs (doubled)
-      singleUpdate: 20,      // 20ms (doubled)
-      avgUpdate: 2.0,        // 2ms (doubled)
-      avgAccess: 0.004,      // 4μs (doubled)
-      avgNestedAccess: 0.2,  // 200μs (doubled)
-      avgEvent: 2.0,         // 2ms (doubled)
-      memoryKB: 60000        // 60MB (doubled)
+      creation: 0.1,         // 100μs
+      singleUpdate: 5,       // 5ms
+      avgUpdate: 0.5,        // 500μs
+      avgAccess: 0.001,      // 1μs
+      avgNestedAccess: 0.05, // 50μs
+      avgEvent: 0.5,         // 500μs
+      memoryKB: 15000        // 15MB
     }
   },
   deep: {
     shallow: {
-      creation: 0.6,         // 600μs (doubled)
-      singleUpdate: 4.0,     // 4ms (doubled)
-      avgUpdate: 3.6,        // 3.6ms (doubled)
-      avgDeepAccess: 0.02,   // 20μs (doubled)
-      avgArrayAccess: 3.6,   // 3.6ms (doubled)
-      avgHistory: 36,        // 36ms (doubled)
-      avgCloning: 3.6,       // 3.6ms (doubled)
-      memoryKB: 40000        // 40MB (doubled)
+      creation: 0.16,        // 160μs
+      singleUpdate: 1.15,    // 1.15ms
+      avgUpdate: 1,          // 1ms
+      avgDeepAccess: 0.005,  // 5μs
+      avgArrayAccess: 1,     // 1ms
+      avgHistory: 10,        // 10ms
+      avgCloning: 1,         // 1ms
+      memoryKB: 12000        // 12MB
     },
     medium: {
-      creation: 0.4,         // 400μs (doubled)
-      singleUpdate: 7.0,     // 7ms (doubled)
-      avgUpdate: 7.0,        // 7ms (doubled)
-      avgDeepAccess: 0.036,  // 36μs (doubled)
-      avgArrayAccess: 7.0,   // 7ms (doubled)
-      avgHistory: 70,        // 70ms (doubled)
-      avgCloning: 7.0,       // 7ms (doubled)
-      memoryKB: 170000       // 170MB (doubled)
+      creation: 0.1,         // 100μs
+      singleUpdate: 2,       // 2ms
+      avgUpdate: 2,          // 2ms
+      avgDeepAccess: 0.01,   // 10μs
+      avgArrayAccess: 2,     // 2ms
+      avgHistory: 20,        // 20ms
+      avgCloning: 2,         // 2ms
+      memoryKB: 50000        // 50MB
     },
     deep: {
-      creation: 0.4,         // 400μs (doubled)
-      singleUpdate: 7.0,     // 7ms (doubled)
-      avgUpdate: 7.0,        // 7ms (doubled)
-      avgDeepAccess: 0.02,   // 20μs (doubled)
-      avgArrayAccess: 7.0,   // 7ms (doubled)
-      avgHistory: 70,        // 70ms (doubled)
-      avgCloning: 7.0,       // 7ms (doubled)
-      memoryKB: 160000       // 160MB (doubled)
+      creation: 0.1,         // 100μs
+      singleUpdate: 2,       // 2ms
+      avgUpdate: 2,          // 2ms
+      avgDeepAccess: 0.005,  // 5μs
+      avgArrayAccess: 2,     // 2ms
+      avgHistory: 20,        // 20ms
+      avgCloning: 2,         // 2ms
+      memoryKB: 48000        // 48MB
     }
   }
 };

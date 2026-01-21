@@ -1,3 +1,4 @@
+<a id="performance-benchmarks"></a>
 ## ⚡ Performance Benchmarks
 
 Substate delivers excellent performance across different use cases. Here are real benchmark results from our test suite (averaged over 5 runs for statistical accuracy):
@@ -48,15 +49,6 @@ const complexStore = createStore({
 // ✅ Property access is always fast
 const value = store.getProp('deeply.nested.property'); // ~1μs
 ```
-
-### 🆚 Performance Comparison
-
-| Operation | Substate | Native Object | Redux | Zustand |
-|-----------|----------|---------------|-------|---------|
-| Property Access | **0.15μs** | ~0.1μs | ~2-5μs | ~1-3μs |
-| Shallow Update | **1.41μs** | ~1μs | ~50-100μs | ~20-50μs |
-| Memory Management | **Automatic** | Manual | Manual | Manual |
-| History/Time Travel | **Built-in** | None | DevTools | None |
 
 > **🔬 Benchmark Environment**: 
 > - **Hardware**: 13th Gen Intel(R) Core(TM) i7-13650HX (14 cores), 16 GB RAM

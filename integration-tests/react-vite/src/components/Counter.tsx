@@ -1,7 +1,7 @@
-import type { TState, ISubstate } from 'substate'
+import type { TUserState, ISubstate } from 'substate'
 import { useSubstate, useSubstateActions } from 'substate/react'
 
-interface CounterState extends TState {
+interface CounterState extends TUserState {
   count: number
   lastUpdated: number
 }
@@ -12,9 +12,8 @@ interface CounterProps {
 
 export default function Counter({ store }: CounterProps) {
   // Test selector optimization - only re-renders when count changes
-  const count1 = useSubstate(store, (state) => state.count)
-  const lastUpdated1 = useSubstate(store, (state) => state.lastUpdated)
-  const { count, lastUpdated } = useSubstate(store);
+  const count = useSubstate(store, (state) => state.count)
+  const lastUpdated = useSubstate(store, (state) => state.lastUpdated)
   
   // Test comprehensive actions hook
   const { 
@@ -87,10 +86,6 @@ export default function Counter({ store }: CounterProps) {
           </div>
         </div>
       )}
-
-      <div style={{ marginBottom: '1rem' }}>
-        {count1} - {lastUpdated1} | {count} - {lastUpdated}
-      </div>
       
       <div style={{ fontSize: '0.8rem', color: '#666', marginTop: '1rem' }}>
         <p>Last updated: {new Date(lastUpdated).toLocaleTimeString()}</p>

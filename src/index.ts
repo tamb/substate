@@ -4,10 +4,10 @@ export { createStore } from './core/createStore/createStore';
 export type { IPubSub } from './core/PubSub/PubSub.interface';
 export type {
   ISyncContext,
-  TState,
   TSyncConfig,
   TSyncMiddleware,
   TUpdateMiddleware,
+  TUserState,
 } from './core/Substate/interfaces';
 // The Substate class itself (for advanced usage)
 export { Substate } from './core/Substate/Substate';

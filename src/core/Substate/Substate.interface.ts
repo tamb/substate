@@ -1,39 +1,39 @@
 import type { IPubSub } from '../PubSub/PubSub.interface';
-import type { TState, TSyncConfig, TUpdateMiddleware } from './interfaces';
+import type { TSyncConfig, TUpdateMiddleware, TUserState } from './interfaces';
 
 interface ISyncInstance {
   unsync: () => void;
 }
-interface ISubstateConfig<TSubstateState extends TState = TState> {
+interface ISubstateConfig<TState extends TUserState = TUserState> {
   name?: string;
   afterUpdate?: TUpdateMiddleware[];
   beforeUpdate?: TUpdateMiddleware[];
   currentState?: number;
-  stateStorage?: TSubstateState[];
+  stateStorage?: TState[];
   defaultDeep?: boolean;
   maxHistorySize?: number;
-  state?: TSubstateState;
+  state?: TState;
 }
-interface ISubstate<TSubstateState extends TState = TState> extends IPubSub {
+interface ISubstate<TState extends TUserState = TUserState> extends IPubSub {
   name?: string;
   afterUpdate: TUpdateMiddleware[];
   beforeUpdate: TUpdateMiddleware[];
   currentState: number;
-  stateStorage: TSubstateState[];
+  stateStorage: TState[];
   defaultDeep: boolean;
   maxHistorySize: number;
-  taggedStates: Map<string, { stateIndex: number; state: TSubstateState }>;
+  taggedStates: Map<string, { stateIndex: number; state: TState }>;
   // methods
-  getState(index: number): TSubstateState;
-  getCurrentState(): TSubstateState;
+  getState(index: number): TState;
+  getCurrentState(): TState;
   getProp(prop: string): unknown;
   resetState(): void;
-  updateState(action: Partial<TSubstateState>): void;
+  updateState(action: Partial<TState>): void;
   sync(config: TSyncConfig): ISyncInstance;
   clearHistory(): void;
   limitHistory(maxSize: number): void;
   getMemoryUsage(): { stateCount: number; taggedCount: number; estimatedSizeKB: number | null };
-  getTaggedState(tag: string): TSubstateState | undefined;
+  getTaggedState(tag: string): TState | undefined;
   getAvailableTags(): string[];
   jumpToTag(tag: string): void;
   removeTag(tag: string): void;

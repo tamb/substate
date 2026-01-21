@@ -2,11 +2,11 @@ import React from 'react';
 import { describe, expect, test, beforeEach, vi } from 'vitest';
 import { render, act, renderHook } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { createStore, type TState } from '../../index';
+import { createStore, type TUserState } from '../../index';
 import { useSubstate } from './useSubstate';
 
 // Test state interfaces
-interface TestState extends TState {
+interface TestState extends TUserState {
   count: number;
   user: {
     name: string;
@@ -18,7 +18,7 @@ interface TestState extends TState {
   lastUpdated: number;
 }
 
-interface NestedState extends TState {
+interface NestedState extends TUserState {
   deep: {
     nested: {
       value: string;

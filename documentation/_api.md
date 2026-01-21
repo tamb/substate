@@ -1,3 +1,4 @@
+<a id="api-reference"></a>
 ## 📖 API Reference
 
 ### createStore(config)
@@ -12,7 +13,7 @@ function createStore(config: ICreateStoreConfig): ISubstate
 
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
-| `name` | `string` | ❌ | - | Unique identifier for the store |
+| `name` | `string` | ✅ | - | Unique identifier for the store |
 | `state` | `object` | ❌ | `{}` | Initial state object |
 | `defaultDeep` | `boolean` | ❌ | `false` | Enable deep cloning by default for all updates |
 | `beforeUpdate` | `UpdateMiddleware[]` | ❌ | `[]` | Functions called before each state update |
@@ -86,7 +87,7 @@ store.updateState({
 
 ---
 
-#### `batchUpdateState(actions: Array<Partial<TSubstateState> & IState>): void`
+#### `batchUpdateState(actions: Array<Partial<TState> & IState>): void`
 
 Updates multiple properties at once for better performance. This method is optimized for bulk operations and provides significant performance improvements over multiple individual `updateState()` calls.
 
