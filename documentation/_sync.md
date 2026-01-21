@@ -37,6 +37,7 @@ user.with({ $tag: 'profile-save', $type: 'USER_EDIT', $deep: true }).name = 'Tom
 user.with({ $tag: 'profile-save' }, (draft) => {
   draft.name = 'Tom';
 });
+```
 
 ### Primitive Sync (v11+): `.value`
 
@@ -72,30 +73,115 @@ state.user.name = 'Thomas';       // nested write
 
 `with()` applies **tags/metadata + scoped middleware** to the **next write** (one assignment) or to the single commit produced by the callback form.
 
-```typescript
-// Applies to this one write only
-store
-  .sync('user')
-  .with(
-    {
-      $tag: 'profile-save',
-      before: [(store, action) => {}],
-      after: [(store, action) => {}],
-    }
-  )
-  .name = 'Tom';
+#### Basic `with()` usage
 
-// Callback form: auto-batch and apply once at commit
+```typescript
+// Tag a single write
+store.sync('user').with({ $tag: 'profile-save' }).name = 'Tom';
+
+// Multiple attributes
+store.sync('user').with({
+  $tag: 'profile-save',
+  $type: 'USER_EDIT',
+  $deep: true
+}).name = 'Tom';
+```
+
+#### `with()` on primitives (using `.value`)
+
+```typescript
+const age = store.sync<number>('age');
+
+// Tag a primitive update
+age.with({ $tag: 'age-update' }).value = 30;
+
+// With validation middleware
+age.with({
+  $tag: 'age-update',
+  before: [
+    (store, action) => {
+      const newAge = action['age'] as number;
+      if (newAge < 0 || newAge > 150) {
+        throw new Error('Invalid age');
+      }
+    }
+  ]
+}).value = 25;
+```
+
+#### `with()` with middleware
+
+```typescript
+const user = store.sync('user');
+
+// Validation before update
+user.with({
+  before: [
+    (store, action) => {
+      const name = action['user.name'] as string;
+      if (!name || name.length < 2) {
+        throw new Error('Name must be at least 2 characters');
+      }
+    }
+  ],
+  after: [
+    (store, action) => {
+      console.log('User updated:', action);
+    }
+  ]
+}).name = 'Thomas';
+```
+
+#### `with()` callback form (auto-batch)
+
+```typescript
+// Multiple changes in one commit with attributes
 store.sync('user').with({ $tag: 'profile-save' }, (draft) => {
   draft.name = 'Tom';
   draft.settings.theme = 'dark';
+  draft.settings.notifications = true;
+});
+// All changes committed atomically with $tag: 'profile-save'
+```
+
+#### `with()` on root sync
+
+```typescript
+const state = store.sync();
+
+// Tag a root-level update
+state.with({ $tag: 'app-reset' }).user = { name: 'Guest' };
+
+// Or update multiple root fields
+state.with({ $tag: 'app-init' }, (draft) => {
+  draft.user = { name: 'Admin' };
+  draft.settings = { theme: 'dark' };
 });
 ```
 
 ### `batch()` + `with()` (v11+)
 
-- If you call `with(...)` and then do **one immediate assignment**, it applies to that assignment and is cleared.
-- If you call `batch()` and then `with(...)`, the attributes apply to the **commit** (the grouped update).
+When combining `batch()` and `with()`, the attributes apply to the **commit** (the grouped update), not individual writes.
+
+```typescript
+const user = store.sync('user');
+
+// Start batch, then apply attributes
+const batch = user.batch();
+batch.with({ $tag: 'profile-batch-update' });
+batch.name = 'Thomas';
+batch.settings.theme = 'dark';
+batch.commit(); // One updateState with $tag: 'profile-batch-update'
+
+// Or: attributes first, then batch
+user.with({ $tag: 'profile-batch-update' });
+const batch2 = user.batch();
+batch2.name = 'Thomas';
+batch2.settings.theme = 'dark';
+batch2.commit(); // Attributes still apply to the commit
+```
+
+**Important**: If you call `with(...)` and then do **one immediate assignment** (without batch), it applies to that single assignment and is cleared. If you use `batch()`, the attributes apply to the **commit**.
 
 ---
 
