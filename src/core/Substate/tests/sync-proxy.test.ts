@@ -138,4 +138,3 @@ describe('Substate sync() proxy (v11+)', () => {
     synced2.unsync();
   });
 });
-

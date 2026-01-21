@@ -1,5 +1,5 @@
-import type { ISubstate } from '../Substate.interface';
 import type { TUpdateMiddleware, TUserState } from '../interfaces';
+import type { ISubstate } from '../Substate.interface';
 
 export type TSubstateSyncProxy<TShape> = TShape & {
   /**
@@ -83,7 +83,11 @@ function buildActionPayload(
   return payload as Partial<TUserState>;
 }
 
-function runMiddleware(store: ISubstate, list: TUpdateMiddleware[], action: Partial<TUserState>): void {
+function runMiddleware(
+  store: ISubstate,
+  list: TUpdateMiddleware[],
+  action: Partial<TUserState>
+): void {
   for (let i = 0; i < list.length; i++) list[i](store, action);
 }
 
@@ -187,11 +191,16 @@ export function createSliceProxy<TShape = unknown>(
           if (internal.pending) {
             internal.pending[internal.rootPath] = copy;
           } else {
-            const action = buildActionPayload({ [internal.rootPath]: copy }, internal.pendingAttributes);
+            const action = buildActionPayload(
+              { [internal.rootPath]: copy },
+              internal.pendingAttributes
+            );
             runMiddleware(store, internal.scopedBefore, action);
-            if (internal.pendingAttributes?.before) runMiddleware(store, internal.pendingAttributes.before, action);
+            if (internal.pendingAttributes?.before)
+              runMiddleware(store, internal.pendingAttributes.before, action);
             store.updateState(action);
-            if (internal.pendingAttributes?.after) runMiddleware(store, internal.pendingAttributes.after, action);
+            if (internal.pendingAttributes?.after)
+              runMiddleware(store, internal.pendingAttributes.after, action);
             runMiddleware(store, internal.scopedAfter, action);
             internal.pendingAttributes = null;
           }
@@ -226,11 +235,13 @@ export function createSliceProxy<TShape = unknown>(
       const action = buildActionPayload({ [fullPath]: value }, internal.pendingAttributes);
 
       runMiddleware(store, internal.scopedBefore, action);
-      if (internal.pendingAttributes?.before) runMiddleware(store, internal.pendingAttributes.before, action);
+      if (internal.pendingAttributes?.before)
+        runMiddleware(store, internal.pendingAttributes.before, action);
 
       store.updateState(action);
 
-      if (internal.pendingAttributes?.after) runMiddleware(store, internal.pendingAttributes.after, action);
+      if (internal.pendingAttributes?.after)
+        runMiddleware(store, internal.pendingAttributes.after, action);
       runMiddleware(store, internal.scopedAfter, action);
 
       internal.pendingAttributes = null;
@@ -247,9 +258,11 @@ export function createSliceProxy<TShape = unknown>(
       }
       const action = buildActionPayload({ [fullPath]: undefined }, internal.pendingAttributes);
       runMiddleware(store, internal.scopedBefore, action);
-      if (internal.pendingAttributes?.before) runMiddleware(store, internal.pendingAttributes.before, action);
+      if (internal.pendingAttributes?.before)
+        runMiddleware(store, internal.pendingAttributes.before, action);
       store.updateState(action);
-      if (internal.pendingAttributes?.after) runMiddleware(store, internal.pendingAttributes.after, action);
+      if (internal.pendingAttributes?.after)
+        runMiddleware(store, internal.pendingAttributes.after, action);
       runMiddleware(store, internal.scopedAfter, action);
       internal.pendingAttributes = null;
       return true;
@@ -279,7 +292,9 @@ export function createSliceProxy<TShape = unknown>(
   };
 
   // Proxy target is an empty object; traps read from store snapshot
-  const proxy = new Proxy<Record<string, unknown>>({}, handler) as unknown as TSubstateSyncProxy<TShape>;
+  const proxy = new Proxy<Record<string, unknown>>(
+    {},
+    handler
+  ) as unknown as TSubstateSyncProxy<TShape>;
   return proxy;
 }
-

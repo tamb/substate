@@ -1,6 +1,6 @@
 import type { IPubSub } from '../PubSub/PubSub.interface';
-import type { TProxySyncConfig, TSyncConfig, TUpdateMiddleware, TUserState } from './interfaces';
 import type { TSubstateSyncProxy } from './helpers/createSliceProxy';
+import type { TProxySyncConfig, TSyncConfig, TUpdateMiddleware, TUserState } from './interfaces';
 
 interface ISyncInstance {
   unsync: () => void;
