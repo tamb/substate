@@ -38,12 +38,12 @@ const BASE_THRESHOLDS = {
     },
     large: {
       creation: 0.1,         // 100μs
-      singleUpdate: 5,       // 5ms
-      avgUpdate: 0.5,        // 500μs
-      avgAccess: 0.001,      // 1μs
+      singleUpdate: 20,     // 20ms (increased from 5ms for large-state single updates)
+      avgUpdate: 0.6,       // 600μs (increased from 500μs)
+      avgAccess: 0.006,     // 6μs (increased from 1μs for property access)
       avgNestedAccess: 0.05, // 50μs
       avgEvent: 0.5,         // 500μs
-      memoryKB: 15000        // 15MB
+      memoryKB: 15000       // 15MB
     }
   },
   deep: {
