@@ -18,7 +18,8 @@ import type {
 } from './interfaces';
 import type { ISubstate, ISubstateConfig, ISyncInstance } from './Substate.interface';
 
-const cloneDeep = rfdc();
+// proto: false, circles: false — faster clone; state is expected to be plain POJOs
+const cloneDeep = rfdc({ proto: false, circles: false });
 
 let hasWarnedSyncEventsDeprecation = false;
 
@@ -148,8 +149,9 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
       this.fireAfterMiddleware(action);
     }
 
-    // Event emission using already computed newState
-    this.emit(action.$type || EVENTS.STATE_UPDATED, newState);
+    // Event emission only when there are listeners (avoids unnecessary work)
+    const eventName = action.$type || EVENTS.STATE_UPDATED;
+    if (this.events[eventName]?.length) this.emit(eventName, newState);
   }
 
   /**
@@ -907,21 +909,16 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
     currentState: TState,
     keys: string[]
   ): void {
-    // Use provided currentState instead of array access for better performance
     const newState = { ...currentState } as TState;
-
-    // Fast property assignment for direct properties
-    // Use pre-computed keys to avoid Object.keys() call
     for (let i = 0; i < keys.length; i++) {
       const key = keys[i];
       if (key !== '$deep' && key !== '$type' && key !== '$tag') {
         (newState as Record<string, unknown>)[key] = (action as Record<string, unknown>)[key];
       }
     }
-
     (newState as TState).$type = EVENTS.UPDATE_STATE;
     this.pushState(newState);
-    this.emit(EVENTS.STATE_UPDATED, newState);
+    if (this.events[EVENTS.STATE_UPDATED]?.length) this.emit(EVENTS.STATE_UPDATED, newState);
   }
 
   /**
@@ -950,7 +947,7 @@ class Substate<TState extends TUserState = TUserState> extends PubSub implements
 
     (newState as TState).$type = EVENTS.UPDATE_STATE;
     this.pushState(newState);
-    this.emit(EVENTS.STATE_UPDATED, newState);
+    if (this.events[EVENTS.STATE_UPDATED]?.length) this.emit(EVENTS.STATE_UPDATED, newState);
   }
 
   private validateSyncFields(stateField: string): void {

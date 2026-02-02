@@ -120,6 +120,17 @@ describe('Substate state management', () => {
     expect((currentState.nested as Record<string, unknown>).double).toBe(NEWTEXT);
   });
 
+  test('updateState applies state when no listeners for STATE_UPDATED', () => {
+    const store = new Substate({
+      name: 'NoListenersStore',
+      state: { count: 0 },
+      defaultDeep: false,
+    });
+    expect(store.getCurrentState()).toMatchObject({ count: 0 });
+    store.updateState({ count: 1 });
+    expect(store.getCurrentState()).toMatchObject({ count: 1 });
+  });
+
   test('updateState fires middleware', () => {
     const NEWTEXT = 'foobar';
     A.updateState({ 'nested.double': NEWTEXT });

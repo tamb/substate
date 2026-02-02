@@ -39,11 +39,9 @@ class PubSub implements IPubSub {
 
   emit(eventName: string, data: object = {}) {
     const handlers = this.events[eventName];
-    if (handlers && handlers.length > 0) {
-      // Use for...of for better performance with modern engines
-      for (const handler of handlers) {
-        handler(data);
-      }
+    if (!handlers?.length) return;
+    for (const handler of handlers) {
+      handler(data);
     }
   }
 }

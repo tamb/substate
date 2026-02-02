@@ -52,6 +52,10 @@ test('Emitting SPEAK should call shout and not whisper', () => {
   expect(whisper.mock.calls.length).toBe(2);
 });
 
+test('emit with no listeners does not throw', () => {
+  expect(() => pub.emit('NO_LISTENERS')).not.toThrow();
+});
+
 test('emit without data contains empty object', () => {
   const mockFn = vi.fn((obj) => obj);
   pub.on('HELLO', mockFn);
