@@ -4,10 +4,17 @@
   "description": "Performance comparison benchmarks for Substate vs other state management libraries",
   "type": "module",
   "scripts": {
-    "report": "node benchmark-start.mjs"
+    "report": "node benchmark-start.mjs",
+    "benchmark:substate": "node benchmark-substate.mjs",
+    "benchmark:redux": "node benchmark-redux.mjs",
+    "benchmark:zustand": "node benchmark-zustand.mjs",
+    "benchmark:mobx": "node benchmark-mobx.mjs",
+    "benchmark:native": "node benchmark-native.mjs",
+    "benchmark:all": "node benchmark-start.mjs"
   },
   "dependencies": {
     "clone-deep": "^4.0.1",
+    "mobx": "^6.13.0",
     "redux": "^4.2.1",
     "zustand": "^4.4.1"
   },

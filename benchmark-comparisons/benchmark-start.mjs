@@ -27,8 +27,9 @@ console.log(`📁 Output directory: ${runDir}\n`);
 // List of benchmarks to run
 const benchmarks = [
   'benchmark-substate.mjs',
-  'benchmark-redux.mjs', 
+  'benchmark-redux.mjs',
   'benchmark-zustand.mjs',
+  'benchmark-mobx.mjs',
   'benchmark-native.mjs'
 ];
 

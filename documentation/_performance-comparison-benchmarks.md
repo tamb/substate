@@ -6,7 +6,8 @@ Substate includes comprehensive performance benchmarks comparing it with other p
 
 - **Substate** - Our lightweight state management library
 - **Redux** - Industry standard state management
-- **Zustand** - Modern lightweight alternative  
+- **Zustand** - Modern lightweight alternative
+- **MobX** - Reactive state with observable/action pattern
 - **Native JavaScript Objects** - Baseline performance
 
 ### 🎯 Measured Metrics
@@ -31,6 +32,7 @@ cd benchmark-comparisons
 npm run benchmark:substate
 npm run benchmark:redux
 npm run benchmark:zustand
+npm run benchmark:mobx
 npm run benchmark:native
 ```
 
@@ -43,6 +45,7 @@ Here's a sample comparison from our benchmark suite:
 | **Native JS** | 47.90ns | **75.19ns** | **525.13ns** | **1KB** |
 | **Redux** | **47.76ns** | 78.20ns | 2.23μs | 61KB |
 | **Zustand** | 48.07ns | 78.62ns | 3.29μs | 61KB |
+| **MobX** | *(see latest report)* | *(see latest report)* | *(see latest report)* | *(see latest report)* |
 | **Substate** | 61.42ns | 285.69ns | 5.45μs | 7KB |
 
 ### 🔬 Benchmark Methodology
@@ -93,6 +96,7 @@ The report generator creates multiple output formats:
 - **Native JavaScript**: Fastest raw performance, no overhead
 - **Substate**: Optimized for reactive state with minimal overhead (~5x slower than native)
 - **Zustand**: Good balance of features and performance
+- **MobX**: Reactive observable/action pattern with fine-grained updates
 - **Redux**: More overhead due to action/reducer pattern
 
 ### 📊 Use Case Recommendations
@@ -100,6 +104,7 @@ The report generator creates multiple output formats:
 - **High-frequency updates**: Consider Native JS or Substate
 - **Complex state logic**: Redux provides predictable patterns
 - **Simple state management**: Zustand offers good balance
+- **Reactive observable pattern**: MobX provides fine-grained reactivity
 - **Reactive features needed**: Substate provides built-in Pub/Sub
 
 > **💡 Note**: Performance varies by use case. Choose based on your specific requirements, not just raw speed. The comparison benchmarks help you make informed decisions based on real data.

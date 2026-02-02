@@ -64,7 +64,7 @@
     "refresh": "npm ci && npm run integration:setup",
     "fix": "biome check --write src/ && biome format --write src/ && biome lint --write src/",
     "pre": "npm run test && npm run build && npm publish --tag next",
-    "prod:safe-publish": "npm run build && npm run test:all && npm run build && npm run docs && npm publish",
+    "prod:safe-publish": "npm run build && npm run test:all && npm run build && npm run docs && npm publish --tag latest",
     "alpha:safe-publish": "npm run build && npm run test:all && npm run build && npm run docs && npm publish --tag alpha",
     "beta:safe-publish": "npm run build && npm run test:all && npm run build && npm run docs && npm publish --tag beta"
   },

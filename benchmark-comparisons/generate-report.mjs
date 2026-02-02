@@ -393,7 +393,8 @@ function generateMarkdownTables(results) {
   markdown += `- **Native JavaScript**: Baseline performance for direct object operations\n`;
   markdown += `- **Substate**: Optimized for reactive state management with built-in features\n`;
   markdown += `- **Redux**: Mature ecosystem with predictable state updates\n`;
-  markdown += `- **Zustand**: Lightweight alternative with minimal boilerplate\n\n`;
+  markdown += `- **Zustand**: Lightweight alternative with minimal boilerplate\n`;
+  markdown += `- **MobX**: Reactive state with observable/action pattern\n\n`;
   
   markdown += `> **💡 Note**: Performance varies by use case. Choose based on your specific requirements, not just raw speed.\n`;
   markdown += `> **📊 Data**: Results are averaged over ${NUM_RUNS} runs with statistical analysis.\n`;
@@ -658,6 +659,7 @@ function generateComparisonTable(results) {
   console.log('- **Substate**: Optimized for reactive state management with built-in features');
   console.log('- **Redux**: Mature ecosystem with predictable state updates');
   console.log('- **Zustand**: Lightweight alternative with minimal boilerplate');
+  console.log('- **MobX**: Reactive state with observable/action pattern');
   console.log();
   
   console.log('> **💡 Note**: Performance varies by use case. Choose based on your specific requirements, not just raw speed.');

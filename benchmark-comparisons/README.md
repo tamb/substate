@@ -8,6 +8,7 @@ The benchmarks provide **scientifically accurate** performance comparisons betwe
 - **Substate** - Our lightweight state management library
 - **Redux** - Industry standard state management
 - **Zustand** - Modern lightweight alternative
+- **MobX** - Reactive state with observable/action pattern
 - **Native JavaScript Objects** - Baseline performance
 
 ## 📊 What We Measure
@@ -107,6 +108,12 @@ All libraries are tested with:
 - Tests `getState()` property access
 - Estimates memory usage
 
+### MobX (`benchmark-mobx.mjs`)
+- Tests `makeAutoObservable()` store creation
+- Measures `updateProp()` / `batchUpdate()` action performance
+- Tests direct observable property access
+- Estimates memory usage
+
 ### Native JavaScript (`benchmark-native.mjs`)
 - Tests direct object spread operations
 - Measures immutable update patterns
@@ -119,12 +126,14 @@ All libraries are tested with:
 - **Native JavaScript**: Fastest raw performance, no overhead
 - **Substate**: Optimized for reactive state with minimal overhead
 - **Zustand**: Good balance of features and performance
+- **MobX**: Reactive observable/action pattern with fine-grained updates
 - **Redux**: More overhead due to action/reducer pattern
 
 ### Use Case Recommendations
 - **High-frequency updates**: Consider Native JS or Substate
 - **Complex state logic**: Redux provides predictable patterns
 - **Simple state management**: Zustand offers good balance
+- **Reactive observable pattern**: MobX provides fine-grained reactivity
 - **Reactive features needed**: Substate provides built-in Pub/Sub
 
 ## 🔧 Customization
