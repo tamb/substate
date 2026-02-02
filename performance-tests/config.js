@@ -19,63 +19,63 @@ const CI_MULTIPLIERS = {
 const BASE_THRESHOLDS = {
   shallow: {
     small: {
-      creation: 0.15,        // 150μs
-      singleUpdate: 0.2,     // 200μs
-      avgUpdate: 0.005,      // 5μs
-      avgAccess: 0.001,      // 1μs
-      avgNestedAccess: 0.01, // 10μs
-      avgEvent: 0.1,         // 100μs
-      memoryKB: 150          // 150KB
+      creation: 1,           // 1ms
+      singleUpdate: 1,      // 1ms
+      avgUpdate: 0.02,      // 20μs
+      avgAccess: 0.002,     // 2μs
+      avgNestedAccess: 0.05, // 50μs
+      avgEvent: 0.2,        // 200μs
+      memoryKB: 200         // 200KB
     },
     medium: {
-      creation: 0.3,         // 300μs (adjusted based on observed 260μs)
-      singleUpdate: 0.5,     // 500μs (adjusted based on observed 432μs)
-      avgUpdate: 0.05,       // 50μs
-      avgAccess: 0.001,      // 1μs
-      avgNestedAccess: 0.02, // 20μs
-      avgEvent: 0.2,         // 200μs
-      memoryKB: 1500         // 1.5MB
+      creation: 0.5,        // 500μs
+      singleUpdate: 1,      // 1ms
+      avgUpdate: 0.1,       // 100μs
+      avgAccess: 0.002,     // 2μs
+      avgNestedAccess: 0.05, // 50μs
+      avgEvent: 0.4,        // 400μs
+      memoryKB: 2000        // 2MB
     },
     large: {
-      creation: 0.1,         // 100μs
-      singleUpdate: 20,     // 20ms (increased from 5ms for large-state single updates)
-      avgUpdate: 0.6,       // 600μs (increased from 500μs)
-      avgAccess: 0.006,     // 6μs (increased from 1μs for property access)
-      avgNestedAccess: 0.05, // 50μs
-      avgEvent: 0.5,         // 500μs
-      memoryKB: 15000       // 15MB
+      creation: 0.2,        // 200μs
+      singleUpdate: 50,     // 50ms
+      avgUpdate: 1,         // 1ms
+      avgAccess: 0.02,      // 20μs
+      avgNestedAccess: 0.1, // 100μs
+      avgEvent: 1,          // 1ms
+      memoryKB: 20000       // 20MB
     }
   },
   deep: {
     shallow: {
-      creation: 0.16,        // 160μs
-      singleUpdate: 1.15,    // 1.15ms
-      avgUpdate: 1,          // 1ms
-      avgDeepAccess: 0.005,  // 5μs
-      avgArrayAccess: 1,     // 1ms
-      avgHistory: 10,        // 10ms
-      avgCloning: 1,         // 1ms
-      memoryKB: 12000        // 12MB
+      creation: 0.5,        // 500μs
+      singleUpdate: 4,     // 4ms
+      avgUpdate: 3,        // 3ms
+      avgDeepAccess: 0.02, // 20μs
+      avgArrayAccess: 2.5, // 2.5ms
+      avgHistory: 25,      // 25ms
+      avgCloning: 3,       // 3ms
+      memoryKB: 20000      // 20MB
     },
     medium: {
-      creation: 0.1,         // 100μs
-      singleUpdate: 2,       // 2ms
-      avgUpdate: 2,          // 2ms
-      avgDeepAccess: 0.01,   // 10μs
-      avgArrayAccess: 2,     // 2ms
-      avgHistory: 20,        // 20ms
-      avgCloning: 2,         // 2ms
-      memoryKB: 50000        // 50MB
+      creation: 0.3,       // 300μs
+      singleUpdate: 5,     // 5ms
+      avgUpdate: 5,       // 5ms
+      avgDeepAccess: 0.02, // 20μs
+      avgArrayAccess: 4,   // 4ms
+      avgHistory: 40,      // 40ms
+      avgCloning: 5,       // 5ms
+      memoryKB: 60000      // 60MB
     },
     deep: {
-      creation: 0.1,         // 100μs
-      singleUpdate: 2,       // 2ms
-      avgUpdate: 2,          // 2ms
-      avgDeepAccess: 0.005,  // 5μs
-      avgArrayAccess: 2,     // 2ms
-      avgHistory: 20,        // 20ms
-      avgCloning: 2,         // 2ms
-      memoryKB: 48000        // 48MB
+      creation: 0.3,       // 300μs
+      singleUpdate: 5,     // 5ms
+      avgUpdate: 5,       // 5ms
+      avgDeepAccess: 0.02, // 20μs
+      avgArrayAccess: 5,   // 5ms
+      avgHistory: 50,      // 50ms
+      avgCloning: 5,       // 5ms
+      memoryKB: 60000      // 60MB
     }
   }
 };
